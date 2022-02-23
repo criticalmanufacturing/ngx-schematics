@@ -1,0 +1,32 @@
+{
+  "name": "@criticalmanufacturing/ng-generator-html",
+  "version": "0.0.0",
+  "description": "A blank schematics",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && jasmine src/**/*_spec.js",
+    "debug": "node --inspect --inspect-brk ./node_modules/@angular/cli/bin/ng add @criticalmanufacturing/ng-generator-html"
+  },
+  "keywords": [
+    "schematics"
+  ],
+  "author": "",
+  "license": "MIT",
+  "schematics": "./src/collection.json",
+  "dependencies": {
+    "@angular-devkit/core": "^13.2.4",
+    "@angular-devkit/schematics": "^13.2.4",
+    "@angular/localize": "^13.2.3",
+    "@angular/pwa": "^13.2.4",
+    "@schematics/angular": "^13.2.4",
+    "parse5-html-rewriting-stream": "^6.0.1",
+    "typescript": "~4.5.2"
+  },
+  "devDependencies": {
+    "@angular-devkit/schematics-cli": "^13.2.4",
+    "@types/jasmine": "~3.10.0",
+    "@types/node": "^12.11.1",
+    "@types/parse5-html-rewriting-stream": "^5.1.2",
+    "jasmine": "^4.0.0"
+  }
+}

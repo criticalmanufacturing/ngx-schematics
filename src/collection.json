@@ -1,0 +1,17 @@
+{
+  "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "ng-add": {
+      "description": "Update an application with HTML defaults.",
+      "factory": "./ng-generator-html/ng-add/index",
+      "schema": "./ng-generator-html/ng-add/schema.json",
+      "save": "devDependencies",
+      "private": true,
+      "hidden": true
+    },
+    "ng-generator-html": {
+      "description": "A blank schematic.",
+      "factory": "./ng-generator-html/index#htmlGenerator"
+    }
+  }
+}

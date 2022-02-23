@@ -1,0 +1,31 @@
+{
+  "host": {
+    "rest": {
+      "enableSsl": false,
+      "address": "",
+      "port": 0,
+      "timeout": 120000
+    },
+    "tenant": {
+      "name": ""
+    },
+    "loadBalancer": {
+      "enableSsl": false,
+      "address": "",
+      "port": 0,
+      "timeout": 120000
+    },
+    "isLoadBalancerEnabled": false,
+    "useExternalAuthentication": false
+  },
+  "general": {
+    "supportedCultures": <%= supportedCultures %>,
+    "supportedThemes": <%= supportedThemes %>,
+    "defaultDomain": "",
+    "startup": {
+      "startupCulture": "<%= startupCulture %>",
+      "startupTheme": "<%= startupTheme %>"
+    }
+  },
+  "version": "0.0.1"
+}
