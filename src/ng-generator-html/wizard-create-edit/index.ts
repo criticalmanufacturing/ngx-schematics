@@ -20,7 +20,7 @@ function updateSpaces(spacesToUse: number) {
   return (strings: TemplateStringsArray, ...substitutions: any[]) => {
     return String.raw(strings, ...substitutions).replace(/^([ \t]+)/gm, (_, match: string) => {
       const spaces = match.split('').reduce((res, char) => res += char === ' ' ? 1 : 2, 0)
-      return `${' '.repeat(spaces / 2 * spacesToUse)}`;
+      return `${' '.repeat(Math.floor(spaces / 2) * spacesToUse)}`;
     });
   };
 }
