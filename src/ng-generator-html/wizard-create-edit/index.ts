@@ -1,4 +1,4 @@
-import { dirname, extname, join, normalize, relative, strings } from "@angular-devkit/core";
+import { dirname, extname, join, normalize, Path, relative, strings } from "@angular-devkit/core";
 import { apply, applyTemplates, chain, mergeWith, move, Rule, SchematicContext, SchematicsException, Tree, url } from "@angular-devkit/schematics";
 import { buildDefaultPath, getWorkspace } from "@schematics/angular/utility/workspace";
 import { parseName } from '@schematics/angular/utility/parse-name';
@@ -23,6 +23,16 @@ function updateSpaces(spacesToUse: number) {
       return `${' '.repeat(Math.floor(spaces / 2) * spacesToUse)}`;
     });
   };
+}
+
+function buildRelativePath(from: Path, to: Path) {
+  let relativePath: string = relative(from, to);
+
+  if (!relativePath.startsWith('.')) {
+    relativePath = `./` + relativePath;
+  }
+
+  return relativePath;
 }
 
 export function insertExport(
@@ -68,7 +78,7 @@ function updatePublicAPI(project: ProjectDefinition, entityType: string): Rule {
         const entryDir = join(tree.root.path, dirname(join(normalize(project.root), entryFile)));
         const filesToImport = tree.actions
           .filter(action => action.kind === "c" && extname(action.path) === '.ts')
-          .map((action) => ({ relativePath: relative(entryDir, action.path), path: action.path }));
+          .map((action) => ({ relativePath: buildRelativePath(entryDir, action.path), path: action.path }));
 
         const content = tree.get(join(normalize(project.root), entryFile))!.content.toString('utf-8');
         const source = ts.createSourceFile(join(normalize(project.root), entryFile), content, ts.ScriptTarget.Latest, true);
