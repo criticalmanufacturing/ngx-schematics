@@ -7,7 +7,7 @@ import { JSONFile } from "@schematics/angular/utility/json-file";
 import { ProjectDefinition } from "@angular-devkit/core/src/workspace";
 import { applyToUpdateRecorder, Change, InsertChange } from "@schematics/angular/utility/change";
 import * as ts from "typescript";
-import { findNode, findNodes, getSourceNodes, insertAfterLastOccurrence } from "@schematics/angular/utility/ast-utils";
+import { findNode, findNodes, getSourceNodes, insertAfterLastOccurrence, insertImport } from "@schematics/angular/utility/ast-utils";
 import { indentBy } from "@angular-devkit/core/src/utils/literals";
 
 const STRING_NAMEIFY_REGEXP_1 = /([a-z\d])([A-Z]+)/g;
@@ -163,14 +163,11 @@ ${indentBy(6)`${actionEditToInsert}`}
   }`;
 
     const fallbackPos = findNodes(contentNode, ts.SyntaxKind.Constructor, 1)[0]?.getEnd() ?? contentNode.getStart();
-
-    return insertAfterLastOccurrence(
-      allAccessors,
-      toInsert,
-      fileName,
-      fallbackPos,
-      ts.SyntaxKind.GetAccessor
-    );
+    return [
+      insertImport(source, fileName, 'ActionMode', 'cmf-core'),
+      insertImport(source, fileName, 'Action', 'cmf-core'),
+      insertAfterLastOccurrence(allAccessors, toInsert, fileName, fallbackPos, ts.SyntaxKind.GetAccessor)
+    ];
   }
 
   const returnStatement = findNodes(actions, ts.SyntaxKind.ReturnStatement, 1, true)[0];
@@ -181,9 +178,12 @@ ${indentBy(6)`${actionEditToInsert}`}
 
   const toInsert = updateSpaces(spaces)`${lastChild && lastChild.kind !== ts.SyntaxKind.CommaToken ? ',' : ''}
 ${indentBy(6)`${actionCreateToInsert}`},
-${indentBy(6)`${actionEditToInsert}`}${lastChild ? '' : `\n    ` }`;
+${indentBy(6)`${actionEditToInsert}`}${lastChild ? '' : `\n    `}`;
 
-  return new InsertChange(fileName, lastChild?.getEnd() ?? array.getEnd() - 1, toInsert);
+  return [
+    insertImport(source, fileName, 'ActionMode', 'cmf-core'),
+    new InsertChange(fileName, lastChild?.getEnd() ?? array.getEnd() - 1, toInsert)
+  ];
 }
 
 function updateMetadata(project: ProjectDefinition, projectName: string, entityType: string): Rule {
@@ -219,7 +219,7 @@ function updateMetadata(project: ProjectDefinition, projectName: string, entityT
     }
 
     const recorder = tree.beginUpdate(metadataPath);
-    applyToUpdateRecorder(recorder, [insertActionMetadata(metadataContent, metadataPath, projectName, entityType)]);
+    applyToUpdateRecorder(recorder, insertActionMetadata(metadataContent, metadataPath, projectName, entityType));
     tree.commitUpdate(recorder);
   };
 }
