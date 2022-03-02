@@ -9,9 +9,10 @@
       "private": true,
       "hidden": true
     },
-    "ng-generator-html": {
+    "wizard-create-edit": {
       "description": "A blank schematic.",
-      "factory": "./ng-generator-html/index#htmlGenerator"
+      "factory": "./ng-generator-html/wizard-create-edit",
+      "schema": "./ng-generator-html/wizard-create-edit/schema.json"
     }
   }
 }

@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "SchematicsWizardCreateEdit",
+  "title": "HTML Starter Options Schema",
+  "type": "object",
+  "properties": {
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path at which to create the component file, relative to the current workspace. Default is a folder with the same name as the component in the project root.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the entity type.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What is the name of the entity to create/edit?"
+    },
+    "namespace": {
+      "type": "string",
+      "description": "The namespace of the entity type."
+    },
+    "style": {
+      "description": "The file extension or preprocessor to use for style files, or 'none' to skip generating the style file.",
+      "type": "string",
+      "default": "less",
+      "enum": [
+        "css",
+        "scss",
+        "sass",
+        "less",
+        "none"
+      ]
+    }
+  },
+  "required": []
+}

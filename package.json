@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && jasmine src/**/*_spec.js",
-    "debug": "node --inspect --inspect-brk ./node_modules/@angular/cli/bin/ng add @criticalmanufacturing/ng-generator-html"
+    "debug": "node --inspect --inspect-brk ./node_modules/@angular/cli/bin/ng generate @criticalmanufacturing/ng-generator-html:wizard-create-edit"
   },
   "keywords": [
     "schematics"
@@ -19,11 +19,13 @@
     "@angular/localize": "^13.2.3",
     "@angular/pwa": "^13.2.4",
     "@schematics/angular": "^13.2.4",
+    "inquirer": "^8.2.0",
     "parse5-html-rewriting-stream": "^6.0.1",
     "typescript": "~4.5.2"
   },
   "devDependencies": {
     "@angular-devkit/schematics-cli": "^13.2.4",
+    "@types/inquirer": "^8.2.0",
     "@types/jasmine": "~3.10.0",
     "@types/node": "^12.11.1",
     "@types/parse5-html-rewriting-stream": "^5.1.2",
