@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "SchematicsWizardCreateEdit",
-  "title": "HTML Starter Options Schema",
+  "title": "Wizard Create Edit Options Schema",
   "type": "object",
   "properties": {
     "path": {
