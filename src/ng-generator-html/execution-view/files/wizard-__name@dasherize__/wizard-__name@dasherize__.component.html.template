@@ -4,6 +4,6 @@
 
     <!-- Executuon View steps -->
     <cmf-core-controls-execution-view-tab i18n-mainTitle="@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#DETAILS" mainTitle="Details">
-      Tab 1
+      <p><%= nameify(name) %> Wizard works!</p>
     </cmf-core-controls-execution-view-tab>
 </cmf-core-controls-execution-view>

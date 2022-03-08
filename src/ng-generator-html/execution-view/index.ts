@@ -1,40 +1,14 @@
-import { dirname, extname, join, normalize, strings } from "@angular-devkit/core";
-import { ProjectDefinition } from "@angular-devkit/core/src/workspace";
-import { apply, applyTemplates, chain, mergeWith, move, Rule, SchematicContext, SchematicsException, Tree, url } from "@angular-devkit/schematics";
-import { applyToUpdateRecorder } from "@schematics/angular/utility/change";
-import { JSONFile } from "@schematics/angular/utility/json-file";
-import { parseName } from "@schematics/angular/utility/parse-name";
-import { buildDefaultPath, getWorkspace } from "@schematics/angular/utility/workspace";
+import { join, normalize, strings } from '@angular-devkit/core';
+import { ProjectDefinition } from '@angular-devkit/core/src/workspace';
+import { apply, applyTemplates, chain, mergeWith, move, Rule, SchematicContext, SchematicsException, Tree, url } from '@angular-devkit/schematics';
+import { applyToUpdateRecorder } from '@schematics/angular/utility/change';
+import { JSONFile } from '@schematics/angular/utility/json-file';
+import { parseName } from '@schematics/angular/utility/parse-name';
+import { buildDefaultPath, getWorkspace } from '@schematics/angular/utility/workspace';
 import * as inquirer from 'inquirer';
-import ts = require("typescript");
-import { insertExport } from "../utility/ast-uil";
-import { findMetadataFile, insertMetadata } from "../utility/metadata-util";
-import { buildRelativePath, nameify } from "../utility/string-util";
-
-function updatePublicAPI(project: ProjectDefinition, action: string): Rule {
-  return async (tree: Tree) => {
-    if (tree.exists(join(normalize(project.root), 'ng-package.json'))) {
-      const json = new JSONFile(tree, join(normalize(project.root), 'ng-package.json'));
-      const entryFile = json.get(['lib', 'entryFile']) as string | null;
-
-      if (entryFile) {
-        const entryDir = join(tree.root.path, dirname(join(normalize(project.root), entryFile)));
-        const filesToExport = tree.actions
-          .filter(action => action.kind === "c" && extname(action.path) === '.ts')
-          .map((action) => ({ relativePath: buildRelativePath(entryDir, action.path), path: action.path }));
-
-        const content = tree.get(join(normalize(project.root), entryFile))!.content.toString('utf-8');
-        const source = ts.createSourceFile(join(normalize(project.root), entryFile), content, ts.ScriptTarget.Latest, true);
-
-        const recorder = tree.beginUpdate(join(normalize(project.root), entryFile));
-        const changes = filesToExport.map((file) =>
-          insertExport(source, file.path, '*', file.relativePath.replace(extname(file.path), ''), `Wizard ${nameify(action)}`, true));
-        applyToUpdateRecorder(recorder, changes);
-        tree.commitUpdate(recorder);
-      }
-    }
-  }
-}
+import { findMetadataFile, insertMetadata } from '../utility/metadata-util';
+import { updatePublicAPI } from '../utility/schematics';
+import { nameify } from '../utility/string-util';
 
 function updateMetadata(project: ProjectDefinition, projectName: string, actionName: string, entityType: string,): Rule {
   return async (tree: Tree) => {
@@ -95,7 +69,7 @@ export default function (_options: any): Rule {
   return async (tree: Tree, _context: SchematicContext) => {
     if (!_options.namespace) {
       const question: inquirer.ListQuestion = {
-        type: "list",
+        type: 'list',
         name: 'namespace',
         message: 'What is the business objects namespace of the entity type?',
         choices: ['Foundation', 'Navigo', 'Other (specify)']
@@ -105,7 +79,7 @@ export default function (_options: any): Rule {
 
       if ((_options.namespace as string).startsWith('Other')) {
         const question: inquirer.InputQuestion = {
-          type: "input",
+          type: 'input',
           name: 'namespace',
           message: 'Namespace'
         };
@@ -145,7 +119,7 @@ export default function (_options: any): Rule {
 
     return chain([
       mergeWith(templateSource),
-      updatePublicAPI(project, _options.name),
+      updatePublicAPI(project, `Wizard ${nameify(_options.name)}`),
       updateMetadata(project, _options.project, _options.name, _options.entityType)
     ]);
   }

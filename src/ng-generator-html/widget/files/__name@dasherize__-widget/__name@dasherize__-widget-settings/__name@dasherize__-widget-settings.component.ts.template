@@ -1,0 +1,65 @@
+import {
+  Component,
+  NgModule,
+  ViewContainerRef
+} from '@angular/core';
+
+import {
+  CustomizableComponent
+} from 'cmf-core';
+
+import {
+  WidgetSettingsModule
+} from 'cmf-core-dashboards';
+
+/**
+ * @whatItDoes
+ *
+ * Please provide a meaningful description of this Widget Settings and what it is needed for.
+ * Also describe all the properties that are configurable in the correspondent Widget
+ *
+ * ### Widget Configurable Properties
+ * * `string` : **name** _(default)_ - The name of the widget
+ * * `string` : **description** _(default)_ - The description of the widget
+ * * `string` : **iconClass** _(default)_ - The icon CSS class to change the widget icon
+ *
+ * @description
+ *
+ * ## <%= classify(name) %> Widget Settings Component
+ *
+ * ### Dependencies
+ *
+ * #### Components
+ * * ComponentA : `package`
+ * * ComponentB : `package`
+ *
+ * #### Services
+ * * ServiceA : `package`
+ * * ServiceB : `package`
+ *
+ * #### Directives
+ * * DirectiveA : `package`
+ * * DirectiveB : `package`
+ *
+ */
+@Component({
+  selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget-settings',
+  templateUrl: './<%= dasherize(name) %>-widget-settings.component.html',
+  styleUrls: ['./<%= dasherize(name) %>-widget-settings.component.less']
+})
+export class <%= classify(name) %>WidgetSettingsComponent extends CustomizableComponent {
+
+  /**
+   * Constructor
+   */
+  constructor(viewContainerRef: ViewContainerRef) {
+    super(viewContainerRef);
+  }
+}
+
+@NgModule({
+  imports: [WidgetSettingsModule],
+  declarations: [<%= classify(name) %>WidgetSettingsComponent],
+  exports: [<%= classify(name) %>WidgetSettingsComponent]
+})
+export class <%= classify(name) %>WidgetSettingsModule { }

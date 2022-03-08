@@ -1,0 +1,1 @@
+<p><%= nameify(name) %> Widget works!</p>

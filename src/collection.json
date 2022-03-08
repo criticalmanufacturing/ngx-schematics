@@ -14,6 +14,11 @@
       "factory": "./ng-generator-html/execution-view",
       "schema": "./ng-generator-html/execution-view/schema.json"
     },
+    "widget": {
+      "description": "Generate a new widget.",
+      "factory": "./ng-generator-html/widget",
+      "schema": "./ng-generator-html/widget/schema.json"
+    },
     "wizard": {
       "description": "Generate a new wizard.",
       "factory": "./ng-generator-html/wizard",

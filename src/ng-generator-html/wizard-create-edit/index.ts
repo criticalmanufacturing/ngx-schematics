@@ -1,41 +1,14 @@
-import { dirname, extname, join, normalize, strings } from "@angular-devkit/core";
-import { apply, applyTemplates, chain, mergeWith, move, Rule, SchematicContext, SchematicsException, Tree, url } from "@angular-devkit/schematics";
-import { buildDefaultPath, getWorkspace } from "@schematics/angular/utility/workspace";
+import { join, normalize, strings } from '@angular-devkit/core';
+import { apply, applyTemplates, chain, mergeWith, move, Rule, SchematicContext, SchematicsException, Tree, url } from '@angular-devkit/schematics';
+import { buildDefaultPath, getWorkspace } from '@schematics/angular/utility/workspace';
 import { parseName } from '@schematics/angular/utility/parse-name';
 import * as inquirer from 'inquirer';
-import { JSONFile } from "@schematics/angular/utility/json-file";
-import { ProjectDefinition } from "@angular-devkit/core/src/workspace";
-import { applyToUpdateRecorder } from "@schematics/angular/utility/change";
-import * as ts from "typescript";
-import { insertExport } from "../utility/ast-uil";
-import { buildRelativePath, nameify } from "../utility/string-util";
-import { findMetadataFile, insertMetadata } from "../utility/metadata-util";
-
-
-function updatePublicAPI(project: ProjectDefinition, entityType: string): Rule {
-  return async (tree: Tree) => {
-    if (tree.exists(join(normalize(project.root), 'ng-package.json'))) {
-      const json = new JSONFile(tree, join(normalize(project.root), 'ng-package.json'));
-      const entryFile = json.get(['lib', 'entryFile']) as string | null;
-
-      if (entryFile) {
-        const entryDir = join(tree.root.path, dirname(join(normalize(project.root), entryFile)));
-        const filesToImport = tree.actions
-          .filter(action => action.kind === "c" && extname(action.path) === '.ts')
-          .map((action) => ({ relativePath: buildRelativePath(entryDir, action.path), path: action.path }));
-
-        const content = tree.get(join(normalize(project.root), entryFile))!.content.toString('utf-8');
-        const source = ts.createSourceFile(join(normalize(project.root), entryFile), content, ts.ScriptTarget.Latest, true);
-
-        const recorder = tree.beginUpdate(join(normalize(project.root), entryFile));
-        const changes = filesToImport.map((file) =>
-          insertExport(source, file.path, '*', file.relativePath.replace(extname(file.path), ''), `Wizard Create Edit ${nameify(entityType)}`, true));
-        applyToUpdateRecorder(recorder, changes);
-        tree.commitUpdate(recorder);
-      }
-    }
-  }
-}
+import { JSONFile } from '@schematics/angular/utility/json-file';
+import { ProjectDefinition } from '@angular-devkit/core/src/workspace';
+import { applyToUpdateRecorder } from '@schematics/angular/utility/change';
+import { nameify } from '../utility/string-util';
+import { findMetadataFile, insertMetadata } from '../utility/metadata-util';
+import { updatePublicAPI } from '../utility/schematics';
 
 function insertActionMetadata(content: string, fileName: string, projectName: string, entityName: string) {
   const actionsToInsert = `\
@@ -115,7 +88,7 @@ export default function (_options: any): Rule {
   return async (tree: Tree, _context: SchematicContext) => {
     if (!_options.namespace) {
       const question: inquirer.ListQuestion = {
-        type: "list",
+        type: 'list',
         name: 'namespace',
         message: 'What is the business objects namespace of the entity type?',
         choices: ['Foundation', 'Navigo', 'Other (specify)']
@@ -125,7 +98,7 @@ export default function (_options: any): Rule {
 
       if ((_options.namespace as string).startsWith('Other')) {
         const question: inquirer.InputQuestion = {
-          type: "input",
+          type: 'input',
           name: 'namespace',
           message: 'Namespace'
         };
@@ -165,7 +138,7 @@ export default function (_options: any): Rule {
 
     return chain([
       mergeWith(templateSource),
-      updatePublicAPI(project, _options.name),
+      updatePublicAPI(project, `Wizard Create Edit ${nameify(_options.name)}`),
       updateMetadata(project, _options.project, _options.name)
     ]);
   }

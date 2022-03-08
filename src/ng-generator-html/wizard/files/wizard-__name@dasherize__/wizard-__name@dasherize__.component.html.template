@@ -4,6 +4,6 @@
 
   <!-- Wizard steps -->
   <cmf-core-controls-wizard-step i18n-mainTitle="@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#DETAILS" mainTitle="Details">
-    Step 1
+    <p>Wizard <%= nameify(name) %> works!</p>
   </cmf-core-controls-wizard-step>
 </cmf-core-controls-wizard>
