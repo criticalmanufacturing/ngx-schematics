@@ -9,6 +9,11 @@
       "private": true,
       "hidden": true
     },
+    "execution-view": {
+      "description": "Generate a new execution view.",
+      "factory": "./ng-generator-html/execution-view",
+      "schema": "./ng-generator-html/execution-view/schema.json"
+    },
     "wizard": {
       "description": "Generate a new wizard.",
       "factory": "./ng-generator-html/wizard",

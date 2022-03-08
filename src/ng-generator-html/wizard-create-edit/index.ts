@@ -53,8 +53,8 @@ function insertActionMetadata(content: string, fileName: string, projectName: st
   id: '${strings.classify(entityName)}.Edit',
   mode: ActionMode.ModalPage,
   loadComponent: () => import(
-    /* webpackExports: "WizardCreateEdit${strings.classify(entityName)}" */
-    '${projectName}').then(m => m.WizardCreateEdit${strings.classify(entityName)}),
+    /* webpackExports: "WizardCreateEdit${strings.classify(entityName)}Component" */
+    '${projectName}').then(m => m.WizardCreateEdit${strings.classify(entityName)}Component),
   context: {
     editMode: 3 // mode: EditMode.Edit
   }
