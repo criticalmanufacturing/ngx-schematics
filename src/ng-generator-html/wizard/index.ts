@@ -1,18 +1,17 @@
 import { dirname, extname, join, normalize, strings } from "@angular-devkit/core";
-import { apply, applyTemplates, chain, mergeWith, move, Rule, SchematicContext, SchematicsException, Tree, url } from "@angular-devkit/schematics";
-import { buildDefaultPath, getWorkspace } from "@schematics/angular/utility/workspace";
-import { parseName } from '@schematics/angular/utility/parse-name';
-import * as inquirer from 'inquirer';
-import { JSONFile } from "@schematics/angular/utility/json-file";
 import { ProjectDefinition } from "@angular-devkit/core/src/workspace";
+import { apply, applyTemplates, chain, mergeWith, move, Rule, SchematicContext, SchematicsException, Tree, url } from "@angular-devkit/schematics";
 import { applyToUpdateRecorder } from "@schematics/angular/utility/change";
-import * as ts from "typescript";
+import { JSONFile } from "@schematics/angular/utility/json-file";
+import { parseName } from "@schematics/angular/utility/parse-name";
+import { buildDefaultPath, getWorkspace } from "@schematics/angular/utility/workspace";
+import * as inquirer from 'inquirer';
+import ts = require("typescript");
 import { insertExport } from "../utility/ast-uil";
-import { buildRelativePath, nameify } from "../utility/string-util";
 import { findMetadataFile, insertMetadata } from "../utility/metadata-util";
+import { buildRelativePath, nameify } from "../utility/string-util";
 
-
-function updatePublicAPI(project: ProjectDefinition, entityType: string): Rule {
+function updatePublicAPI(project: ProjectDefinition, action: string): Rule {
   return async (tree: Tree) => {
     if (tree.exists(join(normalize(project.root), 'ng-package.json'))) {
       const json = new JSONFile(tree, join(normalize(project.root), 'ng-package.json'));
@@ -20,7 +19,7 @@ function updatePublicAPI(project: ProjectDefinition, entityType: string): Rule {
 
       if (entryFile) {
         const entryDir = join(tree.root.path, dirname(join(normalize(project.root), entryFile)));
-        const filesToImport = tree.actions
+        const filesToExport = tree.actions
           .filter(action => action.kind === "c" && extname(action.path) === '.ts')
           .map((action) => ({ relativePath: buildRelativePath(entryDir, action.path), path: action.path }));
 
@@ -28,8 +27,8 @@ function updatePublicAPI(project: ProjectDefinition, entityType: string): Rule {
         const source = ts.createSourceFile(join(normalize(project.root), entryFile), content, ts.ScriptTarget.Latest, true);
 
         const recorder = tree.beginUpdate(join(normalize(project.root), entryFile));
-        const changes = filesToImport.map((file) =>
-          insertExport(source, file.path, '*', file.relativePath.replace(extname(file.path), ''), `Wizard Create Edit ${nameify(entityType)}`, true));
+        const changes = filesToExport.map((file) =>
+          insertExport(source, file.path, '*', file.relativePath.replace(extname(file.path), ''), `Wizard ${nameify(action)}`, true));
         applyToUpdateRecorder(recorder, changes);
         tree.commitUpdate(recorder);
       }
@@ -37,44 +36,7 @@ function updatePublicAPI(project: ProjectDefinition, entityType: string): Rule {
   }
 }
 
-function insertActionMetadata(content: string, fileName: string, projectName: string, entityName: string) {
-  const actionsToInsert = `\
-{
-  id: '${strings.classify(entityName)}.Create',
-  mode: ActionMode.ModalPage,
-  loadComponent: () => import(
-    /* webpackExports: "WizardCreateEdit${strings.classify(entityName)}" */
-    '${projectName}').then(m => m.WizardCreateEdit${strings.classify(entityName)}),
-  context: {
-    editMode: 1 // mode: EditMode.Create
-  }
-},
-{
-  id: '${strings.classify(entityName)}.Edit',
-  mode: ActionMode.ModalPage,
-  loadComponent: () => import(
-    /* webpackExports: "WizardCreateEdit${strings.classify(entityName)}" */
-    '${projectName}').then(m => m.WizardCreateEdit${strings.classify(entityName)}),
-  context: {
-    editMode: 3 // mode: EditMode.Edit
-  }
-}`;
-
-  return insertMetadata(
-    content,
-    fileName,
-    {
-      'ActionMode': 'cmf-core',
-      'Action': 'cmf-core'
-    },
-    'actions',
-    'Action[]',
-    'Actions',
-    actionsToInsert
-  );
-}
-
-function updateMetadata(project: ProjectDefinition, projectName: string, entityType: string): Rule {
+function updateMetadata(project: ProjectDefinition, projectName: string, actionName: string, entityType: string,): Rule {
   return async (tree: Tree) => {
     if (!tree.exists(join(normalize(project.root), 'metadata', 'ng-package.json'))) {
       return;
@@ -106,7 +68,25 @@ function updateMetadata(project: ProjectDefinition, projectName: string, entityT
     }
 
     const recorder = tree.beginUpdate(metadataPath);
-    applyToUpdateRecorder(recorder, insertActionMetadata(metadataContent, metadataPath, projectName, entityType));
+    applyToUpdateRecorder(recorder, insertMetadata(
+      metadataContent,
+      metadataPath,
+      {
+        'Action': 'cmf-core',
+        'ActionMode': 'cmf-core'
+      },
+      'actions',
+      'Action[]',
+      'Actions',
+      `\
+{
+  id: '${strings.classify(entityType)}.${strings.classify(actionName).replace(strings.classify(entityType), '')}',
+  loadComponent: () => import(
+    /* webpackExports: "Wizard${strings.classify(actionName)}" */
+    '${projectName}').then(m => m.Wizard${strings.classify(actionName)}),
+  mode: ActionMode.ModalPage
+}`
+    ));
     tree.commitUpdate(recorder);
   };
 }
@@ -134,10 +114,6 @@ export default function (_options: any): Rule {
       }
     }
 
-    if (!_options.namespace) {
-      throw new SchematicsException(`Entity Type mamespace is required`);
-    }
-
     const workspace = await getWorkspace(tree);
     const project = workspace.projects.get(_options.project as string);
 
@@ -147,6 +123,10 @@ export default function (_options: any): Rule {
 
     if (_options.path === undefined) {
       _options.path = buildDefaultPath(project);
+    }
+
+    if (!_options.namespace) {
+      throw new SchematicsException(`Entity Type mamespace is required`);
     }
 
     const parsedPath = parseName(_options.path as string, _options.name);
@@ -160,13 +140,13 @@ export default function (_options: any): Rule {
         nameify,
         project: project?.prefix ?? _options.project
       }),
-      move(parsedPath.path),
+      move(parsedPath.path)
     ]);
 
     return chain([
       mergeWith(templateSource),
       updatePublicAPI(project, _options.name),
-      updateMetadata(project, _options.project, _options.name)
+      updateMetadata(project, _options.project, _options.name, _options.entityType)
     ]);
   }
 }

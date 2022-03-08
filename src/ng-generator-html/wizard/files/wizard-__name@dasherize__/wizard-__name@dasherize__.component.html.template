@@ -1,0 +1,9 @@
+<cmf-core-controls-wizard [cmf-core-business-controls-transaction-wizard]="instance"
+  [mainTitle]="title"
+  [action-name]="action">
+
+  <!--Wizard steps-->
+  <cmf-core-controls-wizard-step i18n-mainTitle="@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#DETAILS" mainTitle="Details">
+    Step 1
+  </cmf-core-controls-wizard-step>
+</cmf-core-controls-wizard>

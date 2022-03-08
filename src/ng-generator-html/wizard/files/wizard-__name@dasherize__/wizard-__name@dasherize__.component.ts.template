@@ -1,0 +1,206 @@
+import {
+  Component,
+  forwardRef,
+  NgModule,
+  OnInit,
+  ViewChild,
+  ViewContainerRef
+} from '@angular/core';
+
+import {
+  CommonModule
+} from '@angular/common';
+
+import {
+  Cmf
+} from "cmf.lbos";
+
+import {
+  CustomizableComponent,
+  HOST_VIEW_COMPONENT,
+  UtilService,
+  EntityTypeService
+} from 'cmf-core';
+
+import {
+  PageBag,
+  Wizard,
+  WizardEventArgs
+} from 'cmf-core-controls';
+
+import {
+  TransactionWizardModule,
+  TransactionWizard
+} from 'cmf-core-business-controls';
+
+/**
+ * @whatItDoes
+ *
+ * Please provide a meaningful description of this component
+ * Try to answer these questions:
+ * * What is it?
+ * * What it does?
+ * * How does it behave with different sizes?
+ * * Does it retrieve data from any external source (server, local database, text file, etc...)?
+ *
+ * @howToUse
+ *
+ * This component is used with the inputs and outputs mentioned below.
+ *
+ * Besides the description above, please complement it with a meaningful description of this component that answer these questions:
+ * * How to use it?
+ * * Where and When to use it?
+ *
+ * ### Inputs
+ * `string` : **name** - The name of this component
+ * `number` : **value** - The value of this component
+ *
+ * ### Outputs
+ * `string` : **onNameChange** - When the name of the component change, this output emits the new name
+ * `number` : **onValueChange** - When the value of the component change, this output emits the new value
+ *
+ * ### Example
+ * To use the component, assume this HTML Template as an example:
+ *
+ * ```HTML
+ * <<%= dasherize(project) %>-wizard-<%= dasherize(name) %>></<%= dasherize(project) %>-wizard-<%= dasherize(name) %>>
+ * ```
+ *
+ * ### _NOTES_
+ * (optional, Provide additional notes here)
+ *
+ * @description
+ *
+ * ## <%= classify(name) %>Component Component
+ *
+ * ### Dependencies
+ *
+ * #### Components
+ * * ComponentA : `package`
+ * * ComponentB : `package`
+ *
+ * #### Services
+ * * ServiceA : `package`
+ * * ServiceB : `package`
+ *
+ * #### Directives
+ * * DirectiveA : `package`
+ * * DirectiveB : `package`
+ *
+ */
+@Component({
+  selector: '<%= dasherize(project) %>-wizard-<%= dasherize(name) %>',
+  templateUrl: './wizard-<%= dasherize(name) %>.component.html',
+  styleUrls: ['./wizard-<%= dasherize(name) %>.component.<%= style %>'],
+  viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Wizard<%= classify(name) %>Component) }]
+})
+export class Wizard<%= classify(name) %>Component extends CustomizableComponent implements TransactionWizard, OnInit {
+
+  /**
+   * The wizard element
+   */
+  @ViewChild(Wizard)
+  protected _nestedWizard: Wizard;
+
+  /**
+   * The instance of the wizard
+   */
+  public instance: Cmf.Foundation.BusinessObjects.MasterDataPackage;
+
+  /**
+   * Wizard title
+   */
+  public title: string;
+
+  /**
+   * Wizard action name
+   */
+  public action: string;
+
+  /**
+   * Constructor
+   */
+  constructor(
+    viewContainerRef: ViewContainerRef,
+    private pageBag: PageBag,
+    private util: UtilService,
+    private entityTypes: EntityTypeService
+  ) {
+    super(viewContainerRef);
+  }
+
+  /**
+    * Method that prepares the data for the wizard
+    */
+  public async prepareDataInput(): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput[]> {
+    const inputs: Cmf.Foundation.BusinessOrchestration.BaseInput[] = [];
+
+    const instanceInput = new Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.GetObjectByIdInput();
+    instanceInput.IgnoreLastServiceId = true;
+    instanceInput.Id = this.pageBag.context.instance.Id;
+    instanceInput.Type = this.entityTypes.getEntityTypeNameFromInstance(this.instance);
+    inputs.push(instanceInput);
+
+    return inputs;
+  }
+
+  /**
+   * Method that receive the data from prepareDataInput
+   */
+  public async handleDataOutput(outputs: Cmf.Foundation.BusinessOrchestration.BaseOutput[]): Promise<void> {
+    if (outputs != null && outputs.length >= 1) {
+      const loadInstanceOutput =
+        outputs[0] as Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.OutputObjects.GetObjectByIdOutput;
+
+      this.instance = loadInstanceOutput.Instance;
+    }
+
+    await this._nestedWizard.reEvaluateContextPreConditions({ instance: this.instance }, true);
+  }
+
+  /**
+   * The wizard prepareTransactionInput method where we can append the input for the final wizard
+   * @param args Current inputs where the user can append or simply resolve its own input.
+   */
+  public async prepareTransactionInput(args: WizardEventArgs): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput> {
+    const input: Cmf.Foundation.BusinessOrchestration.BaseInput = null;
+    input.IgnoreLastServiceId = true;
+
+    return input;
+  }
+
+  /**
+   * The wizard hook for handling the above service call.
+   * @param output output object, result of the input created in the prepareTransactionInput
+   */
+  public handleTransactionOutput(output: Cmf.Foundation.BusinessOrchestration.BaseOutput): Promise<void> {
+    return null;
+  }
+
+  /**
+   * NgOnInit. Sets the basic wizard content according to the pageBag context.
+   */
+  public ngOnInit(): void {
+    if (this.pageBag != null && this.pageBag.context != null) {
+      this.title = $localize`:@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#TITLE:<%= nameify(name) %>`;
+      this.action = $localize`:@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#ACTION:Finish`;
+
+      if (this.pageBag.context.instance == null
+        || !this.util.instanceof(this.pageBag.context.instance, Cmf.Foundation.BusinessObjects.MasterDataPackage)) {
+        throw new Error($localize`:@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#NO_INSTANCE_FOUND:No Instance Found`);
+      }
+    } else {
+      throw new Error($localize`:@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#MISSING_CONTEXT:Missing context`);
+    }
+  }
+}
+
+@NgModule({
+  imports: [
+    CommonModule,
+    TransactionWizardModule
+  ],
+  declarations: [Wizard<%= classify(name) %>Component],
+  exports: [Wizard<%= classify(name) %>Component]
+})
+export class Wizard<%= classify(name) %>Module { }

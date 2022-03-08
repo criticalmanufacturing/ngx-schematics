@@ -9,8 +9,13 @@
       "private": true,
       "hidden": true
     },
+    "wizard": {
+      "description": "Generate a new wizard.",
+      "factory": "./ng-generator-html/wizard",
+      "schema": "./ng-generator-html/wizard/schema.json"
+    },
     "wizard-create-edit": {
-      "description": "A blank schematic.",
+      "description": "Generates a new create edit wizard.",
       "factory": "./ng-generator-html/wizard-create-edit",
       "schema": "./ng-generator-html/wizard-create-edit/schema.json"
     }
