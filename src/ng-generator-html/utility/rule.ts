@@ -5,8 +5,9 @@ import { applyToUpdateRecorder } from '@schematics/angular/utility/change';
 import { JSONFile } from '@schematics/angular/utility/json-file';
 import * as ts from 'typescript';
 
-import { insertExport } from './ast-uil';
-import { buildRelativePath } from './string-util';
+import { insertExport } from './ast';
+import { findMetadataFile, insertMetadata, MetadataProperty } from './metadata';
+import { buildRelativePath } from './string';
 
 export function updatePublicAPI(project: ProjectDefinition, description?: string): Rule {
   return async (tree: Tree) => {
@@ -31,4 +32,53 @@ export function updatePublicAPI(project: ProjectDefinition, description?: string
       }
     }
   }
+}
+
+export interface UpdateMetadataOptions {
+  imports: Record<string, string>;
+  identifier: MetadataProperty;
+  toInsert: string;
+}
+
+export function updateMetadata(project: ProjectDefinition, options: UpdateMetadataOptions): Rule {
+  return async (tree: Tree) => {
+    if (!tree.exists(join(normalize(project.root), 'metadata', 'ng-package.json'))) {
+      return;
+    }
+
+    const json = new JSONFile(tree, join(normalize(project.root), 'metadata', 'ng-package.json'));
+    const entryFile = json.get(['lib', 'entryFile']) as string | null;
+
+    if (!entryFile) {
+      return;
+    }
+
+    const content = tree.get(join(normalize(project.root), 'metadata', entryFile))?.content.toString('utf-8');
+
+    if (!content) {
+      return;
+    }
+
+    const metadataPath = findMetadataFile(content, entryFile, project.root);
+
+    if (!metadataPath) {
+      return;
+    }
+
+    const metadataContent = tree.get(metadataPath)?.content.toString('utf-8');
+
+    if (!metadataContent) {
+      return;
+    }
+
+    const recorder = tree.beginUpdate(metadataPath);
+    applyToUpdateRecorder(recorder, insertMetadata(
+      metadataContent,
+      metadataPath,
+      options.imports,
+      options.identifier,
+      options.toInsert
+    ));
+    tree.commitUpdate(recorder);
+  };
 }

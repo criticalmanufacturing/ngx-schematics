@@ -1,88 +1,11 @@
-import { join, normalize, strings } from '@angular-devkit/core';
+import { strings } from '@angular-devkit/core';
 import { apply, applyTemplates, chain, mergeWith, move, Rule, SchematicContext, SchematicsException, Tree, url } from '@angular-devkit/schematics';
 import { buildDefaultPath, getWorkspace } from '@schematics/angular/utility/workspace';
 import { parseName } from '@schematics/angular/utility/parse-name';
 import * as inquirer from 'inquirer';
-import { JSONFile } from '@schematics/angular/utility/json-file';
-import { ProjectDefinition } from '@angular-devkit/core/src/workspace';
-import { applyToUpdateRecorder } from '@schematics/angular/utility/change';
-import { nameify } from '../utility/string-util';
-import { findMetadataFile, insertMetadata } from '../utility/metadata-util';
-import { updatePublicAPI } from '../utility/schematics';
-
-function insertActionMetadata(content: string, fileName: string, projectName: string, entityName: string) {
-  const actionsToInsert = `\
-{
-  id: '${strings.classify(entityName)}.Create',
-  mode: ActionMode.ModalPage,
-  loadComponent: () => import(
-    /* webpackExports: "WizardCreateEdit${strings.classify(entityName)}" */
-    '${projectName}').then(m => m.WizardCreateEdit${strings.classify(entityName)}),
-  context: {
-    editMode: 1 // mode: EditMode.Create
-  }
-},
-{
-  id: '${strings.classify(entityName)}.Edit',
-  mode: ActionMode.ModalPage,
-  loadComponent: () => import(
-    /* webpackExports: "WizardCreateEdit${strings.classify(entityName)}Component" */
-    '${projectName}').then(m => m.WizardCreateEdit${strings.classify(entityName)}Component),
-  context: {
-    editMode: 3 // mode: EditMode.Edit
-  }
-}`;
-
-  return insertMetadata(
-    content,
-    fileName,
-    {
-      'ActionMode': 'cmf-core',
-      'Action': 'cmf-core'
-    },
-    'actions',
-    'Action[]',
-    'Actions',
-    actionsToInsert
-  );
-}
-
-function updateMetadata(project: ProjectDefinition, projectName: string, entityType: string): Rule {
-  return async (tree: Tree) => {
-    if (!tree.exists(join(normalize(project.root), 'metadata', 'ng-package.json'))) {
-      return;
-    }
-
-    const json = new JSONFile(tree, join(normalize(project.root), 'metadata', 'ng-package.json'));
-    const entryFile = json.get(['lib', 'entryFile']) as string | null;
-
-    if (!entryFile) {
-      return;
-    }
-
-    const content = tree.get(join(normalize(project.root), 'metadata', entryFile))?.content.toString('utf-8');
-
-    if (!content) {
-      return;
-    }
-
-    const metadataPath = findMetadataFile(content, entryFile, project.root);
-
-    if (!metadataPath) {
-      return;
-    }
-
-    const metadataContent = tree.get(metadataPath)?.content.toString('utf-8');
-
-    if (!metadataContent) {
-      return;
-    }
-
-    const recorder = tree.beginUpdate(metadataPath);
-    applyToUpdateRecorder(recorder, insertActionMetadata(metadataContent, metadataPath, projectName, entityType));
-    tree.commitUpdate(recorder);
-  };
-}
+import { nameify } from '../utility/string';
+import { updateMetadata, updatePublicAPI } from '../utility/rule';
+import { MetadataProperty } from '../utility/metadata';
 
 export default function (_options: any): Rule {
   return async (tree: Tree, _context: SchematicContext) => {
@@ -136,10 +59,36 @@ export default function (_options: any): Rule {
       move(parsedPath.path),
     ]);
 
+    const metadataOptions = {
+      identifier: MetadataProperty.Action,
+      imports: { 'ActionMode': 'cmf-core' },
+      toInsert: `\
+{
+  id: '${strings.classify(_options.name)}.Create',
+  mode: ActionMode.ModalPage,
+  loadComponent: () => import(
+    /* webpackExports: "WizardCreateEdit${strings.classify(_options.name)}Component" */
+    '${_options.project}').then(m => m.WizardCreateEdit${strings.classify(_options.name)})Component,
+  context: {
+    editMode: 1 // mode: EditMode.Create
+  }
+},
+{
+  id: '${strings.classify(_options.name)}.Edit',
+  mode: ActionMode.ModalPage,
+  loadComponent: () => import(
+    /* webpackExports: "WizardCreateEdit${strings.classify(_options.name)}Component" */
+    '${_options.project}').then(m => m.WizardCreateEdit${strings.classify(_options.name)}Component),
+  context: {
+    editMode: 3 // mode: EditMode.Edit
+  }
+}`
+    };
+
     return chain([
       mergeWith(templateSource),
       updatePublicAPI(project, `Wizard Create Edit ${nameify(_options.name)}`),
-      updateMetadata(project, _options.project, _options.name)
+      updateMetadata(project, metadataOptions)
     ]);
   }
 }

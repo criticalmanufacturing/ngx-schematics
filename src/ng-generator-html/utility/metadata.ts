@@ -3,6 +3,47 @@ import { indentBy } from "@angular-devkit/core/src/utils/literals";
 import { findNode, findNodes, getSourceNodes, insertAfterLastOccurrence, insertImport } from "@schematics/angular/utility/ast-utils";
 import { InsertChange } from "@schematics/angular/utility/change";
 import ts = require("typescript");
+import { nameify } from "./string";
+
+export enum MetadataProperty {
+  Route = 'routes',
+  Action = 'actions',
+  ActionGroup = 'actionGroups',
+  ActionButton = 'actionButtons',
+  ActionButtonGroup = 'actionButtonGroups',
+  ActionBar = 'actionBars',
+  MenuItem = 'menuItems',
+  MenuSubGroup = 'menuSubGroups',
+  MenuGroup = 'menuGroups',
+  EntityType = 'entityTypes',
+  Table = 'tables',
+  StaticType = 'staticTypes',
+  FileViewer = 'fileViewers',
+  SideBarTab = 'sideBarTabs',
+  UserMenu = 'userMenus',
+  Credit = 'credits',
+  FlexComponent = 'flexComponents'
+}
+
+const PROPERTY_REFERENCE = {
+  [MetadataProperty.Route]: { 'RouteConfig': 'cmf-core' },
+  [MetadataProperty.Action]: { 'Action': 'cmf-core' },
+  [MetadataProperty.ActionGroup]: { 'ActionGroup': 'cmf-core' },
+  [MetadataProperty.ActionButton]: { 'ActionButton': 'cmf-core' },
+  [MetadataProperty.ActionButtonGroup]: { 'ActionButtonGroup': 'cmf-core' },
+  [MetadataProperty.ActionBar]: { 'ActionBar': 'cmf-core' },
+  [MetadataProperty.MenuItem]: { 'MenuItem': 'cmf-core' },
+  [MetadataProperty.MenuSubGroup]: { 'MenuSubGroup': 'cmf-core' },
+  [MetadataProperty.MenuGroup]: { 'MenuGroup': 'cmf-core' },
+  [MetadataProperty.EntityType]: { 'EntityTypeMetadata': 'cmf-core' },
+  [MetadataProperty.Table]: { 'Table': 'cmf-core' },
+  [MetadataProperty.StaticType]: { 'StaticType': 'cmf-core' },
+  [MetadataProperty.FileViewer]: { 'FileViewerMetadata': 'cmf-core' },
+  [MetadataProperty.SideBarTab]: { 'SideBarTab': 'cmf-core' },
+  [MetadataProperty.UserMenu]: { 'UserMenu': 'cmf-core' },
+  [MetadataProperty.Credit]: { 'Credit': 'cmf-core' },
+  [MetadataProperty.FlexComponent]: { 'FlexComponent': 'cmf-core' }
+};
 
 /**
  * Updates the space identation in a string
@@ -53,9 +94,7 @@ export function insertMetadata(
   content: string,
   filePath: string,
   requiredImports: Record<string, string>,
-  propertyIdentifier: string,
-  typeReference: string,
-  description: string,
+  propertyIdentifier: MetadataProperty,
   toInsert: string
 ) {
   const source = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
@@ -84,19 +123,22 @@ export function insertMetadata(
 
   if (!actions) {
     const toInsertSpaced = updateSpaces(spaces)`
-  
-    /**
-     * ${description}
-     */
-    public override get ${propertyIdentifier}(): ${typeReference} {
-      return [
-  ${indentBy(6)`${toInsert}`}
-      ];
-    }`;
+
+  /**
+   * ${nameify(propertyIdentifier)}
+   */
+  public override get ${propertyIdentifier}(): ${Object.keys(PROPERTY_REFERENCE[propertyIdentifier])[0]}[] {
+    return [
+${indentBy(6)`${toInsert}`}
+    ];
+  }`;
 
     const fallbackPos = findNodes(contentNode, ts.SyntaxKind.Constructor, 1)[0]?.getEnd() ?? contentNode.getStart();
     return [
-      ...Object.keys(requiredImports).map((key) => insertImport(source, filePath, key, requiredImports[key])),
+      ...Object.keys({
+        ...requiredImports,
+        ...PROPERTY_REFERENCE[propertyIdentifier]
+      }).map((key) => insertImport(source, filePath, key, requiredImports[key])),
       insertAfterLastOccurrence(allAccessors, toInsertSpaced, filePath, fallbackPos, ts.SyntaxKind.GetAccessor)
     ];
   }
@@ -108,7 +150,7 @@ export function insertMetadata(
   const lastChild = list.getChildAt(list.getChildCount() - 1);
 
   const toInsertSpaced = updateSpaces(spaces)`${lastChild && lastChild.kind !== ts.SyntaxKind.CommaToken ? ',' : ''}
-  ${indentBy(6)`${toInsert}`}${lastChild ? '' : `\n    `}`;
+${indentBy(6)`${toInsert}`}${lastChild ? '' : `\n    `}`;
 
   return [
     ...Object.keys(requiredImports).map((key) => insertImport(source, filePath, key, requiredImports[key])),

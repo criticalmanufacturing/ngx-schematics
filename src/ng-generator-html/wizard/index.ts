@@ -1,69 +1,11 @@
-import { join, normalize, strings } from '@angular-devkit/core';
-import { ProjectDefinition } from '@angular-devkit/core/src/workspace';
+import { strings } from '@angular-devkit/core';
 import { apply, applyTemplates, chain, mergeWith, move, Rule, SchematicContext, SchematicsException, Tree, url } from '@angular-devkit/schematics';
-import { applyToUpdateRecorder } from '@schematics/angular/utility/change';
-import { JSONFile } from '@schematics/angular/utility/json-file';
 import { parseName } from '@schematics/angular/utility/parse-name';
 import { buildDefaultPath, getWorkspace } from '@schematics/angular/utility/workspace';
 import * as inquirer from 'inquirer';
-import { findMetadataFile, insertMetadata } from '../utility/metadata-util';
-import { updatePublicAPI } from '../utility/schematics';
-import { nameify } from '../utility/string-util';
-
-function updateMetadata(project: ProjectDefinition, projectName: string, actionName: string, entityType: string,): Rule {
-  return async (tree: Tree) => {
-    if (!tree.exists(join(normalize(project.root), 'metadata', 'ng-package.json'))) {
-      return;
-    }
-
-    const json = new JSONFile(tree, join(normalize(project.root), 'metadata', 'ng-package.json'));
-    const entryFile = json.get(['lib', 'entryFile']) as string | null;
-
-    if (!entryFile) {
-      return;
-    }
-
-    const content = tree.get(join(normalize(project.root), 'metadata', entryFile))?.content.toString('utf-8');
-
-    if (!content) {
-      return;
-    }
-
-    const metadataPath = findMetadataFile(content, entryFile, project.root);
-
-    if (!metadataPath) {
-      return;
-    }
-
-    const metadataContent = tree.get(metadataPath)?.content.toString('utf-8');
-
-    if (!metadataContent) {
-      return;
-    }
-
-    const recorder = tree.beginUpdate(metadataPath);
-    applyToUpdateRecorder(recorder, insertMetadata(
-      metadataContent,
-      metadataPath,
-      {
-        'Action': 'cmf-core',
-        'ActionMode': 'cmf-core'
-      },
-      'actions',
-      'Action[]',
-      'Actions',
-      `\
-{
-  id: '${strings.classify(entityType)}.${strings.classify(actionName).replace(strings.classify(entityType), '')}',
-  loadComponent: () => import(
-    /* webpackExports: "Wizard${strings.classify(actionName)}Component" */
-    '${projectName}').then(m => m.Wizard${strings.classify(actionName)}Component),
-  mode: ActionMode.ModalPage
-}`
-    ));
-    tree.commitUpdate(recorder);
-  };
-}
+import { MetadataProperty } from '../utility/metadata';
+import { updateMetadata, updatePublicAPI } from '../utility/rule';
+import { nameify } from '../utility/string';
 
 export default function (_options: any): Rule {
   return async (tree: Tree, _context: SchematicContext) => {
@@ -117,10 +59,23 @@ export default function (_options: any): Rule {
       move(parsedPath.path)
     ]);
 
+    const metadataOptions = {
+      identifier: MetadataProperty.Action,
+      imports: { 'ActionMode': 'cmf-core' },
+      toInsert: `\
+{
+  id: '${strings.classify(_options.entityType)}.${strings.classify(_options.name).replace(strings.classify(_options.entityType), '')}',
+  loadComponent: () => import(
+    /* webpackExports: "Wizard${strings.classify(_options.name)}Component" */
+    '${_options.project}').then(m => m.Wizard${strings.classify(_options.name)}Component),
+  mode: ActionMode.ModalPage
+}`
+    };
+
     return chain([
       mergeWith(templateSource),
       updatePublicAPI(project, `Wizard ${nameify(_options.name)}`),
-      updateMetadata(project, _options.project, _options.name, _options.entityType)
+      updateMetadata(project, metadataOptions)
     ]);
   }
 }

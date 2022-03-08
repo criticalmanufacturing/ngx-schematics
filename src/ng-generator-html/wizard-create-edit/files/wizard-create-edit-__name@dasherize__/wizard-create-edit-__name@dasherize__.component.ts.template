@@ -201,6 +201,7 @@ export class WizardCreateEdit<%= classify(name) %>Component extends Customizable
     }
   }
 }
+
 @NgModule({
   imports: [
     CommonModule,
