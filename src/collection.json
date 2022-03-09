@@ -9,6 +9,16 @@
       "private": true,
       "hidden": true
     },
+    "converter": {
+      "description": "Generate a new converter.",
+      "factory": "./ng-generator-html/converter",
+      "schema": "./ng-generator-html/converter/schema.json"
+    },
+    "data-source": {
+      "description": "Generate a new data source.",
+      "factory": "./ng-generator-html/data-source",
+      "schema": "./ng-generator-html/data-source/schema.json"
+    },
     "execution-view": {
       "description": "Generate a new execution view.",
       "factory": "./ng-generator-html/execution-view",

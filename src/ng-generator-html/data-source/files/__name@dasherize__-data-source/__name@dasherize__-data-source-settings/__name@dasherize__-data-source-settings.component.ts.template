@@ -1,0 +1,82 @@
+import {
+  ViewContainerRef,
+  Component,
+  NgModule
+} from '@angular/core';
+
+import {
+  CommonModule
+} from '@angular/common';
+
+import {
+  CustomizableComponent,
+} from 'cmf-core';
+
+import {
+  DataSourceSettingsDef,
+  DataSourceSettingsModule
+} from 'cmf-core-dashboards';
+
+/**
+ * @whatItDoes
+ *
+ * Please provide a meaningful description of this Data Source Settings and what it is needed for.
+ * Also describe all the properties that are configurable in the correspondent Data Source
+ *
+ * @description
+ *
+ * ## <%= nameify(name) %> Data Source Settings Component
+ *
+ * ### Dependencies
+ *
+ * #### Components
+ * * ComponentA : `package`
+ * * ComponentB : `package`
+ *
+ * #### Services
+ * * ServiceA : `package`
+ * * ServiceB : `package`
+ *
+ * #### Directives
+ * * DirectiveA : `package`
+ * * DirectiveB : `package`
+ *
+ */
+@Component({
+  selector: "<%= dasherize(project) %>-<%= dasherize(name) %>-data-source-settings",
+  templateUrl: "./<%= dasherize(name) %>-data-source-settings.component.html",
+  styleUrls: ["./<%= dasherize(name) %>-data-source-settings.component.less"]
+
+})
+export class <%= classify(name) %>DataSourceSettings extends CustomizableComponent {
+
+  /**
+   * The settings of the <%= classify(name) %>DataSource
+   */
+  public settings: DataSourceSettingsDef;
+
+  /**
+   * Constructor
+   */
+  constructor(viewContainerRef: ViewContainerRef) {
+    super(viewContainerRef);
+  }
+
+  /**
+   * On settings loaded
+   * @param settings the <%= classify(name) %>DataSource settings definition
+   */
+  public onLoadSettings(settings: DataSourceSettingsDef): void {
+    this.settings = settings;
+  }
+}
+
+@NgModule({
+  imports: [
+    CommonModule,
+    DataSourceSettingsModule
+  ],
+  declarations: [<%= classify(name) %>DataSourceSettings],
+  exports: [<%= classify(name) %>DataSourceSettings]
+})
+export class <%= classify(name) %>DataSourceSettingsModule { }

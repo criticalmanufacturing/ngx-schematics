@@ -25,7 +25,7 @@ import {
  *
  * @description
  *
- * ## <%= classify(name) %> Widget Settings Component
+ * ## <%= nameify(name) %> Widget Settings Component
  *
  * ### Dependencies
  *

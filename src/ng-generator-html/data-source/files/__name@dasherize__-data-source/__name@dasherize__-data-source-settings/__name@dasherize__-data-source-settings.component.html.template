@@ -1,0 +1,3 @@
+<cmf-core-dashboards-datasource-settings [updatedSettings]="settings" (onLoadSettings)="onLoadSettings($event)">
+  <%= nameify(name) %> Data Source Settings Works!
+</cmf-core-dashboards-datasource-settings>
