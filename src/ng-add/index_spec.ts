@@ -4,11 +4,11 @@ import * as path from 'path';
 
 const collectionPath = path.join(__dirname, '../collection.json');
 
-describe('ng-generator-html', () => {
+describe('ng-schematics', () => {
   it('works', async () => {
     const runner = new SchematicTestRunner('schematics', collectionPath);
     const tree = await runner
-      .runSchematicAsync('ng-generator-html', {}, Tree.empty())
+      .runSchematicAsync('ng-add', {}, Tree.empty())
       .toPromise();
 
     expect(tree.files).toEqual([]);

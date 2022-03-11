@@ -1,7 +1,7 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "$id": "SchematicsWidget",
-  "title": "Widget Options Schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsConverter",
+  "title": "Converter Options Schema",
   "type": "object",
   "properties": {
     "path": {
@@ -23,5 +23,5 @@
       "x-prompt": "What is the name of the converter?"
     }    
   },
-  "required": []
+  "required": ["name"]
 }

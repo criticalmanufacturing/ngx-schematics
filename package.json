@@ -1,11 +1,11 @@
 {
-  "name": "@criticalmanufacturing/ng-generator-html",
+  "name": "@criticalmanufacturing/ng-schematics",
   "version": "0.0.0",
-  "description": "A blank schematics",
+  "description": "Criticalmanufacturing angular schematics",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && jasmine src/**/*_spec.js",
-    "debug": "node --inspect --inspect-brk ./node_modules/@angular/cli/bin/ng generate @criticalmanufacturing/ng-generator-html:wizard-create-edit"
+    "debug": "node --inspect --inspect-brk ../CoreHTML/node_modules/@angular/cli/bin/ng generate @criticalmanufacturing/ng-schematics:wizard-create-edit"
   },
   "keywords": [
     "schematics"
@@ -16,6 +16,7 @@
   "dependencies": {
     "@angular-devkit/core": "^13.2.4",
     "@angular-devkit/schematics": "^13.2.4",
+    "@angular-eslint/schematics": "^13.1.0",
     "@angular/localize": "^13.2.3",
     "@angular/pwa": "^13.2.4",
     "@schematics/angular": "^13.2.4",

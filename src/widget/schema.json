@@ -1,7 +1,7 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "$id": "SchematicsExecutionView",
-  "title": "Execution View Options Schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsWidget",
+  "title": "Widget Options Schema",
   "type": "object",
   "properties": {
     "path": {
@@ -19,17 +19,8 @@
     },
     "name": {
       "type": "string",
-      "description": "The name of the action that the execution view will perform.",
-      "x-prompt": "What is the name of the action?"
-    },
-    "entityType": {
-      "type": "string",
-      "description": "The name of the entity type to be perfromed.",
-      "x-prompt": "What is the name of the entity type to be performed?"
-    },
-    "namespace": {
-      "type": "string",
-      "description": "The namespace of the entity type."
+      "description": "The name of the widget.",
+      "x-prompt": "What is the name of the widget?"
     },
     "style": {
       "description": "The file extension or preprocessor to use for style files, or 'none' to skip generating the style file.",
@@ -44,5 +35,5 @@
       ]
     }
   },
-  "required": []
+  "required": ["name"]
 }

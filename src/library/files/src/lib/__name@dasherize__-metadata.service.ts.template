@@ -1,0 +1,85 @@
+import {
+  Injectable
+} from '@angular/core';
+
+import {
+  RouteConfig,
+  PackageMetadata,
+  Action,
+  MenuGroup,
+  MenuItem,
+  ActionButton,
+  ActionButtonGroup,
+  EntityTypeMetadata,
+  PackageInfo
+} from 'cmf-core';
+
+
+@Injectable()
+export class <%= classify(name) %>MetadataService extends PackageMetadata {
+
+  /**
+   * Package Info
+   */
+  public override get packageInfo(): PackageInfo {
+    return {
+      name: '<%= fullName %>',
+      loader: () => import(
+        /* webpackExports: [] */
+        '<%= fullName %>'),
+      converters: [],
+      widgets: [],
+      dataSources: [],
+      components: []
+    };
+  }
+
+  /**
+   * Action Button Groups
+   */
+  public override get actionButtonGroups(): ActionButtonGroup[] {
+    return [];
+  }
+
+  /**
+   * Action Buttons
+   */
+  public override get actionButtons(): ActionButton[] {
+    return [];
+  }
+
+  /**
+   * Actions
+   */
+  public override get actions(): Action[] {
+    return [];
+  }
+
+  /**
+   * Menu Groups
+   */
+  public override get menuGroups(): MenuGroup[] {
+    return [];
+  }
+
+  /**
+   * Menu Items
+   */
+  public override get menuItems(): MenuItem[] {
+    return [];
+  }
+
+  /**
+   * Entity Types
+   */
+  public override get entityTypes(): EntityTypeMetadata[] {
+    return [];
+  }
+
+  /**
+   * Routes
+   */
+  public override get routes(): RouteConfig[] {
+    return [];
+  }
+}

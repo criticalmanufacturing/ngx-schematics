@@ -1,43 +1,49 @@
 {
   "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "extends": ["@angular-eslint/schematics"],
   "schematics": {
     "ng-add": {
       "description": "Update an application with HTML defaults.",
-      "factory": "./ng-generator-html/ng-add/index",
-      "schema": "./ng-generator-html/ng-add/schema.json",
+      "factory": "./ng-add/index",
+      "schema": "./ng-add/schema.json",
       "save": "devDependencies",
       "private": true,
       "hidden": true
     },
     "converter": {
       "description": "Generate a new converter.",
-      "factory": "./ng-generator-html/converter",
-      "schema": "./ng-generator-html/converter/schema.json"
+      "factory": "./converter",
+      "schema": "./converter/schema.json"
     },
     "data-source": {
       "description": "Generate a new data source.",
-      "factory": "./ng-generator-html/data-source",
-      "schema": "./ng-generator-html/data-source/schema.json"
+      "factory": "./data-source",
+      "schema": "./data-source/schema.json"
     },
     "execution-view": {
-      "description": "Generate a new execution view.",
-      "factory": "./ng-generator-html/execution-view",
-      "schema": "./ng-generator-html/execution-view/schema.json"
+      "description": "Generate a customization library project for Angular.",
+      "factory": "./execution-view",
+      "schema": "./execution-view/schema.json"
+    },
+    "library": {
+      "description": "Generate a new widget.",
+      "factory": "./library",
+      "schema": "./library/schema.json"
     },
     "widget": {
       "description": "Generate a new widget.",
-      "factory": "./ng-generator-html/widget",
-      "schema": "./ng-generator-html/widget/schema.json"
+      "factory": "./widget",
+      "schema": "./widget/schema.json"
     },
     "wizard": {
       "description": "Generate a new wizard.",
-      "factory": "./ng-generator-html/wizard",
-      "schema": "./ng-generator-html/wizard/schema.json"
+      "factory": "./wizard",
+      "schema": "./wizard/schema.json"
     },
     "wizard-create-edit": {
       "description": "Generates a new create edit wizard.",
-      "factory": "./ng-generator-html/wizard-create-edit",
-      "schema": "./ng-generator-html/wizard-create-edit/schema.json"
+      "factory": "./wizard-create-edit",
+      "schema": "./wizard-create-edit/schema.json"
     }
   }
 }
