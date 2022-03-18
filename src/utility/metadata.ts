@@ -49,7 +49,7 @@ const PROPERTY_REFERENCE = {
  * Updates the space identation in a string
  * @param spacesToUse Spaces to use in the identation
  */
-function updateSpaces(spacesToUse: number, initialSpaces: number = 2) {
+export function updateSpaces(spacesToUse: number, initialSpaces: number = 2) {
   return (strings: TemplateStringsArray, ...substitutions: any[]) => {
     return String.raw(strings, ...substitutions).replace(/^([ \t]+)/gm, (_, match: string) => {
       const spaces = match.split('').reduce((res, char) => res += char === ' ' ? 1 : 2, 0)
@@ -111,7 +111,7 @@ export function insertMetadata(
         && findNode(clause, ts.SyntaxKind.Identifier, 'PackageMetadata'));
     })[0];
 
-  const allAccessors = findNodes(metadataClassDeclaration, ts.SyntaxKind.GetAccessor);
+  const allAccessors = findNodes(metadataClassDeclaration, ts.isGetAccessor);
 
   const actions = allAccessors.find((accessor) =>
     accessor.getChildren().find(node => node.kind === ts.SyntaxKind.Identifier && node.getText() === propertyIdentifier));

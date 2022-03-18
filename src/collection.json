@@ -30,6 +30,11 @@
       "factory": "./library",
       "schema": "./library/schema.json"
     },
+    "package-info": {
+      "description": "Generate the package information.",
+      "factory": "./package-info",
+      "schema": "./package-info/schema.json"
+    },
     "widget": {
       "description": "Generate a new widget.",
       "factory": "./widget",
