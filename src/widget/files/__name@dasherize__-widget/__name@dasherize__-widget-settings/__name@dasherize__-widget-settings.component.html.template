@@ -1,3 +1,2 @@
-<cmf-core-dashboards-widgetSettings>    
-  <p><%= nameify(name) %> Widget Settings works!</p>
+<cmf-core-dashboards-widgetSettings>
 </cmf-core-dashboards-widgetSettings>
