@@ -61,6 +61,6 @@ export class <%= classify(name) %>DataSource extends DataSourceGeneric implement
    */
   public async execute(): Promise<DataSourceExecutionOutput | void> {
     // Please change the next line to execute what this data source requires
-    return null;
+    return;
   }
 }

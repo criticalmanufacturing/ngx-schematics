@@ -30,6 +30,10 @@ export default function (_options: any): Rule {
       }
     }
 
+    if (!_options.name) {
+      throw new SchematicsException(`Entity Type name is required`);
+    }
+
     if (!_options.namespace) {
       throw new SchematicsException(`Entity Type mamespace is required`);
     }
@@ -68,7 +72,7 @@ export default function (_options: any): Rule {
   mode: ActionMode.ModalPage,
   loadComponent: () => import(
     /* webpackExports: "WizardCreateEdit${strings.classify(_options.name)}Component" */
-    '${_options.project}').then(m => m.WizardCreateEdit${strings.classify(_options.name)})Component,
+    '${_options.project}').then(m => m.WizardCreateEdit${strings.classify(_options.name)}Component),
   context: {
     editMode: 1 // mode: EditMode.Create
   }

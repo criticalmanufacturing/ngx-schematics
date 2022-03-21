@@ -46,14 +46,13 @@ import {
   selector: "<%= dasherize(project) %>-<%= dasherize(name) %>-data-source-settings",
   templateUrl: "./<%= dasherize(name) %>-data-source-settings.component.html",
   styleUrls: ["./<%= dasherize(name) %>-data-source-settings.component.less"]
-
 })
-export class <%= classify(name) %>DataSourceSettings extends CustomizableComponent {
+export class <%= classify(name) %>DataSourceSettingsComponent extends CustomizableComponent {
 
   /**
    * The settings of the <%= classify(name) %>DataSource
    */
-  public settings: DataSourceSettingsDef;
+  public settings!: DataSourceSettingsDef;
 
   /**
    * Constructor
@@ -76,7 +75,7 @@ export class <%= classify(name) %>DataSourceSettings extends CustomizableCompone
     CommonModule,
     DataSourceSettingsModule
   ],
-  declarations: [<%= classify(name) %>DataSourceSettings],
-  exports: [<%= classify(name) %>DataSourceSettings]
+  declarations: [<%= classify(name) %>DataSourceSettingsComponent],
+  exports: [<%= classify(name) %>DataSourceSettingsComponent]
 })
 export class <%= classify(name) %>DataSourceSettingsModule { }

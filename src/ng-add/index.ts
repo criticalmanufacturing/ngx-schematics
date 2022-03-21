@@ -13,7 +13,7 @@ import { CORE_METADATA_MODULES, CORE_MODULE, CORE_PACKAGES, PROJECT_ASSETS, PROJ
 import { applyToUpdateRecorder, Change, RemoveChange, ReplaceChange } from '@schematics/angular/utility/change';
 import { JSONFile } from '@schematics/angular/utility/json-file';
 import { posix } from 'path';
-import { dirname, join, normalize } from '@angular-devkit/core';
+import { dirname, join, JsonObject, normalize } from '@angular-devkit/core';
 
 /**
  * Updates index.html file with the themes and loading container
@@ -108,6 +108,118 @@ function findParentNode(node: ts.Node, kind: ts.SyntaxKind) {
     node = node.parent as ts.CallExpression;
   }
   return node ?? null;
+}
+
+/**
+ * Updates main.ts file adding the load config method
+ */
+function installSchematics(_options: any) {
+  return async (host: Tree, _context: SchematicContext) => {
+    const workspace = await getWorkspace(host);
+    const project = workspace.projects.get(_options.project);
+
+    if (!project) {
+      throw new SchematicsException(`Project is not defined in this workspace.`);
+    }
+
+    (workspace.extensions.cli as JsonObject)!.defaultCollection = '@criticalmanufacturing/ng-schematics'
+
+    const buildTargets = [];
+    const testTargets = [];
+    for (const target of project.targets.values()) {
+      if (target.builder === '@angular-devkit/build-angular:browser') {
+        buildTargets.push(target);
+      } else if (target.builder === '@angular-devkit/build-angular:karma') {
+        testTargets.push(target);
+      }
+    }
+
+    // Configure project options
+    for (const target of buildTargets) {
+      // Add assets
+      if (target.options?.assets instanceof Array) {
+        const index = target.options.assets.indexOf('src/favicon.ico');
+        if (index >= 0) {
+          target.options.assets.splice(index, 1);
+          if (host.exists('src/favicon.ico')) {
+            host.delete('src/favicon.ico');
+          }
+        }
+        target.options.assets.push(...PROJECT_ASSETS);
+      }
+
+      // Add styles
+      if (target.options?.styles instanceof Array) {
+        target.options.styles.push(...PROJECT_STYLES);
+      }
+
+      // Add scripts
+      if (target.options?.scripts instanceof Array) {
+        target.options.scripts.push(...PROJECT_SCRIPTS);
+      }
+    }
+
+    // Find all index.html files in build targets
+    const indexFiles = new Set<string>();
+    for (const target of buildTargets) {
+      if (typeof target.options?.index === 'string') {
+        indexFiles.add(target.options.index);
+      }
+
+      if (!target.configurations) {
+        continue;
+      }
+
+      for (const options of Object.values(target.configurations)) {
+        if (typeof options?.index === 'string') {
+          indexFiles.add(options.index);
+        }
+      }
+    }
+
+    if (_options.registry) {
+      host.create('.npmrc', `registry=${_options.registry}`);
+    }
+
+    const buildTarget = project.targets.get('build');
+    if (!buildTarget) {
+      throw targetBuildNotFoundError();
+    }
+
+    const buildOptions = ((buildTarget.options || {}) as unknown) as BrowserBuilderOptions;
+
+    // Setup sources for the assets files to add to the project
+    const sourcePath = project.sourceRoot ?? posix.join(project.root, 'src');
+
+    const templateSource = apply(url('./files'), [
+      applyTemplates({
+        startupCulture: 'en-US',
+        startupTheme: 'cmf.style.light.blue',
+        supportedCultures: `[
+      "en-US"
+    ]`,
+        supportedThemes: `[
+      "cmf.style.light.blue",
+      "cmf.style.dark.blue",
+      "cmf.style.blue.grey",
+      "cmf.style.blue"
+    ]`
+      }),
+      move(posix.join(sourcePath, 'assets')),
+    ]);
+
+    return chain([
+      updateWorkspace(workspace),
+      emptyDir(posix.join(sourcePath, 'assets', 'icons')),
+      mergeWith(templateSource),
+      installDependencies(CORE_PACKAGES),
+      ...[...indexFiles].map((path) => updateIndexFile(path)),
+      overriteComponentTemplate(buildOptions.main),
+      updateAppModule(buildOptions.main, [...CORE_METADATA_MODULES, CORE_MODULE]),
+      updateMain(buildOptions.main),
+      updateTsConfig({ "allowSyntheticDefaultImports": true })
+    ]);
+  };
 }
 
 /**
@@ -352,104 +464,13 @@ export default function (_options: any): Rule {
       throw new SchematicsException(`Targets are not defined for this project.`);
     }
 
-    if (_options.registry) {
-      tree.create('.npmrc', `registry=${_options.registry}`);
-    }
-
-    const buildTargets = [];
-    const testTargets = [];
-    for (const target of project.targets.values()) {
-      if (target.builder === '@angular-devkit/build-angular:browser') {
-        buildTargets.push(target);
-      } else if (target.builder === '@angular-devkit/build-angular:karma') {
-        testTargets.push(target);
-      }
-    }
-
-    // Configure project options
-    for (const target of buildTargets) {
-      // Add assets
-      if (target.options?.assets instanceof Array) {
-        const index = target.options.assets.indexOf('src/favicon.ico');
-        if (index >= 0) {
-          target.options.assets.splice(index, 1);
-          if (tree.exists('src/favicon.ico')) {
-            tree.delete('src/favicon.ico');
-          }
-        }
-        target.options.assets.push(...PROJECT_ASSETS);
-      }
-
-      // Add styles
-      if (target.options?.styles instanceof Array) {
-        target.options.styles.push(...PROJECT_STYLES);
-      }
-
-      // Add scripts
-      if (target.options?.scripts instanceof Array) {
-        target.options.scripts.push(...PROJECT_SCRIPTS);
-      }
-    }
-
-    // Find all index.html files in build targets
-    const indexFiles = new Set<string>();
-    for (const target of buildTargets) {
-      if (typeof target.options?.index === 'string') {
-        indexFiles.add(target.options.index);
-      }
-
-      if (!target.configurations) {
-        continue;
-      }
-
-      for (const options of Object.values(target.configurations)) {
-        if (typeof options?.index === 'string') {
-          indexFiles.add(options.index);
-        }
-      }
-    }
-
-    const buildTarget = project.targets.get('build');
-    if (!buildTarget) {
-      throw targetBuildNotFoundError();
-    }
-
-    const buildOptions = ((buildTarget.options || {}) as unknown) as BrowserBuilderOptions;
-
     const externalOptions = { project: _options.project };
-
-    // Setup sources for the assets files to add to the project
-    const sourcePath = project.sourceRoot ?? posix.join(project.root, 'src');
-
-    const templateSource = apply(url('./files'), [
-      applyTemplates({
-        startupCulture: 'en-US',
-        startupTheme: 'cmf.style.light.blue',
-        supportedCultures: `[
-      "en-US"
-    ]`,
-        supportedThemes: `[
-      "cmf.style.light.blue",
-      "cmf.style.dark.blue",
-      "cmf.style.blue.grey",
-      "cmf.style.blue"
-    ]`
-      }),
-      move(posix.join(sourcePath, 'assets')),
-    ]);
 
     return chain([
       externalSchematic('@angular/pwa', 'pwa', externalOptions),
       externalSchematic('@angular/localize', 'ng-add', { externalOptions, useAtRuntime: true }),
-      emptyDir(posix.join(sourcePath, 'assets', 'icons')),
-      mergeWith(templateSource),
-      updateWorkspace(workspace),
-      installDependencies(CORE_PACKAGES),
-      ...[...indexFiles].map((path) => updateIndexFile(path)),
-      overriteComponentTemplate(buildOptions.main),
-      updateAppModule(buildOptions.main, [...CORE_METADATA_MODULES, CORE_MODULE]),
-      updateMain(buildOptions.main),
-      updateTsConfig({ "allowSyntheticDefaultImports": true })
+      externalSchematic('@angular-eslint/schematics', 'ng-add', {}),
+      installSchematics(_options)
     ]);
   };
 }

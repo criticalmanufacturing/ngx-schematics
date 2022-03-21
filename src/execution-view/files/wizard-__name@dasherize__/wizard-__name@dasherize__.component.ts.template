@@ -98,15 +98,15 @@ import {
 export class Wizard<%= classify(name) %>Component extends CustomizableComponent implements TransactionExecutionView, OnInit {
 
   /**
-   * The instance of the execution view
-   */
-  public instance: Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
-
-  /**
    * Nested execution view
    */
   @ViewChild(ExecutionView, { static: true })
-  private _nestedExecutionView: ExecutionView;
+  private _nestedExecutionView!: ExecutionView;
+
+  /**
+   * The instance of the execution view
+   */
+  public instance: Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %> | null = null;
 
   /**
    * Constructor
@@ -129,7 +129,7 @@ export class Wizard<%= classify(name) %>Component extends CustomizableComponent 
     const instanceInput = new Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.GetObjectByIdInput();
     instanceInput.IgnoreLastServiceId = true;
     instanceInput.Id = this.pageBag.context.instance.Id;
-    instanceInput.Type = this.entityTypes.getEntityTypeNameFromInstance(this.instance);
+    instanceInput.Type = this.entityTypes.getEntityTypeNameFromInstance(this.pageBag.context.instance);
     inputs.push(instanceInput);
 
     return inputs;
@@ -154,7 +154,7 @@ export class Wizard<%= classify(name) %>Component extends CustomizableComponent 
    * @param args Current inputs where the user can append or simply resolve its own input.
    */
   public async prepareTransactionInput(args: TransactionEventArgs): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput> {
-    const input: Cmf.Foundation.BusinessOrchestration.BaseInput = null;
+    const input = new Cmf.Foundation.BusinessOrchestration.BaseInput();
     input.IgnoreLastServiceId = true;
 
     return input;
@@ -164,8 +164,8 @@ export class Wizard<%= classify(name) %>Component extends CustomizableComponent 
    * The execution view hook for handling the above service call.
    * @param output output object, result of the input created in the prepareTransactionInput
    */
-  public handleTransactionOutput(output: Cmf.Foundation.BusinessOrchestration.BaseOutput): Promise<void> {
-    return null;
+  public async handleTransactionOutput(output: Cmf.Foundation.BusinessOrchestration.BaseOutput): Promise<void> {
+    return;
   }
 
   /**

@@ -24,7 +24,7 @@ import {
   factory: () => new <%= classify(name) %>Pipe(),
   deps: [],
   input: [],
-  output: null
+  output: null!
 })
 @Pipe({
   name: "<%= camelize(name) %>"

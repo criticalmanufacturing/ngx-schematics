@@ -41,6 +41,14 @@ export default function (_options: any): Rule {
       _options.path = buildDefaultPath(project);
     }
 
+    if (!_options.name) {
+      throw new SchematicsException(`Action name is required`);
+    }
+
+    if (!_options.entityType) {
+      throw new SchematicsException(`Entity Type name is required`);
+    }
+
     if (!_options.namespace) {
       throw new SchematicsException(`Entity Type mamespace is required`);
     }

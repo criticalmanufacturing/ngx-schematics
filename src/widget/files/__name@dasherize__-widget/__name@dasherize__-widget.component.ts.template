@@ -90,7 +90,7 @@ export class <%= classify(name) %>WidgetComponent extends WidgetGeneric implemen
   /**
    * Defines how the widget will be represented
    */
-  public uiWidgetViewMode: WidgetViewMode;
+  public uiWidgetViewMode: WidgetViewMode = WidgetViewMode.Normal;
 
   /**
    * Constructor

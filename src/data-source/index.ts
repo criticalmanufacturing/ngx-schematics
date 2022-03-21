@@ -14,6 +14,10 @@ export default function (_options: any): Rule {
       throw new SchematicsException(`Project "${_options.project}" does not exist.`);
     }
 
+    if (!_options.name) {
+      throw new SchematicsException(`Data Source name is required`);
+    }
+
     if (_options.path === undefined) {
       _options.path = buildDefaultPath(project);
     }
