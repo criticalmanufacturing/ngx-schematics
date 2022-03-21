@@ -1,25 +1,25 @@
 import { extname, join, normalize } from '@angular-devkit/core';
-import { indentBy } from '@angular-devkit/core/src/utils/literals';
 import { ProjectDefinition } from '@angular-devkit/core/src/workspace';
 import { chain, Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
-import { findNode, findNodes, getSourceNodes, insertAfterLastOccurrence, insertImport } from '@schematics/angular/utility/ast-utils';
-import { applyToUpdateRecorder, Change, InsertChange } from '@schematics/angular/utility/change';
+import { findNodes } from '@schematics/angular/utility/ast-utils';
+import { applyToUpdateRecorder } from '@schematics/angular/utility/change';
 import { JSONFile } from '@schematics/angular/utility/json-file';
 import { getWorkspace } from '@schematics/angular/utility/workspace';
+import { basename } from 'path';
 import ts = require('typescript');
-import { findMetadataFile, updateSpaces } from '../utility/metadata';
+import { findMetadataFile, insertPackageInfoMetadata, PackageInfo } from '../utility/metadata';
 
 
 function getAllFiles(host: Tree, rootPath: string) {
   const rootDir = host.getDir(rootPath);
 
   const files = rootDir.subfiles
-    .filter(file => extname(file) === '.ts')
+    .filter(file => extname(file) === '.ts' && file.split('.')[0] === basename(rootPath))
     .map((file) => join(normalize(rootPath), file));
 
-  rootDir.subdirs.forEach((dir) => {
-    files.push(...getAllFiles(host, join(normalize(rootPath), dir)))
-  });
+  if (files.length === 0) {
+    rootDir.subdirs.forEach((dir) => files.push(...getAllFiles(host, join(normalize(rootPath), dir))));;
+  }
 
   return files;
 }
@@ -45,18 +45,6 @@ function getMetadataPath(tree: Tree, rootDir: string) {
   return findMetadataFile(content, entryFile, rootDir);
 }
 
-const WIDGETS = 'widgets';
-const CONVERTERS = 'converters';
-const DATA_SOURCES = 'dataSources';
-const COMPONENTS = 'components';
-
-interface PackageInfo {
-  package: string;
-  [WIDGETS]: string[];
-  [CONVERTERS]: string[];
-  [DATA_SOURCES]: string[];
-  [COMPONENTS]: string[];
-}
 
 function fillMetadataPackageInfo(project: ProjectDefinition, options: PackageInfo): Rule {
   return (tree: Tree) => {
@@ -66,152 +54,18 @@ function fillMetadataPackageInfo(project: ProjectDefinition, options: PackageInf
       return;
     }
 
-    const source = ts.createSourceFile(metadataPath, tree.get(metadataPath)!.content.toString('utf-8'), ts.ScriptTarget.Latest, true);
+    const changes = insertPackageInfoMetadata(tree.get(metadataPath)!.content.toString('utf-8'), metadataPath, options);
 
-    const metadataClassDeclaration = getSourceNodes(source)
-      .filter(ts.isClassDeclaration)
-      .filter(node => {
-        if (!node.heritageClauses) {
-          return false;
-        }
-
-        return node.heritageClauses.find((clause) =>
-          clause.getChildAt(0).kind === ts.SyntaxKind.ExtendsKeyword
-          && findNode(clause, ts.SyntaxKind.Identifier, 'PackageMetadata'));
-      })[0];
-
-    const allAccessors = findNodes(metadataClassDeclaration, ts.isGetAccessor);
-
-    const packageInfoAccessor = allAccessors.find((accessor) =>
-      accessor.getChildren().find(node => node.kind === ts.SyntaxKind.Identifier && node.getText() === 'packageInfo'));
-
-    const contentNode = metadataClassDeclaration.getChildAt(metadataClassDeclaration.getChildren()
-      .findIndex(node => node.kind === ts.SyntaxKind.OpenBraceToken) + 1);
-
-    const spaces = contentNode.getFullText().match(/^(\r?\n)+(\s*)/)?.[2].length ?? 2;
-
-    if (!packageInfoAccessor) {
-      const toInsertSpaced = updateSpaces(spaces)`
-
-  /**
-   * Package Info
-   */
-  public override get packageInfo(): PackageInfo {
-    return {
-      name: '${options.package}',
-      loader: () => import(
-        /* webpackExports: [
-${indentBy(10)`"${[
-          ...options.widgets,
-          ...options.dataSources,
-          ...options.converters,
-          ...options.components
-        ].join(`",\n"`)}"`}
-        ] */
-        '${options.package}'),
-      widgets: [
-${indentBy(8)`'${options.widgets.join(`',\n'`)}'`}
-      ],
-      dataSources: [
-${indentBy(8)`'${options.dataSources.join(`',\n'`)}'`}
-      ],
-      converters: [
-${indentBy(8)`'${options.converters.join(`',\n'`)}'`}
-      ],
-      components: [
-${indentBy(8)`'${options.components.join(`',\n'`)}'`}
-      ]
-    }
-  }`;
-
-      const fallbackPos = findNodes(contentNode, ts.SyntaxKind.Constructor, 1)[0]?.getEnd() ?? contentNode.getStart();
-      const changes = [
-        insertImport(source, metadataPath, 'PackageInfo', 'cmf-core'),
-        insertAfterLastOccurrence(allAccessors, toInsertSpaced, metadataPath, fallbackPos, ts.SyntaxKind.GetAccessor)
-      ];
-
-      const recorder = tree.beginUpdate(metadataPath);
-      applyToUpdateRecorder(recorder, changes);
-      tree.commitUpdate(recorder);
+    if (!changes) {
       return;
     }
-
-    const returnStatement = findNodes(packageInfoAccessor, ts.SyntaxKind.ReturnStatement, 1, true)[0];
-    const addedTypes: string[] = [];
-    const changes: Change[] = [];
-    [WIDGETS, DATA_SOURCES, CONVERTERS, COMPONENTS].forEach((identifier) => {
-      const property = findNode(returnStatement, ts.SyntaxKind.Identifier, identifier)?.parent;
-
-      if (!property || property.kind !== ts.SyntaxKind.PropertyAssignment) {
-        return;
-      }
-
-      const arrayExp = (property as ts.PropertyAssignment).initializer as ts.ArrayLiteralExpression;
-
-      if (arrayExp.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
-        return;
-      }
-
-      const elementsToAdd: string[] = [];
-
-      (options as any)[identifier].forEach((type: string) => {
-        if (!arrayExp.elements.find((elem) => elem.kind === ts.SyntaxKind.StringLiteral && (elem as ts.StringLiteral).text === type)) {
-          elementsToAdd.push(type);
-        }
-      });
-
-      if (elementsToAdd.length === 0) {
-        return;
-      }
-
-      const list = arrayExp.getChildAt(1);
-      const lastChild = list.getChildAt(list.getChildCount() - 1);
-
-      const toInsertSpaced = updateSpaces(spaces)`${lastChild && lastChild.kind !== ts.SyntaxKind.CommaToken ? ',' : ''}
-${indentBy(8)`'${elementsToAdd.join(`',\n'`)}'`}${lastChild ? '' : `\n      `}`;
-
-      changes.push(new InsertChange(metadataPath, lastChild?.getEnd() ?? arrayExp.getEnd() - 1, toInsertSpaced));
-
-      addedTypes.push(...elementsToAdd);
-    });
-
-    const loader = findNode(returnStatement, ts.SyntaxKind.Identifier, 'loader')?.parent;
-
-    const importExp = findNodes(loader!, ts.isCallExpression)
-      .find(node => node.expression.getText() === 'import');
-
-    if (!importExp) {
-      return;
-    }
-
-    const ranges = ts.getLeadingCommentRanges(source.getFullText(), importExp.arguments[0].getFullStart());
-
-    if (!ranges) {
-      return;
-    }
-
-    ranges.forEach((range) => {
-      const commentText = source.getFullText().slice(range.pos, range.end);
-      const exports = /(webpackExports\s*:\s*\[)(.*?)\]/gms.exec(commentText);
-
-      if (!exports) {
-        return;
-      }
-
-      const insertPos = range.pos + exports.index + exports[1].length + exports[2]?.trimEnd().length ?? 0;
-      const containsElements = exports[2] && exports[2].trim().length > 0;
-      const toInsertSpaced = updateSpaces(spaces)`${containsElements && !exports[2].trimEnd().endsWith(',') ? ',' : ''}
-${indentBy(10)`"${addedTypes.join(`",\n"`)}"`}${containsElements ? '' : `\n        `}`;
-
-      changes.push(new InsertChange(metadataPath, insertPos, toInsertSpaced));
-    });
-
 
     const recorder = tree.beginUpdate(metadataPath);
     applyToUpdateRecorder(recorder, changes);
     tree.commitUpdate(recorder);
   }
 }
+
 
 export default function (_options: any): Rule {
   return async (tree: Tree, _context: SchematicContext) => {
