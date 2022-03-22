@@ -1,0 +1,55 @@
+import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { Routes } from 'cmf-core';
+
+import {
+  ViewGuard,
+  HistoryView,
+  HistoryViewModule,
+  ReferencesView,
+  ReferencesViewModule
+} from 'cmf-core-business-controls';
+
+import { Page<%= classify(name) %>Component } from './page-<%= dasherize(name) %>.component';
+
+import {
+  Page<%= classify(name) %>DetailsViewComponent,
+  Page<%= classify(name) %>DetailsViewModule,
+} from './page-<%= dasherize(name) %>-details-view/page-<%= dasherize(name) %>-details-view.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: Page<%= classify(name) %>Component,
+    children: [
+      {
+        path: '',
+        redirectTo: 'View/Details',
+        pathMatch: 'full'
+      },
+      {
+        path: 'View/Details',
+        component: Page<%= classify(name) %>DetailsViewComponent
+      },
+      {
+        path: 'View/References',
+        component: ReferencesView
+      },
+      {
+        path: 'View/History',
+        component: HistoryView
+      }
+    ]
+  }
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forChild(routes),
+    Page<%= classify(name) %>DetailsViewModule,
+    HistoryViewModule,
+    ReferencesViewModule
+  ],
+  providers: [ViewGuard]
+})
+export class Page<%= classify(name) %>RoutingModule { }

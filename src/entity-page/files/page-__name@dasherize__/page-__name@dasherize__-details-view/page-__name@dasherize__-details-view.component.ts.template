@@ -1,0 +1,130 @@
+import {
+  Component,
+  NgModule,
+  OnDestroy,
+  ViewContainerRef
+} from '@angular/core';
+
+import {
+  CommonModule
+} from '@angular/common';
+
+import { Subscription } from 'rxjs';
+import Cmf from 'cmf.lbos';
+
+import {
+  CustomizableComponent,
+} from 'cmf-core';
+
+import {
+  EntityPageService,
+  DetailsViewModule
+} from 'cmf-core-business-controls';
+
+/**
+ * @whatItDoes
+ *
+ * Please provide a meaningful description of this component
+ * Try to answer these questions:
+ * * What is it?
+ * * What it does?
+ * * How does it behave with different sizes?
+ * * Does it retrieve data from any external source (server, local database, text file, etc...)?
+ *
+ * @howToUse
+ *
+ * This component is used with the inputs and outputs mentioned below.
+ *
+ * Besides the description above, please complement it with a meaningful description of this component that answer these questions:
+ * * How to use it?
+ * * Where and When to use it?
+ *
+ * ### Inputs
+ * `string` : **name** - The name of this component
+ * `number` : **value** - The value of this component
+ *
+ * ### Outputs
+ * `string` : **onNameChange** - When the name of the component change, this output emits the new name
+ * `number` : **onValueChange** - When the value of the component change, this output emits the new value
+ *
+ * ### Example
+ * To use the component, assume this HTML Template as an example:
+ *
+ * ```HTML
+ * <<%= dasherize(project) %>-wizard-<%= dasherize(name) %>></<%= dasherize(project) %>-wizard-<%= dasherize(name) %>>
+ * ```
+ *
+ * ### _NOTES_
+ * (optional, Provide additional notes here)
+ *
+ * @description
+ *
+ * ## <%= classify(name) %>Component Component
+ *
+ * ### Dependencies
+ *
+ * #### Components
+ * * ComponentA : `package`
+ * * ComponentB : `package`
+ *
+ * #### Services
+ * * ServiceA : `package`
+ * * ServiceB : `package`
+ *
+ * #### Directives
+ * * DirectiveA : `package`
+ * * DirectiveB : `package`
+ *
+ */
+@Component({
+  selector: '<%= dasherize(project) %>-page-<%= dasherize(name) %>-details-view',
+  templateUrl: './page-<%= dasherize(name) %>-details-view.component.html'
+})
+export class Page<%= classify(name) %>DetailsViewComponent extends CustomizableComponent implements OnDestroy {
+
+  /**
+   * Subscription of the ep entity loaded event from the entity page service.
+   */
+  private _epEntityLoadedSubscription: Subscription;
+
+  /**
+   * The entity to be presented in this view
+   */
+  public epEntity!: Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
+
+  /**
+   * Constructor
+   *
+   * @param viewContainerRef the reference to the component view container
+   */
+  constructor(viewContainerRef: ViewContainerRef, private entityPage: EntityPageService) {
+    super(viewContainerRef);
+
+    this.epOnEntityLoaded();
+    this._epEntityLoadedSubscription = this.entityPage.epEntityLoaded.subscribe(this.epOnEntityLoaded.bind(this));
+  }
+
+  /**
+    * When the entity is loaded by the Entity Page, chooses which properties to display
+    */
+  public epOnEntityLoaded() {
+    this.epEntity = this.entityPage.epEntity as Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
+  }
+
+  /**
+   * Unsubscribes subscriptions
+   */
+  public ngOnDestroy(): void {
+    this._epEntityLoadedSubscription?.unsubscribe();
+  }
+}
+
+@NgModule({
+  imports: [
+    CommonModule,
+    DetailsViewModule
+  ],
+  declarations: [Page<%= classify(name) %>DetailsViewComponent],
+  exports: [Page<%= classify(name) %>DetailsViewComponent]
+})
+export class Page<%= classify(name) %>DetailsViewModule { }

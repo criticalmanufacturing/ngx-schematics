@@ -1,0 +1,6 @@
+<cmf-core-business-controls-entityPage
+  [mainTitle]="epEntity?.Name!"
+  entityType="<%= classify(name) %>"
+  i18n-entityTypeName="@@<%= dasherize(project) %>/page-<%= dasherize(name) %>#ENTITY_TYPE"
+  entityTypeName="<%= nameify(name) %>">
+</cmf-core-business-controls-entityPage>

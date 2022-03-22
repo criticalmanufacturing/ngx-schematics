@@ -142,11 +142,10 @@ ${indentBy(6)`${toInsert}`}
   }`;
 
     const fallbackPos = findNodes(contentNode, ts.SyntaxKind.Constructor, 1)[0]?.getEnd() ?? contentNode.getStart();
+    const imports = { ...requiredImports, ...PROPERTY_REFERENCE[propertyIdentifier] };
+
     return [
-      ...Object.keys({
-        ...requiredImports,
-        ...PROPERTY_REFERENCE[propertyIdentifier]
-      }).map((key) => insertImport(source, filePath, key, requiredImports[key])),
+      ...Object.keys(imports).map((key) => insertImport(source, filePath, key, (imports as any)[key])),
       insertAfterLastOccurrence(allAccessors, toInsertSpaced, filePath, fallbackPos, ts.SyntaxKind.GetAccessor)
     ];
   }
@@ -165,6 +164,83 @@ ${indentBy(6)`${toInsert}`}${lastChild ? '' : `\n    `}`;
     new InsertChange(filePath, lastChild?.getEnd() ?? array.getEnd() - 1, toInsertSpaced)
   ];
 }
+
+export function insertRoutesMetadata(
+  content: string,
+  filePath: string,
+  requiredImports: Record<string, string>,
+  toInsert: string
+) {
+  const source = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
+
+  const metadataClassDeclaration = getSourceNodes(source)
+    .filter(ts.isClassDeclaration)
+    .filter(node => {
+      if (!node.heritageClauses) {
+        return false;
+      }
+
+      return node.heritageClauses.find((clause) =>
+        clause.getChildAt(0).kind === ts.SyntaxKind.ExtendsKeyword
+        && findNode(clause, ts.SyntaxKind.Identifier, 'PackageMetadata'));
+    })[0];
+
+  const allAccessors = findNodes(metadataClassDeclaration, ts.isGetAccessor);
+
+  const routesAccessor = allAccessors.find((accessor) =>
+    accessor.getChildren().find(node => node.kind === ts.SyntaxKind.Identifier && node.getText() === 'routes'));
+
+  const contentNode = metadataClassDeclaration.getChildAt(metadataClassDeclaration.getChildren()
+    .findIndex(node => node.kind === ts.SyntaxKind.OpenBraceToken) + 1);
+
+  const spaces = contentNode.getFullText().match(/^(\r?\n)+(\s*)/)?.[2].length ?? 2;
+
+  if (!routesAccessor) {
+    return insertMetadata(content, filePath, { ...requiredImports, 'KnownRoutes': 'cmf-core' }, MetadataProperty.Route, `\
+{
+  id: KnownRoutes.Page,
+  routes: [
+${indentBy(4)`${toInsert}`}
+  ]
+}`);
+  }
+
+  const returnStatement = findNodes(routesAccessor, ts.SyntaxKind.ReturnStatement, 1, true)[0];
+  const changes: Change[] = [];
+
+  const property = findNode(returnStatement, ts.SyntaxKind.Identifier, 'routes')?.parent;
+
+  if (property && property.kind !== ts.SyntaxKind.PropertyAssignment) {
+    return;
+  }
+
+  if (!property) {
+    return insertMetadata(content, filePath, { ...requiredImports, 'KnownRoutes': 'cmf-core' }, MetadataProperty.Route, `\
+{
+  id: KnownRoutes.Page,
+  routes: [
+${indentBy(4)`${toInsert}`}
+  ]
+}`);
+  }
+
+  const arrayExp = (property as ts.PropertyAssignment).initializer as ts.ArrayLiteralExpression;
+
+  if (arrayExp.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
+    return;
+  }
+
+  const list = arrayExp.getChildAt(1);
+  const lastChild = list.getChildAt(list.getChildCount() - 1);
+
+  const toInsertSpaced = updateSpaces(spaces)`${lastChild && lastChild.kind !== ts.SyntaxKind.CommaToken ? ',' : ''}
+${indentBy(10)`${toInsert}`}${lastChild ? '' : `\n      `}`;
+
+  changes.push(new InsertChange(filePath, lastChild?.getEnd() ?? arrayExp.getEnd() - 1, toInsertSpaced));
+
+  return changes;
+}
+
 
 export function insertPackageInfoMetadata(content: string, filePath: string, options: PackageInfo) {
   const source = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);

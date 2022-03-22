@@ -1,0 +1,2 @@
+<cmf-core-business-controls-detailsView *ngIf="epEntity">
+</cmf-core-business-controls-detailsView>

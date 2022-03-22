@@ -146,13 +146,15 @@ export class WizardCreateEdit<%= classify(name) %>Component extends Customizable
    * @param outputs BaseOutput[]
    */
   public onInitialSetupFinish = (instance: any, outputs: Cmf.Foundation.BusinessOrchestration.BaseOutput[]): void => {
-    if (outputs != null && outputs.length >= 1) {
-      const loadInstanceOutput =
-        outputs[0] as Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.OutputObjects.GetObjectByIdOutput;
+    if (EditMode.Edit === this.editMode) {
+      if (outputs != null && outputs.length >= 1) {
+        const loadInstanceOutput =
+          outputs[0] as Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.OutputObjects.GetObjectByIdOutput;
 
-      this.instance = loadInstanceOutput.Instance;
-    } else {
-      throw new Error($localize`:@@<%= project %>/<%= dasherize(name) %>#LOAD_INSTANCE:Error Loading Instance`);
+        this.instance = loadInstanceOutput.Instance;
+      } else {
+        throw new Error($localize`:@@<%= project %>/<%= dasherize(name) %>#LOAD_INSTANCE:Error Loading Instance`);
+      }
     }
   };
 

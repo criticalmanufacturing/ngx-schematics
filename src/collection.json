@@ -20,6 +20,11 @@
       "factory": "./data-source",
       "schema": "./data-source/schema.json"
     },
+    "entity-page": {
+      "description": "Generate a new entity page.",
+      "factory": "./entity-page",
+      "schema": "./entity-page/schema.json"
+    },
     "execution-view": {
       "description": "Generate a customization library project for Angular.",
       "factory": "./execution-view",
