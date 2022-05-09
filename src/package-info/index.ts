@@ -1,27 +1,65 @@
-import { extname, join, normalize } from '@angular-devkit/core';
+import { join, normalize } from '@angular-devkit/core';
 import { ProjectDefinition } from '@angular-devkit/core/src/workspace';
 import { chain, Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
+import ts = require('@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript');
 import { findNodes } from '@schematics/angular/utility/ast-utils';
 import { applyToUpdateRecorder } from '@schematics/angular/utility/change';
 import { JSONFile } from '@schematics/angular/utility/json-file';
 import { getWorkspace } from '@schematics/angular/utility/workspace';
-import { basename } from 'path';
-import ts = require('typescript');
+import { dirname } from 'path';
+
 import { findMetadataFile, insertPackageInfoMetadata, PackageInfo } from '../utility/metadata';
 
 
-function getAllFiles(host: Tree, rootPath: string) {
-  const rootDir = host.getDir(rootPath);
-
-  const files = rootDir.subfiles
-    .filter(file => extname(file) === '.ts' && file.split('.')[0] === basename(rootPath))
-    .map((file) => join(normalize(rootPath), file));
-
-  if (files.length === 0) {
-    rootDir.subdirs.forEach((dir) => files.push(...getAllFiles(host, join(normalize(rootPath), dir))));;
+function getAllFiles(host: Tree, rootPath: string): string[] {
+  if (!host.exists(join(normalize(rootPath), 'ng-package.json'))) {
+    return [];
   }
 
-  return files;
+  const json = new JSONFile(host, join(normalize(rootPath), 'ng-package.json'));
+  const entryFile = json.get(['lib', 'entryFile']) as string | null;
+
+  if (!entryFile) {
+    return [];
+  }
+
+  const filesToSearch: string[] = [join(normalize(rootPath), entryFile)];
+  const filesFound: string[] = [];
+
+  while (filesToSearch.length > 0) {
+    const file = filesToSearch.pop()!;
+
+    const content = host.get(file)?.content.toString('utf-8');
+
+    if (!content) {
+      continue;
+    }
+
+    const sourceFile = ts.createSourceFile(file, content, ts.ScriptTarget.Latest, true);
+
+    findNodes(sourceFile, ts.isExportDeclaration)
+      .forEach((node) => {
+        if (!node.moduleSpecifier || !ts.isStringLiteral(node.moduleSpecifier)) {
+          return;
+        }
+
+        const path = join(normalize(dirname(file)), (node.moduleSpecifier as ts.StringLiteral).text + '.ts');
+
+        if (!host.exists(path)) {
+          return;
+        }
+
+        if (!filesFound.includes(path)) {
+          filesFound.push(path);
+
+          if (!filesToSearch.includes(path)) {
+            filesToSearch.push(path);
+          }
+        }
+      });
+  }
+
+  return filesFound;
 }
 
 function getMetadataPath(tree: Tree, rootDir: string) {
@@ -89,7 +127,7 @@ export default function (_options: any): Rule {
       components: []
     }
 
-    getAllFiles(tree, project.sourceRoot).forEach((file) => {
+    getAllFiles(tree, project.root).forEach((file) => {
       const source = ts.createSourceFile(file, tree.get(file)!.content.toString('utf-8'), ts.ScriptTarget.Latest, true);
 
       const classNodes = findNodes(source, ts.isClassDeclaration);

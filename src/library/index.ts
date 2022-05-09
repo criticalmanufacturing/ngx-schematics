@@ -6,11 +6,11 @@ import { nameify } from '../utility/string';
 import { JSONFile } from '@schematics/angular/utility/json-file';
 import { findBootstrapModuleCall, findBootstrapModulePath } from '@schematics/angular/utility/ng-ast-utils';
 import { BrowserBuilderOptions } from '@schematics/angular/utility/workspace-models';
-import * as ts from 'typescript';
 import { getSourceNodes } from '@schematics/angular/utility/ast-utils';
 import { addSymbolToNgModuleMetadata } from '../utility/ast';
 import { classify } from '@angular-devkit/core/src/utils/strings';
 import { applyToUpdateRecorder } from '@schematics/angular/utility/change';
+import ts = require('@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript');
 
 function updateTsConfig(packageName: string, ...paths: string[]) {
   return (host: Tree) => {
@@ -106,7 +106,7 @@ function updateAppModule(options: any) {
 function createMetadataSubEntry(options: any) {
   return async (host: Tree) => {
     const workspace = await getWorkspace(host);
-    const addedProject = Array.from(workspace.projects.keys()).find((projectName) => options.name.includes(projectName));
+    const addedProject = Array.from(workspace.projects.keys()).find((projectName) => projectName === options.name);
 
     if (!addedProject) {
       return;

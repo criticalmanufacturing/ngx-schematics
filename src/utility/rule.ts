@@ -1,9 +1,9 @@
 import { dirname, extname, join, normalize } from '@angular-devkit/core';
 import { ProjectDefinition } from '@angular-devkit/core/src/workspace';
 import { Rule, Tree } from '@angular-devkit/schematics';
+import ts = require('@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript');
 import { applyToUpdateRecorder } from '@schematics/angular/utility/change';
 import { JSONFile } from '@schematics/angular/utility/json-file';
-import * as ts from 'typescript';
 
 import { insertExport } from './ast';
 import { findMetadataFile, insertMetadata, MetadataProperty } from './metadata';

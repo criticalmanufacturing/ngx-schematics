@@ -6,7 +6,6 @@ import { isImported, insertImport, addSymbolToNgModuleMetadata, findNodes, getDe
 import { targetBuildNotFoundError } from '@schematics/angular/utility/project-targets';
 import { BrowserBuilderOptions } from '@schematics/angular/utility/workspace-models';
 import { addPackageJsonDependency, NodeDependency } from '@schematics/angular/utility/dependencies';
-import * as ts from 'typescript';
 
 import { Readable, Writable } from 'stream';
 import { CORE_METADATA_MODULES, CORE_MODULE, CORE_PACKAGES, PROJECT_ASSETS, PROJECT_SCRIPTS, PROJECT_STYLES } from './package-configs';
@@ -14,6 +13,7 @@ import { applyToUpdateRecorder, Change, RemoveChange, ReplaceChange } from '@sch
 import { JSONFile } from '@schematics/angular/utility/json-file';
 import { posix } from 'path';
 import { dirname, join, JsonObject, normalize } from '@angular-devkit/core';
+import ts = require('@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript');
 
 /**
  * Updates index.html file with the themes and loading container

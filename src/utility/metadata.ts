@@ -1,9 +1,9 @@
-import { dirname, join, normalize } from "@angular-devkit/core";
-import { indentBy } from "@angular-devkit/core/src/utils/literals";
-import { findNode, findNodes, getSourceNodes, insertAfterLastOccurrence, insertImport } from "@schematics/angular/utility/ast-utils";
-import { Change, InsertChange } from "@schematics/angular/utility/change";
-import ts = require("typescript");
-import { nameify } from "./string";
+import { dirname, join, normalize } from '@angular-devkit/core';
+import { indentBy } from '@angular-devkit/core/src/utils/literals';
+import ts = require('@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript');
+import { findNode, findNodes, getSourceNodes, insertAfterLastOccurrence, insertImport } from '@schematics/angular/utility/ast-utils';
+import { Change, InsertChange, ReplaceChange } from '@schematics/angular/utility/change';
+import { nameify } from './string';
 
 export enum MetadataProperty {
   Route = 'routes',
@@ -267,8 +267,7 @@ export function insertPackageInfoMetadata(content: string, filePath: string, opt
 
   const spaces = contentNode.getFullText().match(/^(\r?\n)+(\s*)/)?.[2].length ?? 2;
 
-  if (!packageInfoAccessor) {
-    const toInsertSpaced = updateSpaces(spaces)`
+  const toInsertSpaced = updateSpaces(spaces)`
 
   /**
    * Package Info
@@ -279,11 +278,11 @@ export function insertPackageInfoMetadata(content: string, filePath: string, opt
       loader: () => import(
         /* webpackExports: [
 ${indentBy(10)`"${[
-        ...options.widgets,
-        ...options.dataSources,
-        ...options.converters,
-        ...options.components
-      ].join(`",\n"`)}"`}
+      ...options.widgets,
+      ...options.dataSources,
+      ...options.converters,
+      ...options.components
+    ].join(`",\n"`)}"`}
         ] */
         '${options.package}'),
       widgets: [
@@ -301,6 +300,7 @@ ${indentBy(8)`'${options.components.join(`',\n'`)}'`}
     }
   }`;
 
+  if (!packageInfoAccessor) {
     const fallbackPos = findNodes(contentNode, ts.SyntaxKind.Constructor, 1)[0]?.getEnd() ?? contentNode.getStart();
     return [
       insertImport(source, filePath, 'PackageInfo', 'cmf-core'),
@@ -308,97 +308,5 @@ ${indentBy(8)`'${options.components.join(`',\n'`)}'`}
     ];
   }
 
-  const returnStatement = findNodes(packageInfoAccessor, ts.SyntaxKind.ReturnStatement, 1, true)[0];
-  const addedTypes: string[] = [];
-  const changes: Change[] = [];
-
-  [
-    {
-      identifier: 'widgets',
-      elements: options.widgets
-    },
-    {
-      identifier: 'dataSources',
-      elements: options.dataSources
-    },
-    {
-      identifier: 'converters',
-      elements: options.converters
-    },
-    {
-      identifier: 'components',
-      elements: options.components
-    }
-  ].forEach((prop) => {
-    const property = findNode(returnStatement, ts.SyntaxKind.Identifier, prop.identifier)?.parent;
-
-    if (!property || property.kind !== ts.SyntaxKind.PropertyAssignment) {
-      return;
-    }
-
-    const arrayExp = (property as ts.PropertyAssignment).initializer as ts.ArrayLiteralExpression;
-
-    if (arrayExp.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
-      return;
-    }
-
-    const elementsToAdd: string[] = [];
-
-    prop.elements.forEach((type: string) => {
-      if (!arrayExp.elements.find((elem) => elem.kind === ts.SyntaxKind.StringLiteral && (elem as ts.StringLiteral).text === type)) {
-        elementsToAdd.push(type);
-      }
-    });
-
-    if (elementsToAdd.length === 0) {
-      return;
-    }
-
-    const list = arrayExp.getChildAt(1);
-    const lastChild = list.getChildAt(list.getChildCount() - 1);
-
-    const toInsertSpaced = updateSpaces(spaces)`${lastChild && lastChild.kind !== ts.SyntaxKind.CommaToken ? ',' : ''}
-${indentBy(8)`'${elementsToAdd.join(`',\n'`)}'`}${lastChild ? '' : `\n      `}`;
-
-    changes.push(new InsertChange(filePath, lastChild?.getEnd() ?? arrayExp.getEnd() - 1, toInsertSpaced));
-
-    addedTypes.push(...elementsToAdd);
-  });
-
-  if (addedTypes.length === 0) {
-    return;
-  }
-
-  const loader = findNode(returnStatement, ts.SyntaxKind.Identifier, 'loader')?.parent;
-
-  const importExp = findNodes(loader!, ts.isCallExpression)
-    .find(node => node.expression.getText() === 'import');
-
-  if (!importExp) {
-    return;
-  }
-
-  const ranges = ts.getLeadingCommentRanges(source.getFullText(), importExp.arguments[0].getFullStart());
-
-  if (!ranges) {
-    return;
-  }
-
-  ranges.forEach((range) => {
-    const commentText = source.getFullText().slice(range.pos, range.end);
-    const exports = /(webpackExports\s*:\s*\[)(.*?)\]/gms.exec(commentText);
-
-    if (!exports) {
-      return;
-    }
-
-    const insertPos = range.pos + exports.index + exports[1].length + exports[2]?.trimEnd().length ?? 0;
-    const containsElements = exports[2] && exports[2].trim().length > 0;
-    const toInsertSpaced = updateSpaces(spaces)`${containsElements && !exports[2].trimEnd().endsWith(',') ? ',' : ''}
-${indentBy(10)`"${addedTypes.join(`",\n"`)}"`}${containsElements ? '' : `\n        `}`;
-
-    changes.push(new InsertChange(filePath, insertPos, toInsertSpaced));
-  });
-
-  return changes;
+  return [new ReplaceChange(filePath, packageInfoAccessor.getFullStart(), packageInfoAccessor.getFullText(), toInsertSpaced)];
 }

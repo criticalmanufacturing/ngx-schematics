@@ -1,7 +1,7 @@
-import { tags } from "@angular-devkit/core";
-import { findNodes, getDecoratorMetadata, getMetadataField, insertAfterLastOccurrence, insertImport } from "@schematics/angular/utility/ast-utils";
-import { Change, InsertChange } from "@schematics/angular/utility/change";
-import ts = require("typescript");
+import { tags } from '@angular-devkit/core';
+import ts = require('@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript');
+import { findNodes, getDecoratorMetadata, getMetadataField, insertAfterLastOccurrence, insertImport } from '@schematics/angular/utility/ast-utils';
+import { Change, InsertChange } from '@schematics/angular/utility/change';
 
 /**
  * Inserts an Export Declaration in a file
