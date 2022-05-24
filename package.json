@@ -5,8 +5,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "watch": "tsc -w -p tsconfig.json",
-    "test": "npm run build && jasmine src/**/*_spec.js",
-    "debug": "node --inspect --inspect-brk ../CoreHTML/node_modules/@angular/cli/bin/ng generate @criticalmanufacturing/ng-schematics:wizard-create-edit"
+    "test": "npm run build && jasmine src/**/*_spec.js"
   },
   "keywords": [
     "schematics"
