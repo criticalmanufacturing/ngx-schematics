@@ -285,19 +285,11 @@ ${indentBy(10)`"${[
     ].join(`",\n"`)}"`}
         ] */
         '${options.package}'),
-      widgets: [
-${indentBy(8)`'${options.widgets.join(`',\n'`)}'`}
-      ],
-      dataSources: [
-${indentBy(8)`'${options.dataSources.join(`',\n'`)}'`}
-      ],
-      converters: [
-${indentBy(8)`'${options.converters.join(`',\n'`)}'`}
-      ],
-      components: [
-${indentBy(8)`'${options.components.join(`',\n'`)}'`}
-      ]
-    }
+      widgets: [${options.widgets.length > 0 ? `\n${indentBy(8)`'${options.widgets.join(`',\n'`)}'`}\n      ` : ''}],
+      dataSources: [${options.dataSources.length > 0 ? `\n${indentBy(8)`'${options.dataSources.join(`',\n'`)}'`}\n      ` : ''}],
+      converters: [${options.converters.length > 0 ? `\n${indentBy(8)`'${options.converters.join(`',\n'`)}'`}\n      ` : ''}],
+      components: [${options.components.length > 0 ? `\n${indentBy(8)`'${options.components.join(`',\n'`)}'`}\n      ` : ''}]
+    };
   }`;
 
   if (!packageInfoAccessor) {
