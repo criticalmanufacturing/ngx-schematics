@@ -227,7 +227,7 @@ function installSchematics(_options: any) {
             overriteComponentTemplate(),
             updateAppModule([...CORE_METADATA_MODULES, CORE_MODULE]),
             updateMain(),
-            addRulesToTsConfig({ "allowSyntheticDefaultImports": true })
+            updateTsConfig({ 'compilerOptions.allowSyntheticDefaultImports': true })
         ]);
     };
 }
@@ -312,21 +312,6 @@ function updateAppModule(pkgs: [string, string][]): Rule {
         host.overwrite(modulePath, source.getFullText());
 
         return;
-    };
-}
-
-/**
- * Adds a set of packages to the package.json in the given host tree.
- */
-function addRulesToTsConfig(rules: Record<string, any>) {
-    return (host: Tree) => {
-        const modifyOptions = new Map<string[], any>();
-
-        Object.keys(rules).forEach((rule) => {
-            modifyOptions.set(['compilerOptions', rule], rules[rule]);
-        });
-
-        updateTsConfig(host, modifyOptions);
     };
 }
 

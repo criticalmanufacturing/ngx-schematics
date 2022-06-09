@@ -17,24 +17,11 @@ import {
     url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
-import { JSONFile } from '@schematics/angular/utility/json-file';
 
 import { nameify } from '../utility/string';
 import { addSymbolToNgModuleMetadata, createSourceFile } from '../utility/ast';
 import { getAppModulePath, relativePathToWorkspaceRoot } from '../utility/workspace';
-
-function updateTsConfig(packageName: string, ...paths: string[]) {
-    return (host: Tree) => {
-        if (!host.exists('tsconfig.json')) {
-            return host;
-        }
-
-        const file = new JSONFile(host, 'tsconfig.json');
-        const jsonPath = ['compilerOptions', 'paths', packageName];
-        const value = file.get(jsonPath);
-        file.modify(jsonPath, Array.isArray(value) ? [...value, ...paths] : paths);
-    };
-}
+import { updateTsConfig } from '../utility/project';
 
 function updateAppModule(options: any) {
     return async (host: Tree) => {
@@ -93,7 +80,7 @@ function createMetadataSubEntry(options: any) {
 
         return chain([
             mergeWith(templateSource),
-            options.skipTsConfig ? noop() : updateTsConfig(packageName, pathImportLib, distRoot),
+            options.skipTsConfig ? noop() : updateTsConfig({ [`compilerOptions.paths.${packageName}`]: [pathImportLib, distRoot] }),
             updateAppModule({ packageName, namePrefix })
         ]);
     }
