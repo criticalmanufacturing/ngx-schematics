@@ -14,22 +14,23 @@
   "license": "MIT",
   "schematics": "./src/collection.json",
   "dependencies": {
-    "@angular-devkit/core": "^13.3.5",
-    "@angular-devkit/schematics": "^13.3.5",
+    "@angular-devkit/core": "^14.0.0",
+    "@angular-devkit/schematics": "^14.0.0",
     "@angular-eslint/schematics": "^13.2.1",
-    "@angular/localize": "^13.3.5",
-    "@angular/pwa": "^13.3.5",
-    "@schematics/angular": "^13.3.5",
+    "@angular/localize": "^14.0.0",
+    "@angular/pwa": "^14.0.0",
+    "@schematics/angular": "^14.0.0",
     "inquirer": "^8.2.0",
     "parse5-html-rewriting-stream": "^6.0.1",
-    "typescript": "~4.5.2"
+    "ts-morph": "^15.0.0",
+    "typescript": "~4.7.2"
   },
   "devDependencies": {
-    "@angular-devkit/schematics-cli": "^13.2.4",
-    "@types/inquirer": "^8.2.0",
+    "@angular-devkit/schematics-cli": "^14.0.0",
+    "@types/inquirer": "^8.2.1",
     "@types/jasmine": "~3.10.0",
-    "@types/node": "^12.11.1",
+    "@types/node": "^14.18.20",
     "@types/parse5-html-rewriting-stream": "^5.1.2",
-    "jasmine": "^4.0.0"
+    "jasmine": "^4.1.0"
   }
 }

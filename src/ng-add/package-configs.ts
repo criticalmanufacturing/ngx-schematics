@@ -13,7 +13,7 @@ export const CORE_METADATA_MODULES: [string, string][] = [
   ['cmf-core-camera/metadata', 'CoreCameraMetadataModule'],
   ['cmf-core-search/metadata', 'CoreSearchMetadataModule'],
   ['cmf-core-admin-i18n/metadata', 'CoreAdminI18nMetadataModule'],
-  ['cmf-core-masterdata/metadata', 'CoreMasterDataMetadataModule']
+  ['cmf-core-masterdata/metadata', 'CoreMasterdataMetadataModule']
 ];
 
 /**
@@ -25,21 +25,6 @@ export const CORE_MODULE: [string, string] = ['cmf-core', 'CoreModule'];
  * Project Core Packages
  */
 export const CORE_PACKAGES: NodeDependency[] = [
-  {
-    type: NodeDependencyType.Default,
-    name: '@criticalmanufacturing/messagebus-client',
-    version: 'file:../dev/MessageBus/cmf.messagebus.client.html5'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'angular2-grid',
-    version: 'file:../dev/angular2-grid/dist/angular2-grid'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'bootstrap',
-    version: '^3.4.1'
-  },
   {
     type: NodeDependencyType.Default,
     name: 'cmf-core',
@@ -94,126 +79,6 @@ export const CORE_PACKAGES: NodeDependency[] = [
     type: NodeDependencyType.Default,
     name: 'cmf-core-shell',
     version: 'file:../CoreHTML/dist/cmf-core-shell'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'cmf.instascan',
-    version: 'file:../dev/Library/HTML/cmf.instascan'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'cmf.kendoui',
-    version: 'file:../dev/Library/HTML/cmf.kendoui'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'dagre',
-    version: '^0.8.5'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'cmf.lbos',
-    version: 'file:../dev/Library/HTML/cmf.mes.lbos'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'decimal.js',
-    version: '^10.3.1'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'dexie',
-    version: '^3.0.3'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'graphlib',
-    version: '^2.1.8'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'jointjs',
-    version: '^3.5.2'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'graphlib',
-    version: '^2.1.8'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'jquery',
-    version: '^3.6.0'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'jquery-ui',
-    version: '^1.13.0'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'lodash',
-    version: '^4.17.21'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'lodash',
-    version: '^4.17.21'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'moment',
-    version: '^2.29.1'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'moment-duration-format',
-    version: '^2.3.2'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'monaco-editor',
-    version: '^0.30.1'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'quagga',
-    version: '^0.12.1'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'reflect-metadata',
-    version: '^0.1.13'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'rxjs',
-    version: '~7.4.0'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'toastr',
-    version: '^2.1.4'
-  },
-  {
-    type: NodeDependencyType.Default,
-    name: 'underscore',
-    version: '^1.13.1'
-  },
-  {
-    type: NodeDependencyType.Dev,
-    name: '@types/backbone',
-    version: '^1.4.15'
-  },
-  {
-    type: NodeDependencyType.Dev,
-    name: '@types/jquery',
-    version: '^3.5.6'
-  },
-  {
-    type: NodeDependencyType.Dev,
-    name: '@types/underscore',
-    version: '^1.11.3'
   }
 ];
 
@@ -271,23 +136,18 @@ export const PROJECT_STYLES = [
   'node_modules/cmf-core/src/assets/style/styles.less',
   {
     'inject': false,
+    'bundleName': 'cmf.style.gray',
+    'input': 'node_modules/cmf-core/src/assets/style/themes/cmf.style.gray/cmf.style.gray.less'
+  },
+  {
+    'inject': false,
+    'bundleName': 'cmf.style.dark',
+    'input': 'node_modules/cmf-core/src/assets/style/themes/cmf.style.dark/cmf.style.dark.less'
+  },
+  {
+    'inject': false,
     'bundleName': 'cmf.style.blue',
     'input': 'node_modules/cmf-core/src/assets/style/themes/cmf.style.blue/cmf.style.blue.less'
-  },
-  {
-    'inject': false,
-    'bundleName': 'cmf.style.blue.grey',
-    'input': 'node_modules/cmf-core/src/assets/style/themes/cmf.style.blue.grey/cmf.style.blue.grey.less'
-  },
-  {
-    'inject': false,
-    'bundleName': 'cmf.style.dark.blue',
-    'input': 'node_modules/cmf-core/src/assets/style/themes/cmf.style.dark.blue/cmf.style.dark.blue.less'
-  },
-  {
-    'inject': false,
-    'bundleName': 'cmf.style.light.blue',
-    'input': 'node_modules/cmf-core/src/assets/style/themes/cmf.style.light.blue/cmf.style.light.blue.less'
   }
 ];
 
@@ -346,11 +206,6 @@ export const PROJECT_SCRIPTS = [
   'node_modules/cmf.kendoui/js/kendo.pager.min.js',
   'node_modules/cmf.kendoui/js/kendo.grid.min.js',
   'node_modules/cmf.kendoui/js/kendo.splitter.min.js',
-  {
-    'bundleName': 'instascan',
-    'inject': false,
-    'input': 'node_modules/cmf.instascan/dist/instascan.min.js'
-  },
   {
     'bundleName': 'jszip',
     'inject': false,

@@ -12,7 +12,7 @@ import {
   CommonModule
 } from '@angular/common';
 
-import Cmf from "cmf.lbos";
+import Cmf from "cmf-lbos";
 
 import {
   CustomizableComponent,

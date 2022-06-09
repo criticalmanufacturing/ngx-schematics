@@ -1,148 +1,220 @@
-import { tags } from '@angular-devkit/core';
-import ts = require('@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript');
-import { findNodes, getDecoratorMetadata, getMetadataField, insertAfterLastOccurrence, insertImport } from '@schematics/angular/utility/ast-utils';
-import { Change, InsertChange } from '@schematics/angular/utility/change';
+import { dirname, join, normalize } from '@angular-devkit/core';
+import { Tree } from '@angular-devkit/schematics';
+import { ArrayLiteralExpression, createWrappedNode, Node, ObjectLiteralExpression, Project, SourceFile, SyntaxKind, ts } from 'ts-morph';
+import { Change } from './recorder';
+
 
 /**
- * Inserts an Export Declaration in a file
+ * Inserts an export declaration in a file
  * @param source Source File
- * @param fileToEdit File Path to Edit
  * @param symbolName Export symbol
- * @param fileName Export file name
- * @param description Export Description
+ * @param module Export module specifier
  * @param isDefault Is Default Export
- * @returns 
  */
 export function insertExport(
-  source: ts.SourceFile,
-  fileToEdit: string,
-  symbolName: string,
-  fileName: string,
-  description?: string,
-  isDefault = false
-): Change {
-  const rootNode = source;
-  const allExports = findNodes(rootNode, ts.SyntaxKind.ExportDeclaration);
-  const useStrict = findNodes(rootNode, ts.isStringLiteral).filter((n) => n.text === 'use strict');
-  let fallbackPos = 0;
-  if (useStrict.length > 0) {
-    fallbackPos = useStrict[0].end;
-  }
+    source: SourceFile,
+    symbolName: string,
+    module: string,
+    isDefault = false
+): void {
+    const allExports = source.getExportDeclarations();
+    const exportNode = allExports.find(node => node.getModuleSpecifierValue() === module);
 
-  const open = isDefault ? '' : '{ ';
-  const close = isDefault ? '' : ' }';
-  // if there are no imports or 'use strict' statement, insert import at beginning of file
-  const insertAtBeginning = allExports.length === 0;
-  const separator = insertAtBeginning ? '' : ';\n';
-  const toInsert = `${separator}${description ? '\n// ' + description + '\n' : ''}`
-    + `export ${open}${symbolName}${close} from '${fileName}'${insertAtBeginning ? ';\n' : ''}`;
+    if (isDefault) {
+        if (exportNode?.isNamespaceExport()) {
+            return;
+        }
 
-  return insertAfterLastOccurrence(
-    allExports,
-    toInsert,
-    fileToEdit,
-    fallbackPos,
-    ts.SyntaxKind.StringLiteral,
-  );
+        source.addExportDeclaration({ moduleSpecifier: module });
+    } else if (exportNode) {
+        const namedExports = exportNode.getNamedExports();
+
+        if (namedExports.find(node => node.getName() === symbolName)) {
+            return;
+        }
+
+        exportNode.addNamedExport(symbolName);
+    } else {
+        source.addExportDeclaration({ namedExports: [symbolName], moduleSpecifier: module });
+    }
+}
+
+/**
+ * Inserts an import Declaration in a file
+ * @param source Source File
+ * @param symbolName Import symbol
+ * @param module Import module specifier
+ * @param isDefault Is default import
+ */
+export function insertImport(
+    source: SourceFile,
+    symbolName: string,
+    module: string,
+    isDefault = false
+): Change | undefined {
+    const allImports = source.getImportDeclarations();
+    const importNode = allImports.find(node => node.getModuleSpecifierValue() === module);
+    let change: Node;
+
+    if (isDefault) {
+        if (importNode?.getNamespaceImport()) {
+            return;
+        }
+
+        change = source.addImportDeclaration({ moduleSpecifier: module, defaultImport: '' });
+    } else if (importNode) {
+        const namedImports = importNode.getNamedImports();
+
+        if (namedImports.find(node => node.getName() === symbolName)) {
+            return;
+        }
+
+        change = importNode.addNamedImport(symbolName);
+    } else {
+        change = source.addImportDeclaration({ moduleSpecifier: module, namedImports: [symbolName] });
+    }
+
+    const position = change.getStart(true);
+    const toInsert = change.getText(true);
+
+    return [[position, position], toInsert];
 }
 
 export function addSymbolToNgModuleMetadata(
-  source: ts.SourceFile,
-  ngModulePath: string,
-  metadataField: string,
-  symbolName: string,
-  importPath: string | null = null,
-  insertBefore: string | null = null
-): Change[] {
-  const nodes = getDecoratorMetadata(source, 'NgModule', '@angular/core');
-  let node: any = nodes[0];
+    source: SourceFile,
+    metadataField: string,
+    symbolName: string,
+    importPath: string | null = null,
+    insertBefore: string | null = null
+): void {
+    // Find the decorator declaration.
+    let decoratorMetadata: ObjectLiteralExpression | undefined;
+    for (const classNode of source.getClasses()) {
+        decoratorMetadata = classNode.getDecorator('NgModule')?.getArguments()[0]?.asKind(SyntaxKind.ObjectLiteralExpression);
 
-  // Find the decorator declaration.
-  if (!node) {
-    return [];
-  }
-
-  // Get all the children property assignment of object literals.
-  const matchingProperties = getMetadataField(node as ts.ObjectLiteralExpression, metadataField);
-
-  if (matchingProperties.length == 0) {
-    // We haven't found the field in the metadata declaration. Insert a new field.
-    const expr = node as ts.ObjectLiteralExpression;
-    let position: number;
-    let toInsert: string;
-    if (expr.properties.length == 0) {
-      position = expr.getEnd() - 1;
-      toInsert = `\n  ${metadataField}: [\n${tags.indentBy(4)`${symbolName}`}\n  ]\n`;
-    } else {
-      node = expr.properties[expr.properties.length - 1];
-      position = node.getEnd();
-      // Get the indentation of the last element, if any.
-      const text = node.getFullText(source);
-      const matches = text.match(/^(\r?\n)(\s*)/);
-      if (matches) {
-        toInsert =
-          `,${matches[0]}${metadataField}: [${matches[1]}` +
-          `${tags.indentBy(matches[2].length + 2)`${symbolName}`}${matches[0]}]`;
-      } else {
-        toInsert = `, ${metadataField}: [${symbolName}]`;
-      }
+        if (decoratorMetadata) {
+            break;
+        }
     }
+
+    if (!decoratorMetadata) {
+        return;
+    }
+
+    // Get all the children property assignment of object literals.
+    const metadataProperty = decoratorMetadata.getProperty(metadataField);
+
+    if (!metadataProperty) {
+        // We haven't found the field in the metadata declaration. Insert a new field.
+        decoratorMetadata.addPropertyAssignment({
+            name: metadataField,
+            initializer: `[\n${symbolName}\n]`
+        });
+
+        if (importPath !== null) {
+            insertImport(source, symbolName.replace(/\..*$/, ''), importPath);
+        }
+
+        return;
+    }
+
+    const assignment = metadataProperty.asKind(SyntaxKind.PropertyAssignment);
+    const arrLiteral = assignment?.getInitializer()?.asKind(SyntaxKind.ArrayLiteralExpression);
+
+    if (!arrLiteral) {
+        return;
+    }
+
+    if (arrLiteral.getElements().some(elem => elem.getText() === symbolName)) {
+        return;
+    }
+
+    let index = arrLiteral.getElements().length;
+
+    if (insertBefore) {
+        index = arrLiteral.getElements().findIndex(elem => elem.getText() === insertBefore) ?? index;
+    }
+
+    arrLiteral.insertElement(index, symbolName);
+
     if (importPath !== null) {
-      return [
-        new InsertChange(ngModulePath, position, toInsert),
-        insertImport(source, ngModulePath, symbolName.replace(/\..*$/, ''), importPath),
-      ];
+        insertImport(source, symbolName.replace(/\..*$/, ''), importPath);
+    }
+}
+
+/**
+ * Finds the bootstrap module path from the main.ts file
+ * @param source main.ts source file
+ */
+export function findBootstrapModulePath(source: ts.SourceFile): string | undefined {
+    const rootNode = createWrappedNode(source);
+
+    const bootstrapCall = rootNode
+        .getDescendantsOfKind(SyntaxKind.CallExpression)
+        .find((descNode) => descNode.getExpression().getText().endsWith('bootstrapModule'));
+
+    if (!bootstrapCall) {
+        return;
+    }
+
+    const bootstrapArg = bootstrapCall.getArguments()[0];
+
+    if (!bootstrapArg) {
+        return;
+    }
+
+    let moduleRelativePath: string | undefined;
+    if (bootstrapArg.getKind() === SyntaxKind.Identifier) {
+        moduleRelativePath = rootNode
+            .getImportDeclarations()
+            .find(impNode => impNode.getNamedImports().some(imp => imp.getName() === bootstrapArg.getText()))
+            ?.getModuleSpecifierValue();
+    } else if (bootstrapArg.getKind() === SyntaxKind.PropertyAccessExpression) {
+        moduleRelativePath = rootNode
+            .getDescendantsOfKind(SyntaxKind.CallExpression)
+            .find(node => node.getExpression().getText() === 'import')
+            ?.getArguments()[0]
+            ?.asKind(SyntaxKind.StringLiteral)
+            ?.getLiteralValue();
+    }
+
+    if (!moduleRelativePath) {
+        return;
+    }
+
+    return join(dirname(normalize(rootNode.getFilePath())), moduleRelativePath) + '.ts';
+}
+
+export function insertElement(array: ArrayLiteralExpression, element: string, index?: number): Change {
+    const lastElem = index === undefined ? array.getElements().slice(-1)[0] : array.getElements()[index];
+
+    if (lastElem) {
+        const spaces = lastElem.getFullText().match(/^\r?\n?\s+/)?.[0] ?? ' ';
+        const position = lastElem.getFullStart();
+
+        return [[position, position], `${spaces}${element},`];
     } else {
-      return [new InsertChange(ngModulePath, position, toInsert)];
+        if (array.getElements().length > 0) {
+            const leadingSpaces = array.getElements()[0].getFullText().match(/^\r?\n?\s+/)?.[0];
+            const trailingSpaces = leadingSpaces ? '' : ' ';
+
+            return [[array.getStart(), array.getStart()], `${leadingSpaces}${element},${trailingSpaces}`]; // not finished
+        } else {
+            return [[array.getStart() + 1, array.getEnd() - 1], `${element}`];
+        }
     }
-  }
-  const assignment = matchingProperties[0] as ts.PropertyAssignment;
+}
 
-  if (assignment.initializer.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
-    return [];
-  }
 
-  const arrLiteral = assignment.initializer as ts.ArrayLiteralExpression;
-  if (arrLiteral.elements.length == 0) {
-    // Forward the property.
-    node = arrLiteral;
-  } else {
-    node = arrLiteral.elements;
-  }
- 
-  if (Array.isArray(node)) {
-    const nodeArray = (node as {}) as Array<ts.Node>;
-    const symbolsArray = nodeArray.map((node) => tags.oneLine`${node.getText()}`);
-    if (symbolsArray.includes(tags.oneLine`${symbolName}`)) {
-      return [];
+/**
+ * Gets the a ts source file
+ */
+export function createSourceFile(host: Tree, path: string): SourceFile | undefined {
+    const content = host.get(path)?.content.toString('utf-8');
+
+    if (!content) {
+        return;
     }
 
-    const beforeNodeIndex = arrLiteral.elements.findIndex((node) => node.getText() === insertBefore);
-    node = beforeNodeIndex > 0 ? node[beforeNodeIndex - 1] : node[node.length - 1];
-  }
-
-  let toInsert: string;
-  let position = node.getEnd();
-  if (node.kind == ts.SyntaxKind.ArrayLiteralExpression) {
-    // We found the field but it's empty. Insert it just before the `]`.
-    position--;
-    toInsert = `\n${tags.indentBy(4)`${symbolName}`}\n  `;
-  } else {
-    // Get the indentation of the last element, if any.
-    const text = node.getFullText(source);
-    const matches = text.match(/^(\r?\n)(\s*)/);
-    if (matches) {
-      toInsert = `,${matches[1]}${tags.indentBy(matches[2].length)`${symbolName}`}`;
-    } else {
-      toInsert = `, ${symbolName}`;
-    }
-  }
-  if (importPath !== null) {
-    return [
-      new InsertChange(ngModulePath, position, toInsert),
-      insertImport(source, ngModulePath, symbolName.replace(/\..*$/, ''), importPath),
-    ];
-  }
-
-  return [new InsertChange(ngModulePath, position, toInsert)];
+    return new Project().createSourceFile(path, content, { overwrite: true });
 }

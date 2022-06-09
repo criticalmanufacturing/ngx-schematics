@@ -1,274 +1,197 @@
-import { dirname, join, normalize } from '@angular-devkit/core';
 import { indentBy } from '@angular-devkit/core/src/utils/literals';
-import ts = require('@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript');
-import { findNode, findNodes, getSourceNodes, insertAfterLastOccurrence, insertImport } from '@schematics/angular/utility/ast-utils';
-import { Change, InsertChange, ReplaceChange } from '@schematics/angular/utility/change';
+import { ClassDeclaration, SourceFile, SyntaxKind } from 'ts-morph';
+import { insertImport } from './ast';
 import { nameify } from './string';
 
 export enum MetadataProperty {
-  Route = 'routes',
-  Action = 'actions',
-  ActionGroup = 'actionGroups',
-  ActionButton = 'actionButtons',
-  ActionButtonGroup = 'actionButtonGroups',
-  ActionBar = 'actionBars',
-  MenuItem = 'menuItems',
-  MenuSubGroup = 'menuSubGroups',
-  MenuGroup = 'menuGroups',
-  EntityType = 'entityTypes',
-  Table = 'tables',
-  StaticType = 'staticTypes',
-  FileViewer = 'fileViewers',
-  SideBarTab = 'sideBarTabs',
-  UserMenu = 'userMenus',
-  Credit = 'credits',
-  FlexComponent = 'flexComponents'
+    Route = 'routes',
+    Action = 'actions',
+    ActionGroup = 'actionGroups',
+    ActionButton = 'actionButtons',
+    ActionButtonGroup = 'actionButtonGroups',
+    ActionBar = 'actionBars',
+    MenuItem = 'menuItems',
+    MenuSubGroup = 'menuSubGroups',
+    MenuGroup = 'menuGroups',
+    EntityType = 'entityTypes',
+    Table = 'tables',
+    StaticType = 'staticTypes',
+    FileViewer = 'fileViewers',
+    SideBarTab = 'sideBarTabs',
+    UserMenu = 'userMenus',
+    Credit = 'credits',
+    FlexComponent = 'flexComponents'
 }
 
 const PROPERTY_REFERENCE = {
-  [MetadataProperty.Route]: { 'RouteConfig': 'cmf-core' },
-  [MetadataProperty.Action]: { 'Action': 'cmf-core' },
-  [MetadataProperty.ActionGroup]: { 'ActionGroup': 'cmf-core' },
-  [MetadataProperty.ActionButton]: { 'ActionButton': 'cmf-core' },
-  [MetadataProperty.ActionButtonGroup]: { 'ActionButtonGroup': 'cmf-core' },
-  [MetadataProperty.ActionBar]: { 'ActionBar': 'cmf-core' },
-  [MetadataProperty.MenuItem]: { 'MenuItem': 'cmf-core' },
-  [MetadataProperty.MenuSubGroup]: { 'MenuSubGroup': 'cmf-core' },
-  [MetadataProperty.MenuGroup]: { 'MenuGroup': 'cmf-core' },
-  [MetadataProperty.EntityType]: { 'EntityTypeMetadata': 'cmf-core' },
-  [MetadataProperty.Table]: { 'Table': 'cmf-core' },
-  [MetadataProperty.StaticType]: { 'StaticType': 'cmf-core' },
-  [MetadataProperty.FileViewer]: { 'FileViewerMetadata': 'cmf-core' },
-  [MetadataProperty.SideBarTab]: { 'SideBarTab': 'cmf-core' },
-  [MetadataProperty.UserMenu]: { 'UserMenu': 'cmf-core' },
-  [MetadataProperty.Credit]: { 'Credit': 'cmf-core' },
-  [MetadataProperty.FlexComponent]: { 'FlexComponent': 'cmf-core' }
+    [MetadataProperty.Route]: { 'RouteConfig': 'cmf-core' },
+    [MetadataProperty.Action]: { 'Action': 'cmf-core' },
+    [MetadataProperty.ActionGroup]: { 'ActionGroup': 'cmf-core' },
+    [MetadataProperty.ActionButton]: { 'ActionButton': 'cmf-core' },
+    [MetadataProperty.ActionButtonGroup]: { 'ActionButtonGroup': 'cmf-core' },
+    [MetadataProperty.ActionBar]: { 'ActionBar': 'cmf-core' },
+    [MetadataProperty.MenuItem]: { 'MenuItem': 'cmf-core' },
+    [MetadataProperty.MenuSubGroup]: { 'MenuSubGroup': 'cmf-core' },
+    [MetadataProperty.MenuGroup]: { 'MenuGroup': 'cmf-core' },
+    [MetadataProperty.EntityType]: { 'EntityTypeMetadata': 'cmf-core' },
+    [MetadataProperty.Table]: { 'Table': 'cmf-core' },
+    [MetadataProperty.StaticType]: { 'StaticType': 'cmf-core' },
+    [MetadataProperty.FileViewer]: { 'FileViewerMetadata': 'cmf-core' },
+    [MetadataProperty.SideBarTab]: { 'SideBarTab': 'cmf-core' },
+    [MetadataProperty.UserMenu]: { 'UserMenu': 'cmf-core' },
+    [MetadataProperty.Credit]: { 'Credit': 'cmf-core' },
+    [MetadataProperty.FlexComponent]: { 'FlexComponent': 'cmf-core' }
 };
 
 export interface PackageInfo {
-  package: string;
-  widgets: string[];
-  converters: string[];
-  dataSources: string[];
-  components: string[];
+    package: string;
+    widgets: string[];
+    converters: string[];
+    dataSources: string[];
+    components: string[];
 }
 
-/**
- * Updates the space identation in a string
- * @param spacesToUse Spaces to use in the identation
- */
-export function updateSpaces(spacesToUse: number, initialSpaces: number = 2) {
-  return (strings: TemplateStringsArray, ...substitutions: any[]) => {
-    return String.raw(strings, ...substitutions).replace(/^([ \t]+)/gm, (_, match: string) => {
-      const spaces = match.split('').reduce((res, char) => res += char === ' ' ? 1 : 2, 0)
-      return `${' '.repeat(Math.floor(spaces / initialSpaces) * spacesToUse + spaces % 2)}`;
-    });
-  };
+function getMetadataClassDeclaration(source: SourceFile): ClassDeclaration | undefined {
+    return source.getClasses().find(classNode => classNode.getExtends()?.getText().endsWith('PackageMetadata'));
 }
 
-/**
- * Finds the metadata file path in the root given the public api
- * @param content File content to search the metadata on
- * @param fileName Metadata File Name
- */
-export function findMetadataFile(content: string, fileName: string, root: string) {
-  const source = ts.createSourceFile(fileName, content, ts.ScriptTarget.Latest, true);
-  const exportNodes = findNodes(source, ts.SyntaxKind.ExportDeclaration);
-
-  for (const node of exportNodes) {
-    const importFiles = node.getChildren()
-      .filter(ts.isLiteralExpression)
-      .filter((n) => n.text.endsWith('metadata.service'));
-
-    if (importFiles.length === 1) {
-      return join(dirname(join(normalize(root), 'metadata', fileName)), importFiles[0].text) + '.ts';
+function insertImports(source: SourceFile, imports: Record<string, string>): void {
+    for (const key in imports) {
+        insertImport(source, key, imports[key]);
     }
-  }
-
-  return null;
 }
 
 /**
  * Inserts content in the metadata file.
- * @param content Metadata File Content
- * @param filePath Metadata File Path
+ * @param source Metadata file
  * @param requiredImports Required Import of the content to insert
  * @param propertyIdentifier Identifier of the content
- * @param typeReference Type reference of the object to insert
- * @param description Property to insert description
  * @param toInsert Content to insert
  */
 export function insertMetadata(
-  content: string,
-  filePath: string,
-  requiredImports: Record<string, string>,
-  propertyIdentifier: MetadataProperty,
-  toInsert: string
-) {
-  const source = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
+    source: SourceFile,
+    requiredImports: Record<string, string>,
+    propertyIdentifier: MetadataProperty,
+    toInsert: string
+): void {
+    const metadataClass = getMetadataClassDeclaration(source);
 
-  const metadataClassDeclaration = getSourceNodes(source)
-    .filter(ts.isClassDeclaration)
-    .filter(node => {
-      if (!node.heritageClauses) {
-        return false;
-      }
+    if (!metadataClass) {
+        return;
+    }
 
-      return node.heritageClauses.find((clause) =>
-        clause.getChildAt(0).kind === ts.SyntaxKind.ExtendsKeyword
-        && findNode(clause, ts.SyntaxKind.Identifier, 'PackageMetadata'));
-    })[0];
+    const allAccessors = metadataClass.getGetAccessors();
+    const accessor = allAccessors.find((accessor) => accessor.getName() === propertyIdentifier);
 
-  const allAccessors = findNodes(metadataClassDeclaration, ts.isGetAccessor);
+    // add all required imports
+    insertImports(source, { ...requiredImports, ...PROPERTY_REFERENCE[propertyIdentifier] });
 
-  const actions = allAccessors.find((accessor) =>
-    accessor.getChildren().find(node => node.kind === ts.SyntaxKind.Identifier && node.getText() === propertyIdentifier));
-
-  const contentNode = metadataClassDeclaration.getChildAt(metadataClassDeclaration.getChildren()
-    .findIndex(node => node.kind === ts.SyntaxKind.OpenBraceToken) + 1);
-
-  const spaces = contentNode.getFullText().match(/^(\r?\n)+(\s*)/)?.[2].length ?? 2;
-
-  if (!actions) {
-    const toInsertSpaced = updateSpaces(spaces)`
-
-  /**
-   * ${nameify(propertyIdentifier)}
-   */
-  public override get ${propertyIdentifier}(): ${Object.keys(PROPERTY_REFERENCE[propertyIdentifier])[0]}[] {
+    if (!accessor) {
+        // Accessor not found, lets create the acessor in the metadata with the element to insert
+        const memberToInsert = `\
+/**
+ * ${nameify(propertyIdentifier)}
+ */
+public override get ${propertyIdentifier}(): ${Object.keys(PROPERTY_REFERENCE[propertyIdentifier])[0]}[] {
     return [
-${indentBy(6)`${toInsert}`}
+        ${toInsert}
     ];
-  }`;
+}`;
 
-    const fallbackPos = findNodes(contentNode, ts.SyntaxKind.Constructor, 1)[0]?.getEnd() ?? contentNode.getStart();
-    const imports = { ...requiredImports, ...PROPERTY_REFERENCE[propertyIdentifier] };
+        metadataClass.addMember(memberToInsert).formatText();
 
-    return [
-      ...Object.keys(imports).map((key) => insertImport(source, filePath, key, (imports as any)[key])),
-      insertAfterLastOccurrence(allAccessors, toInsertSpaced, filePath, fallbackPos, ts.SyntaxKind.GetAccessor)
-    ];
-  }
+        return;
+    }
 
-  const returnStatement = findNodes(actions, ts.SyntaxKind.ReturnStatement, 1, true)[0];
-  const array = findNodes(returnStatement, ts.SyntaxKind.ArrayLiteralExpression, 1, true)[0];
-  const list = array.getChildAt(1);
+    // Lets add the new element to the array of the metadata getter
+    const returnStatement = accessor.getFirstDescendantByKind(SyntaxKind.ReturnStatement);
+    const array = returnStatement?.getFirstChildByKind(SyntaxKind.ArrayLiteralExpression);
 
-  const lastChild = list.getChildAt(list.getChildCount() - 1);
+    // just give up at this point
+    if (!array) {
+        return;
+    }
 
-  const toInsertSpaced = updateSpaces(spaces)`${lastChild && lastChild.kind !== ts.SyntaxKind.CommaToken ? ',' : ''}
-${indentBy(6)`${toInsert}`}${lastChild ? '' : `\n    `}`;
-
-  return [
-    ...Object.keys(requiredImports).map((key) => insertImport(source, filePath, key, requiredImports[key])),
-    new InsertChange(filePath, lastChild?.getEnd() ?? array.getEnd() - 1, toInsertSpaced)
-  ];
+    array.addElement(toInsert);
 }
 
+/**
+ * Inserts page routes information in the metadata class.
+ * @param source Metadata file
+ * @param requiredImports required imports by the text to insert
+ * @param toInsert text to insert
+ */
 export function insertRoutesMetadata(
-  content: string,
-  filePath: string,
-  requiredImports: Record<string, string>,
-  toInsert: string
-) {
-  const source = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
+    source: SourceFile,
+    requiredImports: Record<string, string>,
+    toInsert: string
+): void {
+    const metadataClass = getMetadataClassDeclaration(source);
 
-  const metadataClassDeclaration = getSourceNodes(source)
-    .filter(ts.isClassDeclaration)
-    .filter(node => {
-      if (!node.heritageClauses) {
-        return false;
-      }
+    if (!metadataClass) {
+        return;
+    }
 
-      return node.heritageClauses.find((clause) =>
-        clause.getChildAt(0).kind === ts.SyntaxKind.ExtendsKeyword
-        && findNode(clause, ts.SyntaxKind.Identifier, 'PackageMetadata'));
-    })[0];
+    const allAccessors = metadataClass.getGetAccessors();
+    const routesAccessor = allAccessors.find((accessor) => accessor.getName() === 'routes');
 
-  const allAccessors = findNodes(metadataClassDeclaration, ts.isGetAccessor);
+    const returnStatement = routesAccessor
+        ?.getFirstDescendantByKind(SyntaxKind.ReturnStatement);
+    const pageRoutes = returnStatement
+        ?.getFirstChildByKind(SyntaxKind.ArrayLiteralExpression)
+        ?.getElements()
+        .map(elem => elem.asKind(SyntaxKind.ObjectLiteralExpression))
+        .find(elem => elem?.getProperty('id')?.getText().endsWith('Page'));
 
-  const routesAccessor = allAccessors.find((accessor) =>
-    accessor.getChildren().find(node => node.kind === ts.SyntaxKind.Identifier && node.getText() === 'routes'));
-
-  const contentNode = metadataClassDeclaration.getChildAt(metadataClassDeclaration.getChildren()
-    .findIndex(node => node.kind === ts.SyntaxKind.OpenBraceToken) + 1);
-
-  const spaces = contentNode.getFullText().match(/^(\r?\n)+(\s*)/)?.[2].length ?? 2;
-
-  if (!routesAccessor) {
-    return insertMetadata(content, filePath, { ...requiredImports, 'KnownRoutes': 'cmf-core' }, MetadataProperty.Route, `\
+    if (!routesAccessor || !pageRoutes) {
+        const routeToInsert = `\
 {
-  id: KnownRoutes.Page,
-  routes: [
-${indentBy(4)`${toInsert}`}
-  ]
-}`);
-  }
+    id: KnownRoutes.Page,
+    routes: [
+        ${toInsert}
+    ]
+}`;
 
-  const returnStatement = findNodes(routesAccessor, ts.SyntaxKind.ReturnStatement, 1, true)[0];
-  const changes: Change[] = [];
+        return insertMetadata(
+            source,
+            {
+                ...requiredImports,
+                'KnownRoutes': 'cmf-core'
+            },
+            MetadataProperty.Route,
+            routeToInsert
+        );
+    }
 
-  const property = findNode(returnStatement, ts.SyntaxKind.Identifier, 'routes')?.parent;
+    const routes = pageRoutes
+        .getProperty('routes')
+        ?.asKind(SyntaxKind.PropertyAssignment)
+        ?.getInitializerIfKind(SyntaxKind.ArrayLiteralExpression);
 
-  if (property && property.kind !== ts.SyntaxKind.PropertyAssignment) {
-    return;
-  }
+    if (!routes) {
+        return;
+    }
 
-  if (!property) {
-    return insertMetadata(content, filePath, { ...requiredImports, 'KnownRoutes': 'cmf-core' }, MetadataProperty.Route, `\
-{
-  id: KnownRoutes.Page,
-  routes: [
-${indentBy(4)`${toInsert}`}
-  ]
-}`);
-  }
-
-  const arrayExp = (property as ts.PropertyAssignment).initializer as ts.ArrayLiteralExpression;
-
-  if (arrayExp.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
-    return;
-  }
-
-  const list = arrayExp.getChildAt(1);
-  const lastChild = list.getChildAt(list.getChildCount() - 1);
-
-  const toInsertSpaced = updateSpaces(spaces)`${lastChild && lastChild.kind !== ts.SyntaxKind.CommaToken ? ',' : ''}
-${indentBy(10)`${toInsert}`}${lastChild ? '' : `\n      `}`;
-
-  changes.push(new InsertChange(filePath, lastChild?.getEnd() ?? arrayExp.getEnd() - 1, toInsertSpaced));
-
-  return changes;
+    insertImports(source, requiredImports);
+    routes.addElement(toInsert);
 }
 
+/**
+ * Updates the package info getter in the metadata class
+ * @param source Souce file to update
+ * @param options Package info
+ * @returns 
+ */
+export function updatePackageInfoMetadata(source: SourceFile, options: PackageInfo): void {
+    const metadataClass = getMetadataClassDeclaration(source);
 
-export function insertPackageInfoMetadata(content: string, filePath: string, options: PackageInfo) {
-  const source = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
+    if (!metadataClass) {
+        return;
+    }
 
-  const metadataClassDeclaration = getSourceNodes(source)
-    .filter(ts.isClassDeclaration)
-    .filter(node => {
-      if (!node.heritageClauses) {
-        return false;
-      }
-
-      return node.heritageClauses.find((clause) =>
-        clause.getChildAt(0).kind === ts.SyntaxKind.ExtendsKeyword
-        && findNode(clause, ts.SyntaxKind.Identifier, 'PackageMetadata'));
-    })[0];
-
-  const allAccessors = findNodes(metadataClassDeclaration, ts.isGetAccessor);
-
-  const packageInfoAccessor = allAccessors.find((accessor) =>
-    accessor.getChildren().find(node => node.kind === ts.SyntaxKind.Identifier && node.getText() === 'packageInfo'));
-
-  const contentNode = metadataClassDeclaration.getChildAt(metadataClassDeclaration.getChildren()
-    .findIndex(node => node.kind === ts.SyntaxKind.OpenBraceToken) + 1);
-
-  const spaces = contentNode.getFullText().match(/^(\r?\n)+(\s*)/)?.[2].length ?? 2;
-
-  const toInsertSpaced = updateSpaces(spaces)`
-
+    const allAccessors = metadataClass.getGetAccessors();
+    const packageInfoAccessor = allAccessors.find((accessor) => accessor.getName() === 'packageInfo');
+    const toInsert = `\
   /**
    * Package Info
    */
@@ -277,28 +200,26 @@ export function insertPackageInfoMetadata(content: string, filePath: string, opt
       name: '${options.package}',
       loader: () => import(
         /* webpackExports: [
-${indentBy(10)`"${[
-      ...options.widgets,
-      ...options.dataSources,
-      ...options.converters,
-      ...options.components
-    ].join(`",\n"`)}"`}
+${indentBy(12)`"${[
+            ...options.widgets,
+            ...options.dataSources,
+            ...options.converters,
+            ...options.components
+        ].join(`",\n"`)}"`}
         ] */
         '${options.package}'),
-      widgets: [${options.widgets.length > 0 ? `\n${indentBy(8)`'${options.widgets.join(`',\n'`)}'`}\n      ` : ''}],
-      dataSources: [${options.dataSources.length > 0 ? `\n${indentBy(8)`'${options.dataSources.join(`',\n'`)}'`}\n      ` : ''}],
-      converters: [${options.converters.length > 0 ? `\n${indentBy(8)`'${options.converters.join(`',\n'`)}'`}\n      ` : ''}],
-      components: [${options.components.length > 0 ? `\n${indentBy(8)`'${options.components.join(`',\n'`)}'`}\n      ` : ''}]
+      widgets: [${options.widgets.length > 0 ? `\n'${options.widgets.join(`',\n'`)}'\n` : ''}],
+      dataSources: [${options.dataSources.length > 0 ? `\n'${options.dataSources.join(`',\n'`)}'\n` : ''}],
+      converters: [${options.converters.length > 0 ? `\n'${options.converters.join(`',\n'`)}'\n` : ''}],
+      components: [${options.components.length > 0 ? `\n'${options.components.join(`',\n'`)}'\n` : ''}]
     };
   }`;
 
-  if (!packageInfoAccessor) {
-    const fallbackPos = findNodes(contentNode, ts.SyntaxKind.Constructor, 1)[0]?.getEnd() ?? contentNode.getStart();
-    return [
-      insertImport(source, filePath, 'PackageInfo', 'cmf-core'),
-      insertAfterLastOccurrence(allAccessors, toInsertSpaced, filePath, fallbackPos, ts.SyntaxKind.GetAccessor)
-    ];
-  }
+    insertImport(source, 'PackageInfo', 'cmf-core');
 
-  return [new ReplaceChange(filePath, packageInfoAccessor.getFullStart(), packageInfoAccessor.getFullText(), toInsertSpaced)];
+    if (!packageInfoAccessor) {
+        metadataClass.addMember(toInsert).formatText();
+    } else {
+        packageInfoAccessor.replaceWithText(toInsert).formatText();
+    }
 }

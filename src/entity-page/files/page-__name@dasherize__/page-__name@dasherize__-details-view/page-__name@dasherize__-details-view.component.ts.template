@@ -10,7 +10,7 @@ import {
 } from '@angular/common';
 
 import { Subscription } from 'rxjs';
-import Cmf from 'cmf.lbos';
+import Cmf from 'cmf-lbos';
 
 import {
   CustomizableComponent,

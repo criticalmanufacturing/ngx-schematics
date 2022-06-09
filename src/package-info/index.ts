@@ -1,177 +1,132 @@
-import { join, normalize } from '@angular-devkit/core';
-import { ProjectDefinition } from '@angular-devkit/core/src/workspace';
+import { join, normalize, dirname } from '@angular-devkit/core';
 import { chain, Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
-import ts = require('@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript');
-import { findNodes } from '@schematics/angular/utility/ast-utils';
-import { applyToUpdateRecorder } from '@schematics/angular/utility/change';
-import { JSONFile } from '@schematics/angular/utility/json-file';
-import { getWorkspace } from '@schematics/angular/utility/workspace';
-import { dirname } from 'path';
+import { readWorkspace, ProjectDefinition } from '@schematics/angular/utility';
 
-import { findMetadataFile, insertPackageInfoMetadata, PackageInfo } from '../utility/metadata';
+import { JSONFile } from '@schematics/angular/utility/json-file';
+
+import { updatePackageInfoMetadata, PackageInfo } from '../utility/metadata';
+import { getMetadataFilePath } from '../utility/project';
+import { createSourceFile } from '../utility/ast';
 
 
 function getAllFiles(host: Tree, rootPath: string): string[] {
-  if (!host.exists(join(normalize(rootPath), 'ng-package.json'))) {
-    return [];
-  }
-
-  const json = new JSONFile(host, join(normalize(rootPath), 'ng-package.json'));
-  const entryFile = json.get(['lib', 'entryFile']) as string | null;
-
-  if (!entryFile) {
-    return [];
-  }
-
-  const filesToSearch: string[] = [join(normalize(rootPath), entryFile)];
-  const filesFound: string[] = [];
-
-  while (filesToSearch.length > 0) {
-    const file = filesToSearch.pop()!;
-
-    const content = host.get(file)?.content.toString('utf-8');
-
-    if (!content) {
-      continue;
+    if (!host.exists(join(normalize(rootPath), 'ng-package.json'))) {
+        return [];
     }
 
-    const sourceFile = ts.createSourceFile(file, content, ts.ScriptTarget.Latest, true);
+    const json = new JSONFile(host, join(normalize(rootPath), 'ng-package.json'));
+    const entryFile = json.get(['lib', 'entryFile']) as string | null;
 
-    findNodes(sourceFile, ts.isExportDeclaration)
-      .forEach((node) => {
-        if (!node.moduleSpecifier || !ts.isStringLiteral(node.moduleSpecifier)) {
-          return;
+    if (!entryFile) {
+        return [];
+    }
+
+    const filesToSearch: string[] = [join(normalize(rootPath), entryFile)];
+    const filesFound: string[] = [];
+
+    while (filesToSearch.length > 0) {
+        const file = filesToSearch.pop()!;
+        const sourceFile = createSourceFile(host, file);
+
+        if (!sourceFile) {
+            continue;
         }
 
-        const path = join(normalize(dirname(file)), (node.moduleSpecifier as ts.StringLiteral).text + '.ts');
+        sourceFile.getExportDeclarations().forEach((node) => {
+            const modulePath = node.getModuleSpecifierValue();
 
-        if (!host.exists(path)) {
-          return;
-        }
+            if (!modulePath) {
+                return;
+            }
 
-        if (!filesFound.includes(path)) {
-          filesFound.push(path);
+            const path = join(dirname(normalize(file)), modulePath + '.ts');
 
-          if (!filesToSearch.includes(path)) {
-            filesToSearch.push(path);
-          }
-        }
-      });
-  }
+            if (!host.exists(path)) {
+                return;
+            }
 
-  return filesFound;
+            if (!filesFound.includes(path)) {
+                filesFound.push(path);
+
+                if (!filesToSearch.includes(path)) {
+                    filesToSearch.push(path);
+                }
+            }
+        });
+    }
+
+    return filesFound;
 }
-
-function getMetadataPath(tree: Tree, rootDir: string) {
-  if (!tree.exists(join(normalize(rootDir), 'metadata', 'ng-package.json'))) {
-    return;
-  }
-
-  const json = new JSONFile(tree, join(normalize(rootDir), 'metadata', 'ng-package.json'));
-  const entryFile = json.get(['lib', 'entryFile']) as string | null;
-
-  if (!entryFile) {
-    return;
-  }
-
-  const content = tree.get(join(normalize(rootDir), 'metadata', entryFile))?.content.toString('utf-8');
-
-  if (!content) {
-    return;
-  }
-
-  return findMetadataFile(content, entryFile, rootDir);
-}
-
 
 function fillMetadataPackageInfo(project: ProjectDefinition, options: PackageInfo): Rule {
-  return (tree: Tree) => {
-    const metadataPath = getMetadataPath(tree, project.root);
+    return (tree: Tree) => {
+        const metadataPath = getMetadataFilePath(tree, project);
 
-    if (!metadataPath) {
-      return;
+        if (!metadataPath) {
+            return;
+        }
+        const source = createSourceFile(tree, metadataPath);
+
+        if (!source) {
+            return;
+        }
+
+        updatePackageInfoMetadata(source, options);
+        tree.overwrite(metadataPath, source.getFullText());
     }
-
-    const changes = insertPackageInfoMetadata(tree.get(metadataPath)!.content.toString('utf-8'), metadataPath, options);
-
-    if (!changes) {
-      return;
-    }
-
-    const recorder = tree.beginUpdate(metadataPath);
-    applyToUpdateRecorder(recorder, changes);
-    tree.commitUpdate(recorder);
-  }
 }
 
 
 export default function (_options: any): Rule {
-  return async (tree: Tree, _context: SchematicContext) => {
-    const workspace = await getWorkspace(tree);
-    const project = workspace.projects.get(_options.project);
+    return async (tree: Tree, _context: SchematicContext) => {
+        const workspace = await readWorkspace(tree);
+        const project = workspace.projects.get(_options.project);
 
-    if (!project) {
-      throw new SchematicsException(`Project "${_options.project}" does not exist.`);
-    }
-
-
-    if (project.extensions['projectType'] !== 'library' || !project.sourceRoot) {
-      return;
-    }
-
-    const packageInfo: PackageInfo = {
-      package: _options.project,
-      widgets: [],
-      converters: [],
-      dataSources: [],
-      components: []
-    }
-
-    getAllFiles(tree, project.root).forEach((file) => {
-      const source = ts.createSourceFile(file, tree.get(file)!.content.toString('utf-8'), ts.ScriptTarget.Latest, true);
-
-      const classNodes = findNodes(source, ts.isClassDeclaration);
-
-      classNodes.forEach((node) => {
-        if (!node.decorators || !node.name) {
-          return
+        if (!project) {
+            throw new SchematicsException(`Project "${_options.project}" does not exist.`);
         }
 
-        if (node.modifiers?.find((modifier) => modifier.kind === ts.SyntaxKind.AbstractKeyword)) {
-          return;
+
+        if (project.extensions['projectType'] !== 'library' || !project.sourceRoot) {
+            return;
         }
 
-        const decorators = node.decorators
-          .filter(node => node.expression.kind === ts.SyntaxKind.CallExpression)
-          .map(node => node.expression as ts.CallExpression)
-          .reduce((res, expr) => {
-            if (expr.expression.kind == ts.SyntaxKind.Identifier) {
-              res.push((expr.expression as ts.Identifier).text);
-            } else if (expr.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
-              // This covers foo.NgModule when importing * as foo.
-              const paExpr = expr.expression as ts.PropertyAccessExpression;
-              if (paExpr.expression.kind === ts.SyntaxKind.Identifier) {
-                res.push(paExpr.name.text);
-              }
+        const packageInfo: PackageInfo = {
+            package: _options.project,
+            widgets: [],
+            converters: [],
+            dataSources: [],
+            components: []
+        }
+
+        getAllFiles(tree, project.root).forEach((file) => {
+            const source = createSourceFile(tree, file);
+
+            if (!source) {
+                return;
             }
 
-            return res;
-          }, [] as string[]);
+            source?.getClasses().forEach((node) => {
+                const className = node.getName();
 
-        if (decorators.includes('Widget')) {
-          packageInfo.widgets.push(node.name.text);
-        } else if (decorators.includes('DataSource')) {
-          packageInfo.dataSources.push(node.name.text);
-        } else if (decorators.includes('Converter')) {
-          packageInfo.converters.push(node.name.text);
-        } else if (decorators.includes('Component')) {
-          packageInfo.components.push(node.name.text);
-        }
-      });
-    });
+                if (node.isAbstract() || !className) {
+                    return;
+                }
 
-    return chain([
-      fillMetadataPackageInfo(project, packageInfo)
-    ]);
-  }
+                if (node.getDecorator('Widget')) {
+                    packageInfo.widgets.push(className);
+                } else if (node.getDecorator('DataSource')) {
+                    packageInfo.dataSources.push(className);
+                } else if (node.getDecorator('Converter')) {
+                    packageInfo.converters.push(className);
+                } else if (node.getDecorator('Component')) {
+                    packageInfo.components.push(className);
+                }
+            });
+        });
+
+        return chain([
+            fillMetadataPackageInfo(project, packageInfo)
+        ]);
+    }
 }

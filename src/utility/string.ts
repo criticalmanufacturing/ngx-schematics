@@ -1,5 +1,8 @@
-import { Path, relative, strings } from "@angular-devkit/core";
+import { strings } from "@angular-devkit/core";
 
+/**
+ * Nameify RegExp
+ */
 const STRING_NAMEIFY_REGEXP_1 = /([a-z\d])([A-Z]+)/g;
 
 /**
@@ -10,17 +13,16 @@ export function nameify(str: string): string {
     return strings.classify(str).replace(STRING_NAMEIFY_REGEXP_1, '$1 $2');
 }
 
+
 /**
- * Builds the relative path from one path to another
- * @param from From Path
- * @param to To Path
+ * Updates the space identation in a string
+ * @param spacesToUse Spaces to use in the identation
  */
-export function buildRelativePath(from: Path, to: Path): string {
-    let relativePath: string = relative(from, to);
-
-    if (!relativePath.startsWith('.')) {
-        relativePath = `./` + relativePath;
-    }
-
-    return relativePath;
+export function updateSpaces(spacesToUse: number, initialSpaces: number = 2) {
+    return (strings: TemplateStringsArray, ...substitutions: any[]) => {
+        return String.raw(strings, ...substitutions).replace(/^([ \t]+)/gm, (_, match: string) => {
+            const spaces = match.split('').reduce((res, char) => res += char === ' ' ? 1 : 2, 0)
+            return `${' '.repeat(Math.floor(spaces / initialSpaces) * spacesToUse + spaces % 2)}`;
+        });
+    };
 }

@@ -11,7 +11,7 @@ import {
 
 import {
   Cmf
-} from 'cmf.lbos';
+} from 'cmf-lbos';
 
 import {
   CustomizableComponent,
