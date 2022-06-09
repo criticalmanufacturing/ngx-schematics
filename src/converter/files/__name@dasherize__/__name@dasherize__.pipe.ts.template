@@ -1,11 +1,11 @@
 import {
-  NgModule,
-  Pipe,
-  PipeTransform
+    NgModule,
+    Pipe,
+    PipeTransform
 } from '@angular/core';
 
 import {
-  Converter
+    Converter
 } from 'cmf-core-dashboards';
 
 /**
@@ -20,24 +20,24 @@ import {
  * ```
  */
 @Converter({
-  name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>#NAME:<%= nameify(name) %> Converter`,
-  factory: () => new <%= classify(name) %>Pipe(),
-  deps: [],
-  input: [],
-  output: null!
+    name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>#NAME:<%= nameify(name) %> Converter`,
+    factory: () => new <%= classify(name) %>Pipe(),
+    deps: [],
+    input: [],
+    output: null
 })
 @Pipe({
-  name: "<%= camelize(name) %>"
+    name: "<%= camelize(name) %>"
 })
 export class <%= classify(name) %>Pipe implements PipeTransform {
-  transform(value: any, ...args: any[]): any {
-    return value;
-  }
+    transform(value: any, ...args: any[]): any {
+        return value;
+    }
 }
 
 @NgModule({
-  imports: [],
-  declarations: [<%= classify(name) %>Pipe],
-  exports: [<%= classify(name) %>Pipe]
+    imports: [],
+    declarations: [<%= classify(name) %>Pipe],
+    exports: [<%= classify(name) %>Pipe]
 })
 export class <%= classify(name) %>PipeModule { }

@@ -26,7 +26,7 @@ export interface UpdateMetadataOptions {
 export function updatePublicAPI(project: ProjectDefinition): Rule {
     return async (tree: Tree) => {
         if (project.extensions['projectType'] !== ProjectType.Library ||
-            tree.exists(join(normalize(project.root), 'ng-package.json'))) {
+            !tree.exists(join(normalize(project.root), 'ng-package.json'))) {
             return;
         }
 

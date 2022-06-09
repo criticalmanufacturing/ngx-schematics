@@ -1,6 +1,6 @@
 import { dirname, join, normalize } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
-import { ArrayLiteralExpression, createWrappedNode, Node, ObjectLiteralExpression, Project, SourceFile, SyntaxKind, ts } from 'ts-morph';
+import { ArrayLiteralExpression, createWrappedNode, Node, ObjectLiteralExpression, Project, QuoteKind, SourceFile, SyntaxKind, ts } from 'ts-morph';
 import { Change } from './recorder';
 
 
@@ -216,5 +216,9 @@ export function createSourceFile(host: Tree, path: string): SourceFile | undefin
         return;
     }
 
-    return new Project().createSourceFile(path, content, { overwrite: true });
+    return new Project({
+        manipulationSettings: {
+            quoteKind: QuoteKind.Single
+        }
+    }).createSourceFile(path, content, { overwrite: true });
 }

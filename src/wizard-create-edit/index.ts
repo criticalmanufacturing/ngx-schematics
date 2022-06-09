@@ -19,6 +19,30 @@ import { MetadataProperty } from '../utility/metadata';
 import { updatePublicAPI, updateMetadata } from '../utility/project';
 import { buildDefaultPath, parseName } from '../utility/workspace';
 
+function getMetadataActions(project: string, entityTypeName: string) {
+    return `\
+{
+    id: '${strings.classify(entityTypeName)}.Create',
+    mode: ActionMode.ModalPage,
+    loadComponent: () => import(
+        /* webpackExports: "WizardCreateEdit${strings.classify(entityTypeName)}Component" */
+        '${project}').then(m => m.WizardCreateEdit${strings.classify(entityTypeName)}Component),
+    context: {
+        editMode: 1 // mode: EditMode.Create
+    }
+},
+{
+    id: '${strings.classify(entityTypeName)}.Edit',
+    mode: ActionMode.ModalPage,
+    loadComponent: () => import(
+        /* webpackExports: "WizardCreateEdit${strings.classify(entityTypeName)}Component" */
+        '${project}').then(m => m.WizardCreateEdit${strings.classify(entityTypeName)}Component),
+    context: {
+        editMode: 3 // mode: EditMode.Edit
+    }
+}`;
+}
+
 export default function (_options: any): Rule {
     return async (tree: Tree, _context: SchematicContext) => {
         if (!_options.namespace) {
@@ -78,27 +102,7 @@ export default function (_options: any): Rule {
         const metadataOptions = {
             identifier: MetadataProperty.Action,
             imports: { 'ActionMode': 'cmf-core' },
-            toInsert: `\
-{
-  id: '${strings.classify(_options.name)}.Create',
-  mode: ActionMode.ModalPage,
-  loadComponent: () => import(
-    /* webpackExports: "WizardCreateEdit${strings.classify(_options.name)}Component" */
-    '${_options.project}').then(m => m.WizardCreateEdit${strings.classify(_options.name)}Component),
-  context: {
-    editMode: 1 // mode: EditMode.Create
-  }
-},
-{
-  id: '${strings.classify(_options.name)}.Edit',
-  mode: ActionMode.ModalPage,
-  loadComponent: () => import(
-    /* webpackExports: "WizardCreateEdit${strings.classify(_options.name)}Component" */
-    '${_options.project}').then(m => m.WizardCreateEdit${strings.classify(_options.name)}Component),
-  context: {
-    editMode: 3 // mode: EditMode.Edit
-  }
-}`
+            toInsert: getMetadataActions(_options.project, _options.name)
         };
 
         return chain([

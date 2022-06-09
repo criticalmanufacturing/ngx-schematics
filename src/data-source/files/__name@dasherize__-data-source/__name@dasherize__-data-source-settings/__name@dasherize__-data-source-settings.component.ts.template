@@ -1,20 +1,20 @@
 import {
-  ViewContainerRef,
-  Component,
-  NgModule
+    ViewContainerRef,
+    Component,
+    NgModule
 } from '@angular/core';
 
 import {
-  CommonModule
+    CommonModule
 } from '@angular/common';
 
 import {
-  CustomizableComponent,
+    CustomizableComponent,
 } from 'cmf-core';
 
 import {
-  DataSourceSettingsDef,
-  DataSourceSettingsModule
+    DataSourceSettingsDef,
+    DataSourceSettingsModule
 } from 'cmf-core-dashboards';
 
 /**
@@ -43,39 +43,39 @@ import {
  *
  */
 @Component({
-  selector: "<%= dasherize(project) %>-<%= dasherize(name) %>-data-source-settings",
-  templateUrl: "./<%= dasherize(name) %>-data-source-settings.component.html",
-  styleUrls: ["./<%= dasherize(name) %>-data-source-settings.component.less"]
+    selector: "<%= dasherize(project) %>-<%= dasherize(name) %>-data-source-settings",
+    templateUrl: "./<%= dasherize(name) %>-data-source-settings.component.html",
+    styleUrls: ["./<%= dasherize(name) %>-data-source-settings.component.less"]
 })
 export class <%= classify(name) %>DataSourceSettingsComponent extends CustomizableComponent {
 
-  /**
-   * The settings of the <%= classify(name) %>DataSource
-   */
-  public settings!: DataSourceSettingsDef;
+    /**
+     * The settings of the <%= classify(name) %>DataSource
+     */
+    public settings!: DataSourceSettingsDef;
 
-  /**
-   * Constructor
-   */
-  constructor(viewContainerRef: ViewContainerRef) {
-    super(viewContainerRef);
-  }
+    /**
+     * Constructor
+     */
+    constructor(viewContainerRef: ViewContainerRef) {
+        super(viewContainerRef);
+    }
 
-  /**
-   * On settings loaded
-   * @param settings the <%= classify(name) %>DataSource settings definition
-   */
-  public onLoadSettings(settings: DataSourceSettingsDef): void {
-    this.settings = settings;
-  }
+    /**
+     * On settings loaded
+     * @param settings the <%= classify(name) %>DataSource settings definition
+     */
+    public onLoadSettings(settings: DataSourceSettingsDef): void {
+        this.settings = settings;
+    }
 }
 
 @NgModule({
-  imports: [
-    CommonModule,
-    DataSourceSettingsModule
-  ],
-  declarations: [<%= classify(name) %>DataSourceSettingsComponent],
-  exports: [<%= classify(name) %>DataSourceSettingsComponent]
+    imports: [
+        CommonModule,
+        DataSourceSettingsModule
+    ],
+    declarations: [<%= classify(name) %>DataSourceSettingsComponent],
+    exports: [<%= classify(name) %>DataSourceSettingsComponent]
 })
 export class <%= classify(name) %>DataSourceSettingsModule { }

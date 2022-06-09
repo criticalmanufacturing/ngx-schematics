@@ -1,12 +1,12 @@
 import {
-  UtilService
+    UtilService
 } from 'cmf-core';
 
 import {
-  DataSource,
-  DataSourceGeneric,
-  DataSourceSettingsDef,
-  DataSourceExecutionOutput
+    DataSource,
+    DataSourceGeneric,
+    DataSourceSettingsDef,
+    DataSourceExecutionOutput
 } from 'cmf-core-dashboards';
 
 import {
@@ -40,27 +40,27 @@ import {
  * * `string` : **value** _(default)_ - Output description
  */
 @DataSource({
-  name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>-data-source#NAME:<%= nameify(name) %>`,
-  factory: (util: UtilService) => new <%= classify(name) %>DataSource(util),
-  deps: [UtilService],
-  settingsComponent: {
-    component: <%= classify(name) %>DataSourceSettings
-}
+    name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>-data-source#NAME:<%= nameify(name) %>`,
+    factory: (util: UtilService) => new <%= classify(name) %>DataSource(util),
+    deps: [UtilService],
+    settingsComponent: {
+        component: <%= classify(name) %>DataSourceSettings
+    }
 })
 export class <%= classify(name) %>DataSource extends DataSourceGeneric implements DataSourceSettingsDef {
 
-  /**
-   * Constructor
-   */
-  constructor(util: UtilService) {
-    super(util);
-  }
+    /**
+     * Constructor
+     */
+    constructor(util: UtilService) {
+        super(util);
+    }
 
-  /**
-   * This method gathers all the logic to fetch data for this data source
-   */
-  public async execute(): Promise<DataSourceExecutionOutput | void> {
-    // Please change the next line to execute what this data source requires
-    return;
-  }
+    /**
+     * This method gathers all the logic to fetch data for this data source
+     */
+    public async execute(): Promise<DataSourceExecutionOutput | void> {
+        // Please change the next line to execute what this data source requires
+        return;
+    }
 }
