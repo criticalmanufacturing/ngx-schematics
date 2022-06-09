@@ -27,7 +27,6 @@ import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 
 import { targetBuildNotFoundError } from '@schematics/angular/utility/project-targets';
 import { addPackageJsonDependency, NodeDependency } from '@schematics/angular/utility/dependencies';
-import { JSONFile } from '@schematics/angular/utility/json-file';
 
 import {
     CORE_METADATA_MODULES,
@@ -37,8 +36,10 @@ import {
     PROJECT_SCRIPTS,
     PROJECT_STYLES
 } from './package-configs';
+
 import { getAppModulePath, getMainPath } from '../utility/workspace';
 import { addSymbolToNgModuleMetadata, createSourceFile, insertImport } from '../utility/ast';
+import { updateTsConfig } from '../utility/project';
 
 /**
  * Updates index.html file with the themes and loading container
@@ -226,7 +227,7 @@ function installSchematics(_options: any) {
             overriteComponentTemplate(),
             updateAppModule([...CORE_METADATA_MODULES, CORE_MODULE]),
             updateMain(),
-            updateTsConfig({ "allowSyntheticDefaultImports": true })
+            addRulesToTsConfig({ "allowSyntheticDefaultImports": true })
         ]);
     };
 }
@@ -317,19 +318,15 @@ function updateAppModule(pkgs: [string, string][]): Rule {
 /**
  * Adds a set of packages to the package.json in the given host tree.
  */
-function updateTsConfig(rules: Record<string, any>) {
+function addRulesToTsConfig(rules: Record<string, any>) {
     return (host: Tree) => {
-        if (!host.exists('tsconfig.json')) {
-            return host;
-        }
-
-        const file = new JSONFile(host, 'tsconfig.json');
+        const modifyOptions = new Map<string[], any>();
 
         Object.keys(rules).forEach((rule) => {
-            const jsonPath = ['compilerOptions', rule];
-            const value = rules[rule];
-            file.modify(jsonPath, value);
+            modifyOptions.set(['compilerOptions', rule], rules[rule]);
         });
+
+        updateTsConfig(host, modifyOptions);
     };
 }
 

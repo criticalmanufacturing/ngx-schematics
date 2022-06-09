@@ -124,3 +124,16 @@ export function getMetadataFilePath(tree: Tree, project: ProjectDefinition): str
 
     return;
 }
+
+export function updateTsConfig(host: Tree, modifyOptions: Map<string[], any>) {
+    if (!host.exists('tsconfig.json')) {
+        return host;
+    }
+
+    const file = new JSONFile(host, 'tsconfig.json');
+
+    modifyOptions.forEach((value, jsonPath) => {
+        const oldValue = file.get(jsonPath);
+        file.modify(jsonPath, Array.isArray(oldValue) ? [...oldValue, ...value] : value);
+    });
+}
