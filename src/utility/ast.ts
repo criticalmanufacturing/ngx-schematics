@@ -1,8 +1,6 @@
 import { dirname, join, normalize } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
-import { ArrayLiteralExpression, createWrappedNode, Node, ObjectLiteralExpression, Project, QuoteKind, SourceFile, SyntaxKind, ts } from 'ts-morph';
-import { Change } from './recorder';
-
+import { createWrappedNode, ObjectLiteralExpression, Project, QuoteKind, SourceFile, SyntaxKind, ts } from 'ts-morph';
 
 /**
  * Inserts an export declaration in a file
@@ -51,17 +49,16 @@ export function insertImport(
     symbolName: string,
     module: string,
     isDefault = false
-): Change | undefined {
+): void {
     const allImports = source.getImportDeclarations();
     const importNode = allImports.find(node => node.getModuleSpecifierValue() === module);
-    let change: Node;
 
     if (isDefault) {
         if (importNode?.getNamespaceImport()) {
             return;
         }
 
-        change = source.addImportDeclaration({ moduleSpecifier: module, defaultImport: '' });
+        source.addImportDeclaration({ moduleSpecifier: module, defaultImport: '' });
     } else if (importNode) {
         const namedImports = importNode.getNamedImports();
 
@@ -69,15 +66,10 @@ export function insertImport(
             return;
         }
 
-        change = importNode.addNamedImport(symbolName);
+        importNode.addNamedImport(symbolName);
     } else {
-        change = source.addImportDeclaration({ moduleSpecifier: module, namedImports: [symbolName] });
+        source.addImportDeclaration({ moduleSpecifier: module, namedImports: [symbolName] });
     }
-
-    const position = change.getStart(true);
-    const toInsert = change.getText(true);
-
-    return [[position, position], toInsert];
 }
 
 export function addSymbolToNgModuleMetadata(
@@ -184,27 +176,6 @@ export function findBootstrapModulePath(source: ts.SourceFile): string | undefin
 
     return join(dirname(normalize(rootNode.getFilePath())), moduleRelativePath) + '.ts';
 }
-
-export function insertElement(array: ArrayLiteralExpression, element: string, index?: number): Change {
-    const lastElem = index === undefined ? array.getElements().slice(-1)[0] : array.getElements()[index];
-
-    if (lastElem) {
-        const spaces = lastElem.getFullText().match(/^\r?\n?\s+/)?.[0] ?? ' ';
-        const position = lastElem.getFullStart();
-
-        return [[position, position], `${spaces}${element},`];
-    } else {
-        if (array.getElements().length > 0) {
-            const leadingSpaces = array.getElements()[0].getFullText().match(/^\r?\n?\s+/)?.[0];
-            const trailingSpaces = leadingSpaces ? '' : ' ';
-
-            return [[array.getStart(), array.getStart()], `${leadingSpaces}${element},${trailingSpaces}`]; // not finished
-        } else {
-            return [[array.getStart() + 1, array.getEnd() - 1], `${element}`];
-        }
-    }
-}
-
 
 /**
  * Gets the a ts source file
