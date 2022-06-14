@@ -43,7 +43,7 @@ export default function (_options: any): Rule {
                 ...strings,
                 ..._options,
                 nameify,
-                project: project?.prefix ?? _options.project
+                project: project.prefix ?? _options.project
             }),
             move(parsedPath.path)
         ]);
