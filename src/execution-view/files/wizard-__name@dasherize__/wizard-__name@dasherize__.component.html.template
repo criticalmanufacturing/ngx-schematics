@@ -2,7 +2,7 @@
   i18n-mainTitle="@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#TITLE" mainTitle="<%= nameify(name) %>"
   i18n-action-name="<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#ACTION" action-name="Finish">
 
-    <!-- Executuon View steps -->
+    <!-- Execution View steps -->
     <cmf-core-controls-execution-view-tab i18n-mainTitle="@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#DETAILS" mainTitle="Details">
       <p><%= nameify(name) %> Wizard works!</p>
     </cmf-core-controls-execution-view-tab>

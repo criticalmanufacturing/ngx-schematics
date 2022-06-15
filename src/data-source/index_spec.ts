@@ -185,7 +185,12 @@ describe('Generate Data Source', () => {
                 .toPromise();
 
             const dataSourceName = nameify(dataSourceOptions.name);
-            const templateRegExp = new RegExp(`<cmf-core-dashboards-datasource-settings(\r*\n*(\\s*))\\[updatedSettings\\]="settings"(\r*\n*(\\s*))\\(onLoadSettings\\)="onLoadSettings\\(\\$event\\)">(\r*\n*(\\s*))${dataSourceName} Data Source Settings Works!(\r*\n*(\\s*))<\/cmf-core-dashboards-datasource-settings>`, 'gm');
+            const templateRegExp = new RegExp(
+                `<cmf-core-dashboards-datasource-settings(\r*\n*(\\s*))\\` +
+                    `[updatedSettings\\]="settings"(\r*\n*(\\s*))` +
+                    `\\(onLoadSettings\\)="onLoadSettings\\(\\$event\\)">(\r*\n*(\\s*))` +
+                    `${dataSourceName} Data Source Settings Works!(\r*\n*(\\s*))` +
+                `<\/cmf-core-dashboards-datasource-settings>`, 'gm');
 
             const dataSourceSettingsTemplateContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.html`);
             expect(dataSourceSettingsTemplateContent).toMatch(templateRegExp);
@@ -273,8 +278,8 @@ describe('Generate Data Source', () => {
             const dataSourceSettingsClassName = `${strings.classify(dataSourceOptions.name)}DataSourceSettings`;
     
             const dataSourceSettingsContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.ts`);
-            expect(dataSourceSettingsContent).toContain(`declarations: \[${dataSourceSettingsClassName}Component\]`);
-            expect(dataSourceSettingsContent).toContain(`exports: \[${dataSourceSettingsClassName}Component\]`);
+            expect(dataSourceSettingsContent).toContain(`declarations: [${dataSourceSettingsClassName}Component]`);
+            expect(dataSourceSettingsContent).toContain(`exports: [${dataSourceSettingsClassName}Component]`);
             expect(dataSourceSettingsContent).toContain(`export class ${dataSourceSettingsClassName}Module { }`);
         });
     });
