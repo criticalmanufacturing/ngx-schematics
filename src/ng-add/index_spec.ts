@@ -193,9 +193,9 @@ describe('Test ng-add', () => {
                 .toPromise();
 
             const styleRegExp = new RegExp(
-                `<style id="initial-theme">(\r*\n*(\\s*))` +
-                    `@import url\\("cmf\\.style\\.blue\\.css"\\) \\(prefers-color-scheme: light\\);(\r*\n*(\\s*))` +
-                    `@import url\\("cmf\\.style\\.dark\\.css"\\) \\(prefers-color-scheme: dark\\);(\r*\n*(\\s*))` +
+                `<style id="initial-theme">\\s*` +
+                    `@import url\\("cmf\\.style\\.blue\\.css"\\) \\(prefers-color-scheme: light\\);\\s*` +
+                    `@import url\\("cmf\\.style\\.dark\\.css"\\) \\(prefers-color-scheme: dark\\);\\s*` +
                 `</style>`,
                 'gm')
     
@@ -209,11 +209,11 @@ describe('Test ng-add', () => {
                 .toPromise();
 
             const styleRegExp = new RegExp(
-                `<div id="loading-container" class="cmf-loading-container">(\r*\n*(\\s*))` +
-                    `<div class="cmf-loading-center">(\r*\n*(\\s*))` +
-                        `<div class="cmf-loading-cmf-logo"></div>(\r*\n*(\\s*))` +
-                        `<div class="cmf-loading-spinner"></div>(\r*\n*(\\s*))` +
-                    `</div>(\r*\n*(\\s*))` +
+                `<div id="loading-container" class="cmf-loading-container">\\s*` +
+                    `<div class="cmf-loading-center">\\s*` +
+                        `<div class="cmf-loading-cmf-logo"></div>\\s*` +
+                        `<div class="cmf-loading-spinner"></div>\\s*` +
+                    `</div>\\s*` +
                 `</div>`,
                 'gm')
     
@@ -247,11 +247,11 @@ describe('Test ng-add', () => {
                 .toPromise();
 
             const functionRegExp = new RegExp(
-                `loadApplicationConfig\\('assets\/config\\.json'\\)\\.then\\(\\(\\) => {(\r*\n*(\\s*))` +
-                    `import\\(\\/\\* webpackMode: "eager" \\*\\/'\\.\\/app\\/app\\.module'\\)\\.then\\(\\(m\\) => {(\r*\n*(\\s*))` +
-                        `platformBrowserDynamic\\(\\)\\.bootstrapModule\\(m\\.AppModule\\)(\r*\n*(\\s*))` +
-                        `\\.catch\\(err => console\\.error\\(err\\)\\);(\r*\n*(\\s*))` +
-                    `}\\);(\r*\n*(\\s*))` +
+                `loadApplicationConfig\\('assets\/config\\.json'\\)\\.then\\(\\(\\) => {\\s*` +
+                    `import\\(\\/\\* webpackMode: "eager" \\*\\/'\\.\\/app\\/app\\.module'\\)\\.then\\(\\(m\\) => {\\s*` +
+                        `platformBrowserDynamic\\(\\)\\.bootstrapModule\\(m\\.AppModule\\)\\s*` +
+                        `\\.catch\\(err => console\\.error\\(err\\)\\);\\s*` +
+                    `}\\);\\s*` +
                 `}\\);`,
                 'gm'
             );

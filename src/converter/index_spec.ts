@@ -72,8 +72,8 @@ describe('Generate Converter', () => {
 
         const pipeContent = tree.readContent(`${converterOptions.path}/${converterOptions.name}/${converterOptions.name}.pipe.ts`);
 
-        expect(pipeContent).toMatch(/import {([NgModule|Pipe|PipeTransform]*,*(\r*\n*(\s*))*)+} from '@angular\/core';/gm);
-        expect(pipeContent).toMatch(/import {(\r*\n*(\s*))*Converter(\r*\n*(\s*))*} from 'cmf-core-dashboards';/gm);
+        expect(pipeContent).toMatch(/import \{\s*((NgModule|PipeTransform|Pipe)\s*,?\s*){3}\} from '@angular\/core';/gm);
+        expect(pipeContent).toMatch(/import \{\s*Converter\s*\} from 'cmf-core-dashboards';/gm);
         expect(pipeContent).toMatch(/@Pipe\(/);
         expect(pipeContent).toMatch(/@Converter\(/g);
     });

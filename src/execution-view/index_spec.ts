@@ -125,13 +125,13 @@ describe('Generate Execution View', () => {
         const dasherizedExecutionViewName = strings.dasherize(executionViewOptions.name);
 
         const templateRegExp = new RegExp(
-            `<cmf-core-controls-execution-view \\[cmf-core-business-controls-transaction-execution-view\\]="instance!"(\r*\n*(\\s*))` +
-                `i18n-mainTitle="@@${strings.dasherize(executionViewOptions.project)}/wizard-${dasherizedExecutionViewName}#TITLE" mainTitle="${nameify(executionViewOptions.name)}"(\r*\n*(\\s*))` +
-                `i18n-action-name="@@${strings.dasherize(executionViewOptions.project)}/wizard-${dasherizedExecutionViewName}#ACTION" action-name="Finish">(\r*\n*(\\s*))` +
-                    `<!-- Execution View steps -->(\r*\n*(\\s*))` +
-                    `<cmf-core-controls-execution-view-tab i18n-mainTitle="@@${strings.dasherize(executionViewOptions.project)}/wizard-${dasherizedExecutionViewName}#DETAILS" mainTitle="Details">(\r*\n*(\\s*))` +
-                        `<p>${nameify(executionViewOptions.name)} Wizard works!</p>(\r*\n*(\\s*))` +
-                    `</cmf-core-controls-execution-view-tab>(\r*\n*(\\s*))` +
+            `<cmf-core-controls-execution-view \\[cmf-core-business-controls-transaction-execution-view\\]="instance!"\\s*` +
+                `i18n-mainTitle="@@${strings.dasherize(executionViewOptions.project)}/wizard-${dasherizedExecutionViewName}#TITLE" mainTitle="${nameify(executionViewOptions.name)}"\\s*` +
+                `i18n-action-name="@@${strings.dasherize(executionViewOptions.project)}/wizard-${dasherizedExecutionViewName}#ACTION" action-name="Finish">\\s*` +
+                    `<!-- Execution View steps -->\\s*` +
+                    `<cmf-core-controls-execution-view-tab i18n-mainTitle="@@${strings.dasherize(executionViewOptions.project)}/wizard-${dasherizedExecutionViewName}#DETAILS" mainTitle="Details">\\s*` +
+                        `<p>${nameify(executionViewOptions.name)} Wizard works!</p>\\s*` +
+                    `</cmf-core-controls-execution-view-tab>\\s*` +
             `</cmf-core-controls-execution-view>`,
             'gm');
 
@@ -182,7 +182,7 @@ describe('Generate Execution View', () => {
             .toPromise();
 
         const executionViewContent = tree.readContent(`${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`);
-        expect(executionViewContent).toMatch(/constructor\(([viewContainerRef: ViewContainerRef|private pageBag: PageBag|private util: UtilService|private entityTypes: EntityTypeService]*,*(\r*\n*(\s*))*)+\)/gm);
+        expect(executionViewContent).toMatch(/constructor\(\s*((viewContainerRef: ViewContainerRef|private pageBag: PageBag|private util: UtilService|private entityTypes: EntityTypeService)\s*,?\s*){4}\)/gm);
         expect(executionViewContent).toContain('super(viewContainerRef);');
     });
 
@@ -192,7 +192,7 @@ describe('Generate Execution View', () => {
             .toPromise();
 
         const executionViewContent = tree.readContent(`${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`);
-        expect(executionViewContent).toMatch(/imports: \[([CommonModule|ExecutionViewModule|TransactionExecutionViewModule]*,*(\r*\n*(\s*))*)+\]/gm);
+        expect(executionViewContent).toMatch(/imports: \[\s*((CommonModule|ExecutionViewModule|TransactionExecutionViewModule)\s*,?\s*){3}\]/gm);
     });
 
     it('should be declared and exported in NgModule', async () => {

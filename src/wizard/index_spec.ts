@@ -125,17 +125,17 @@ describe('Generate Wizard', () => {
         const dasherizedWizardName = strings.dasherize(wizardOptions.name);
 
         const templateRegExp = new RegExp(
-            `<cmf-core-controls-wizard \\[cmf-core-business-controls-transaction-wizard\\]="instance!"(\r*\n*(\\s*))` +
-                `i18n-mainTitle="@@${strings.dasherize(wizardOptions.project)}/wizard-${dasherizedWizardName}#TITLE"(\r*\n*(\\s*))` +
-                `mainTitle="${nameify(wizardOptions.name)}"(\r*\n*(\\s*))`+
-                `i18n-action-name="@@${strings.dasherize(wizardOptions.project)}/wizard-${dasherizedWizardName}#ACTION"(\r*\n*(\\s*))` +
-                `action-name="Finish">(\r*\n*(\\s*))`+
-                    `<!-- Wizard steps -->(\r*\n*(\\s*))` +
-                    `<cmf-core-controls-wizard-step(\r*\n*(\\s*))` +
-                        `i18n-mainTitle="@@${strings.dasherize(wizardOptions.project)}/wizard-${dasherizedWizardName}#DETAILS"(\r*\n*(\\s*))` +
-                        `mainTitle="Details">(\r*\n*(\\s*))` +
-                        `<p>Wizard ${nameify(wizardOptions.name)} works!</p>(\r*\n*(\\s*))` +
-                    `</cmf-core-controls-wizard-step>(\r*\n*(\\s*))` +
+            `<cmf-core-controls-wizard \\[cmf-core-business-controls-transaction-wizard\\]="instance!"\\s*` +
+                `i18n-mainTitle="@@${strings.dasherize(wizardOptions.project)}/wizard-${dasherizedWizardName}#TITLE"\\s*` +
+                `mainTitle="${nameify(wizardOptions.name)}"\\s*`+
+                `i18n-action-name="@@${strings.dasherize(wizardOptions.project)}/wizard-${dasherizedWizardName}#ACTION"\\s*` +
+                `action-name="Finish">\\s*`+
+                    `<!-- Wizard steps -->\\s*` +
+                    `<cmf-core-controls-wizard-step\\s*` +
+                        `i18n-mainTitle="@@${strings.dasherize(wizardOptions.project)}/wizard-${dasherizedWizardName}#DETAILS"\\s*` +
+                        `mainTitle="Details">\\s*` +
+                        `<p>Wizard ${nameify(wizardOptions.name)} works!</p>\\s*` +
+                    `</cmf-core-controls-wizard-step>\\s*` +
             `</cmf-core-controls-wizard>`,
             'gm');
 
@@ -186,7 +186,7 @@ describe('Generate Wizard', () => {
             .toPromise();
 
         const wizardContent = tree.readContent(`${wizardPath}/wizard-${strings.dasherize(wizardOptions.name)}.component.ts`);
-        expect(wizardContent).toMatch(/constructor\(([viewContainerRef: ViewContainerRef|private pageBag: PageBag|private util: UtilService|private entityTypes: EntityTypeService]*,*(\r*\n*(\s*))*)+\)/gm);
+        expect(wizardContent).toMatch(/constructor\(\s*((viewContainerRef: ViewContainerRef|private pageBag: PageBag|private util: UtilService|private entityTypes: EntityTypeService)\s*,?\s*){4}\)/gm);
         expect(wizardContent).toContain('super(viewContainerRef);');
     });
 
@@ -196,7 +196,7 @@ describe('Generate Wizard', () => {
             .toPromise();
 
         const wizardContent = tree.readContent(`${wizardPath}/wizard-${strings.dasherize(wizardOptions.name)}.component.ts`);
-        expect(wizardContent).toMatch(/imports: \[([CommonModule|TransactionWizardModule]*,*(\r*\n*(\s*))*)+\]/gm);
+        expect(wizardContent).toMatch(/imports: \[\s*((CommonModule|TransactionWizardModule)\s*,?\s*){2}\]/gm);
     });
 
     it('should be declared and exported in NgModule', async () => {

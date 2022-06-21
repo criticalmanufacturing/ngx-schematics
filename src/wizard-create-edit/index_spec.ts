@@ -124,21 +124,21 @@ describe('Generate Wizard Create Edit', () => {
         const dasherizedWizardName = strings.dasherize(wizardOptions.name);
 
         const templateRegExp = new RegExp(
-            `<cmf-core-business-controls-createEditEntity(\r*\n*(\\s*))` +
-                `\\[editMode\\]="editMode"(\r*\n*(\\s*))` +
-                `\\[mainTitle\\]="title"(\r*\n*(\\s*))` +
-                `\\[actionName\\]="action"(\r*\n*(\\s*))` +
-                `\\[onInitialSetupStart\\]="onInitialSetupStart"(\r*\n*(\\s*))` +
-                `\\[onInitialSetupFinish\\]="onInitialSetupFinish"(\r*\n*(\\s*))` +
-                `\\[onBeforeServiceCall\\]="onBeforeServiceCall"(\r*\n*(\\s*))` +
-                `\\[instance\\]="instance">(\r*\n*(\\s*))` +
+            `<cmf-core-business-controls-createEditEntity\\s*` +
+                `\\[editMode\\]="editMode"\\s*` +
+                `\\[mainTitle\\]="title"\\s*` +
+                `\\[actionName\\]="action"\\s*` +
+                `\\[onInitialSetupStart\\]="onInitialSetupStart"\\s*` +
+                `\\[onInitialSetupFinish\\]="onInitialSetupFinish"\\s*` +
+                `\\[onBeforeServiceCall\\]="onBeforeServiceCall"\\s*` +
+                `\\[instance\\]="instance">\\s*` +
 
-                `<!-- General Data Step -->(\r*\n*(\\s*))` +
-                `<cmf-core-business-controls-createEditStepGeneralData(\r*\n*(\\s*))` +
-                    `i18n-mainTitle="@@${strings.dasherize(wizardOptions.project)}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}#GENERAL_DATA" mainTitle="General Data"(\r*\n*(\\s*))` +
-                    `\\[instance\\]="instance"(\r*\n*(\\s*))` +
-                    `\\[editMode\\]="editMode">(\r*\n*(\\s*))` +
-                `</cmf-core-business-controls-createEditStepGeneralData>(\r*\n*(\\s*))` +
+                `<!-- General Data Step -->\\s*` +
+                `<cmf-core-business-controls-createEditStepGeneralData\\s*` +
+                    `i18n-mainTitle="@@${strings.dasherize(wizardOptions.project)}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}#GENERAL_DATA" mainTitle="General Data"\\s*` +
+                    `\\[instance\\]="instance"\\s*` +
+                    `\\[editMode\\]="editMode">\\s*` +
+                `</cmf-core-business-controls-createEditStepGeneralData>\\s*` +
             `</cmf-core-business-controls-createEditEntity>`,
             'gm'
         );
@@ -185,7 +185,7 @@ describe('Generate Wizard Create Edit', () => {
             .toPromise();
 
         const wizardContent = tree.readContent(`${wizardPath}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.ts`);
-        expect(wizardContent).toMatch(/constructor\(([viewContainerRef: ViewContainerRef|private _pageBag: PageBag|private util: UtilService|private entityTypes: EntityTypeService]*,*(\r*\n*(\s*))*)+\)/gm);
+        expect(wizardContent).toMatch(/constructor\(\s*((viewContainerRef: ViewContainerRef|private _pageBag: PageBag|private util: UtilService|private entityTypes: EntityTypeService)\s*,?\s*){4}\)/gm);
         expect(wizardContent).toContain('super(viewContainerRef);');
     });
 
@@ -206,7 +206,7 @@ describe('Generate Wizard Create Edit', () => {
             .toPromise();
 
         const wizardContent = tree.readContent(`${wizardPath}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.ts`);
-        expect(wizardContent).toMatch(/imports: \[([CommonModule|CreateEditEntityModule|CreateEditStepGeneralDataModule]*,*(\r*\n*(\s*))*)+\]/gm);
+        expect(wizardContent).toMatch(/imports: \[\s*((CommonModule|CreateEditEntityModule|CreateEditStepGeneralDataModule)\s*,?\s*){3}\]/gm);
     });
 
     it('should be declared and exported in NgModule', async () => {

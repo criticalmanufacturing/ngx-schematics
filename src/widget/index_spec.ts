@@ -129,7 +129,7 @@ describe('Generate Widget', () => {
         const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
         expect(widgetContent).toContain(`name: $localize\`:@@${strings.dasherize(widgetOptions.project)}/${strings.dasherize(widgetOptions.name)}-widget#NAME:${nameify(widgetOptions.name)} Widget\``);
         expect(widgetContent).toContain(`iconClass: 'icon-core-st-lg-generic'`);
-        expect(widgetContent).toMatch(new RegExp(`settingsComponent: {(\r*\n*(\\s*))component: ${strings.classify(widgetOptions.name)}WidgetSettingsComponent(\r*\n*(\\s*))}`, 'gm'));
+        expect(widgetContent).toMatch(new RegExp(`settingsComponent: {\\s*component: ${strings.classify(widgetOptions.name)}WidgetSettingsComponent\\s*}`, 'gm'));
     });
 
     it('should have the Component decorator having a different extension for the style file', async () => {
@@ -184,7 +184,7 @@ describe('Generate Widget', () => {
             .toPromise();
 
         const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
-        expect(widgetContent).toMatch(/constructor\(([viewContainerRef: ViewContainerRef|elementRef: ElementRef|feedback: FeedbackService]*,*(\r*\n*(\s*))*)+\)/gm);
+        expect(widgetContent).toMatch(/constructor\(\s*((viewContainerRef: ViewContainerRef|elementRef: ElementRef|feedback: FeedbackService)\s*,?\s*){3}\)/gm);
         expect(widgetContent).toContain('super(viewContainerRef, elementRef, feedback);');
     });
 
@@ -223,7 +223,7 @@ describe('Generate Widget', () => {
                 .toPromise();
 
             const templateRegExp = new RegExp(
-                `<cmf-core-dashboards-widgetSettings>(\r*\n*(\\s*))\\` +
+                `<cmf-core-dashboards-widgetSettings>\\s*\\` +
                 `<\/cmf-core-dashboards-widgetSettings>`, 'gm');
 
             const widgetSettingsTemplateContent = tree.readContent(`${defaultWidgetSettingsComponentFilePath}.html`);
@@ -292,7 +292,7 @@ describe('Generate Widget', () => {
                 .toPromise();
     
             const widgetSettingsContent = tree.readContent(`${defaultWidgetSettingsComponentFilePath}.ts`);
-            expect(widgetSettingsContent).toMatch(/constructor\(viewContainerRef: ViewContainerRef\) {(\r*\n*(\s*))super\(viewContainerRef\);(\r*\n*(\s*))}/gm)
+            expect(widgetSettingsContent).toMatch(/constructor\(viewContainerRef: ViewContainerRef\) {\s*super\(viewContainerRef\);\s*}/gm)
         });
 
         it('should import WidgetSettingsModule in NgModule', async () => {

@@ -129,7 +129,7 @@ describe('Generate Data Source', () => {
         expect(dataSourceContent).toContain(`name: $localize\`:@@${strings.dasherize(dataSourceOptions.project)}/${dataSourceOptions.name}-data-source#NAME:${nameify(dataSourceOptions.name)}\``);
         expect(dataSourceContent).toContain(`factory: (util: UtilService) => new ${dataSourceClassName}(util),`);
         expect(dataSourceContent).toContain(`deps: [UtilService],`);
-        expect(dataSourceContent).toMatch(new RegExp(`settingsComponent: {(\r*\n*(\\s*))component: ${dataSourceSettingsName}(\r*\n*(\\s*))}`, 'gm'));
+        expect(dataSourceContent).toMatch(new RegExp(`settingsComponent: {\\s*component: ${dataSourceSettingsName}\\s*}`, 'gm'));
     });
 
     it('should extend DataSourceGeneric and implement DataSourceSetting Def', async () => {
@@ -149,7 +149,7 @@ describe('Generate Data Source', () => {
             .toPromise();
 
         const dataSourceContent = tree.readContent(defaultDataSourceFilePath);
-        expect(dataSourceContent).toMatch(/constructor\(util: UtilService\) {(\r*\n*(\s*))super\(util\);(\r*\n*(\s*))}/gm)
+        expect(dataSourceContent).toMatch(/constructor\(util: UtilService\) {\s*super\(util\);\s*}/gm)
     });
 
     it('should have the function `execute` declared', async () => {
@@ -186,10 +186,10 @@ describe('Generate Data Source', () => {
 
             const dataSourceName = nameify(dataSourceOptions.name);
             const templateRegExp = new RegExp(
-                `<cmf-core-dashboards-datasource-settings(\r*\n*(\\s*))\\` +
-                    `[updatedSettings\\]="settings"(\r*\n*(\\s*))` +
-                    `\\(onLoadSettings\\)="onLoadSettings\\(\\$event\\)">(\r*\n*(\\s*))` +
-                    `${dataSourceName} Data Source Settings Works!(\r*\n*(\\s*))` +
+                `<cmf-core-dashboards-datasource-settings\\s*\\` +
+                    `[updatedSettings\\]="settings"\\s*` +
+                    `\\(onLoadSettings\\)="onLoadSettings\\(\\$event\\)">\\s*` +
+                    `${dataSourceName} Data Source Settings Works!\\s*` +
                 `<\/cmf-core-dashboards-datasource-settings>`, 'gm');
 
             const dataSourceSettingsTemplateContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.html`);
@@ -258,7 +258,7 @@ describe('Generate Data Source', () => {
                 .toPromise();
     
             const dataSourceSettingsContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.ts`);
-            expect(dataSourceSettingsContent).toMatch(/constructor\(viewContainerRef: ViewContainerRef\) {(\r*\n*(\s*))super\(viewContainerRef\);(\r*\n*(\s*))}/gm)
+            expect(dataSourceSettingsContent).toMatch(/constructor\(viewContainerRef: ViewContainerRef\) {\s*super\(viewContainerRef\);\s*}/gm)
         });
 
         it('should import CommonModule and DataSourceSettingsModule in NgModule', async () => {
@@ -267,7 +267,7 @@ describe('Generate Data Source', () => {
                 .toPromise();
     
             const dataSourceSettingsContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.ts`);
-            expect(dataSourceSettingsContent).toMatch(/imports: \[([CommonModule|DataSourceSettingsModule]*,*(\r*\n*(\s*))*)+\]/gm);
+            expect(dataSourceSettingsContent).toMatch(/imports: \[\s*((CommonModule|DataSourceSettingsModule)\s*,?\s*){2}\]/gm);
         });
 
         it('should be declared and exported in NgModule', async () => {

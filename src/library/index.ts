@@ -87,7 +87,7 @@ function createMetadataSubEntry(options: any) {
 }
 
 export default function (_options: any): Rule {
-    return () => {
+    return async () => {
         if (!_options.prefix) {
             const folderName = _options.name.startsWith('@') ? _options.name.substr(1) : _options.name;
 
@@ -97,7 +97,7 @@ export default function (_options: any): Rule {
         }
 
         return chain([
-            externalSchematic('@angular-eslint/schematics', 'library', { ..._options }),
+            await import('@angular-eslint/schematics' as any) ? externalSchematic('@angular-eslint/schematics', 'library', { ..._options }) : noop(),
             createMetadataSubEntry({ ..._options })
         ]);
     }

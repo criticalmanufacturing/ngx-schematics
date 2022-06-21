@@ -81,11 +81,11 @@ describe('Generate Entity Page', () => {
             .toPromise();
 
         const templateRegExp = new RegExp(
-            `<cmf-core-business-controls-entityPage(\r*\n*(\\s*))` +
-                `\\[mainTitle\\]="epEntity\\?.Name!"(\r*\n*(\\s*))` +
-                `\\entityType="${strings.classify(entityPageOptions.name)}"(\r*\n*(\\s*))` +
-                `i18n-entityTypeName="@@${strings.dasherize(entityPageOptions.project)}/page-${strings.dasherize(entityPageOptions.name)}#ENTITY_TYPE"(\r*\n*(\\s*))` +
-                `entityTypeName="${nameify(entityPageOptions.name)}">(\r*\n*(\\s*))` +
+            `<cmf-core-business-controls-entityPage\\s*` +
+                `\\[mainTitle\\]="epEntity\\?.Name!"\\s*` +
+                `\\entityType="${strings.classify(entityPageOptions.name)}"\\s*` +
+                `i18n-entityTypeName="@@${strings.dasherize(entityPageOptions.project)}/page-${strings.dasherize(entityPageOptions.name)}#ENTITY_TYPE"\\s*` +
+                `entityTypeName="${nameify(entityPageOptions.name)}">\\s*` +
             `<\/cmf-core-business-controls-entityPage>`, 'gm');
 
         const entityPageTemplateContent = tree.readContent(`${pageEntityTypePath}/page-${strings.dasherize(entityPageOptions.name)}.component.html`);
@@ -132,7 +132,7 @@ describe('Generate Entity Page', () => {
             .toPromise();
 
         const entityPageContent = tree.readContent(`${pageEntityTypePath}/page-${strings.dasherize(entityPageOptions.name)}.component.ts`);
-        expect(entityPageContent).toMatch(/constructor\(viewContainerRef: ViewContainerRef\) {(\r*\n*(\s*))super\(viewContainerRef\);(\r*\n*(\s*))}/gm)
+        expect(entityPageContent).toMatch(/constructor\(viewContainerRef: ViewContainerRef\) {\s*super\(viewContainerRef\);\s*}/gm)
     });
 
     it('should import CommonModule and EntityPageModule in NgModule', async () => {
@@ -141,7 +141,7 @@ describe('Generate Entity Page', () => {
             .toPromise();
 
         const entityPageContent = tree.readContent(`${pageEntityTypePath}/page-${strings.dasherize(entityPageOptions.name)}.component.ts`);
-        expect(entityPageContent).toMatch(/imports: \[([CommonModule|EntityPageModule]*,*(\r*\n*(\s*))*)+\]/gm);
+        expect(entityPageContent).toMatch(/imports: \[\s*((CommonModule|EntityPageModule)\s*,?\s*){2}\]/gm);
     });
 
     it('should be declared and exported in NgModule', async () => {
@@ -160,7 +160,7 @@ describe('Generate Entity Page', () => {
             .runSchematicAsync('entity-page', entityPageOptions, appTree)
             .toPromise();
 
-        const pathRegExp = new RegExp(`path: '',(\r*\n*(\\s*))component: Page${strings.classify(entityPageOptions.name)}Component`, 'gm');
+        const pathRegExp = new RegExp(`path: '',\\s*component: Page${strings.classify(entityPageOptions.name)}Component`, 'gm');
 
         const routingModuleContent = tree.readContent(`${pageEntityTypePath}/page-${strings.dasherize(entityPageOptions.name)}-routing.module.ts`);
         expect(routingModuleContent).toMatch(pathRegExp);
@@ -177,17 +177,17 @@ describe('Generate Entity Page', () => {
         expect(routingModuleChildren).not.toBeNull();
 
         // Details View
-        const detailsViewRedirectRouteRegExp = new RegExp(`{(\r*\n*(\\s*))path: '',(\r*\n*(\\s*))redirectTo: 'View/Details',(\r*\n*(\\s*))pathMatch: 'full'(\r*\n*(\\s*))}`, 'gm');
+        const detailsViewRedirectRouteRegExp = new RegExp(`{\\s*path: '',\\s*redirectTo: 'View/Details',\\s*pathMatch: 'full'\\s*}`, 'gm');
         expect(routingModuleChildren).toMatch(detailsViewRedirectRouteRegExp);
-        const detailsViewRouteRegExp = new RegExp(`{(\r*\n*(\\s*))path: 'View/Details',(\r*\n*(\\s*))component: Page${strings.classify(entityPageOptions.name)}DetailsViewComponent(\r*\n*(\\s*))}`, 'gm');
+        const detailsViewRouteRegExp = new RegExp(`{\\s*path: 'View/Details',\\s*component: Page${strings.classify(entityPageOptions.name)}DetailsViewComponent\\s*}`, 'gm');
         expect(routingModuleChildren).toMatch(detailsViewRouteRegExp);
 
         // References View
-        const referencesViewRouteRegExp = new RegExp(`{(\r*\n*(\\s*))path: 'View/References',(\r*\n*(\\s*))component: ReferencesView(\r*\n*(\\s*))}`, 'gm');
+        const referencesViewRouteRegExp = new RegExp(`{\\s*path: 'View/References',\\s*component: ReferencesView\\s*}`, 'gm');
         expect(routingModuleChildren).toMatch(referencesViewRouteRegExp);
 
         // History View
-        const historyViewRouteRegExp = new RegExp(`{(\r*\n*(\\s*))path: 'View/History',(\r*\n*(\\s*))component: HistoryView(\r*\n*(\\s*))}`, 'gm');
+        const historyViewRouteRegExp = new RegExp(`{\\s*path: 'View/History',\\s*component: HistoryView\\s*}`, 'gm');
         expect(routingModuleChildren).toMatch(historyViewRouteRegExp);
     });
 
@@ -197,7 +197,8 @@ describe('Generate Entity Page', () => {
             .toPromise();
 
         const routingModuleContent = tree.readContent(`${pageEntityTypePath}/page-${strings.dasherize(entityPageOptions.name)}-routing.module.ts`);
-        const routingModulesImportsRegExp = new RegExp(`imports: \\[([RouterModule.forChild(routes)|Page${strings.classify(entityPageOptions.name)}DetailsViewModule|HistoryViewModule|ReferencesViewModule]*,*(\r*\n*(\\s*))*)+\\]`, 'gm')
+
+        const routingModulesImportsRegExp = new RegExp(`imports: \\[\\s*((RouterModule\\.forChild\\(routes\\)|Page${strings.classify(entityPageOptions.name)}DetailsViewModule|HistoryViewModule|ReferencesViewModule)\\s*,?\\s*){4}\\]`, 'gm')
         expect(routingModuleContent).toMatch(routingModulesImportsRegExp);
     });
 
@@ -226,7 +227,7 @@ describe('Generate Entity Page', () => {
                 .toPromise();
     
             const entityPageDetailsViewTemplateContent = tree.readContent(`${pageEntityTypeDetailsViewPath}/page-${strings.dasherize(entityPageOptions.name)}-details-view.component.html`);
-            expect(entityPageDetailsViewTemplateContent).toMatch(/<cmf-core-business-controls-detailsView \*ngIf="epEntity">(\r*\n*(\s*))<\/cmf-core-business-controls-detailsView>/gm);
+            expect(entityPageDetailsViewTemplateContent).toMatch(/<cmf-core-business-controls-detailsView \*ngIf="epEntity">\s*<\/cmf-core-business-controls-detailsView>/gm);
         });
 
         it('should have the Component decorator with properties selector and templateUrl', async () => {
@@ -289,9 +290,9 @@ describe('Generate Entity Page', () => {
 
             const entityPageDetailsViewContent = tree.readContent(`${pageEntityTypeDetailsViewPath}/page-${strings.dasherize(entityPageOptions.name)}-details-view.component.ts`);
             const epOnEntityLoadedMethodRegExp = new RegExp(
-                `public epOnEntityLoaded\\(\\) {(\r*\n*(\\s*))` +
+                `public epOnEntityLoaded\\(\\) {\\s*` +
                     `this\\.epEntity = this\\.entityPage\\.epEntity as Cmf\\.${entityPageOptions.namespace}\\.BusinessObjects\\.${strings.classify(entityPageOptions.name)};` +
-                `(\r*\n*(\\s*))}`,
+                `\\s*}`,
                 'gm'
             )
             expect(entityPageDetailsViewContent).toMatch(epOnEntityLoadedMethodRegExp);
@@ -303,7 +304,7 @@ describe('Generate Entity Page', () => {
                 .toPromise();
     
             const entityPageDetailsViewContent = tree.readContent(`${pageEntityTypeDetailsViewPath}/page-${strings.dasherize(entityPageOptions.name)}-details-view.component.ts`);
-            expect(entityPageDetailsViewContent).toMatch(/imports: \[([CommonModule|DetailsViewModule]*,*(\r*\n*(\s*))*)+\]/gm);
+            expect(entityPageDetailsViewContent).toMatch(/imports: \[\s*((CommonModule|DetailsViewModule)\s*,?\s*){2}\]/gm);
         });
     
         it('should be declared and exported in NgModule', async () => {
