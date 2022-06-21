@@ -1,30 +1,19 @@
 import { NodeDependency, NodeDependencyType } from "../utility/dependency";
 
 /**
- * Project Core Metadata Modules
+ * Project Core Base Module
  */
-export const CORE_METADATA_MODULES: [string, string][] = [
-    ['cmf-core-shell/metadata', 'CoreShellMetadataModule'],
-    ['cmf-core-controls/metadata', 'CoreControlsMetadataModule'],
-    ['cmf-core-business-controls/metadata', 'CoreBusinessControlsMetadataModule'],
-    ['cmf-core-admin-host/metadata', 'CoreAdminHostMetadataModule'],
-    ['cmf-core-checklist/metadata', 'CoreChecklistMetadataModule'],
-    ['cmf-core-dashboards/metadata', 'CoreDashboardsMetadataModule'],
-    ['cmf-core-camera/metadata', 'CoreCameraMetadataModule'],
-    ['cmf-core-search/metadata', 'CoreSearchMetadataModule'],
-    ['cmf-core-admin-i18n/metadata', 'CoreAdminI18nMetadataModule'],
-    ['cmf-core-masterdata/metadata', 'CoreMasterdataMetadataModule']
-];
+export const CORE_BASE_MODULE: [string, string] = ['cmf-core', 'CoreModule'];
 
 /**
- * Project Core Module
+ * Project MES Base Module
  */
-export const CORE_MODULE: [string, string] = ['cmf-core', 'CoreModule'];
+ export const MES_BASE_MODULE: [string, string] = ['cmf-mes', 'MESModule'];
 
 /**
  * Project Core Packages
  */
-export const CORE_PACKAGES: NodeDependency[] = [
+export const PACKAGES: NodeDependency[] = [
     {
         type: NodeDependencyType.Default,
         name: 'cmf-core',
@@ -83,17 +72,6 @@ export const CORE_PACKAGES: NodeDependency[] = [
 ];
 
 /**
- * Project MES Packages
- */
-export const MES_PACKAGES: NodeDependency[] = [
-    {
-        type: NodeDependencyType.Default,
-        name: 'cmf-mes',
-        version: 'file:../MESHTML/dist/cmf-mes'
-    }
-];
-
-/**
  * Project Assets
  */
 export const PROJECT_ASSETS = [
@@ -125,6 +103,11 @@ export const PROJECT_ASSETS = [
 ];
 
 /**
+ * THEMES
+ */
+export const THEMES = ['cmf.style.gray', 'cmf.style.dark', 'cmf.style.blue'];
+
+/**
  * Project Styles
  */
 export const PROJECT_STYLES = [
@@ -134,21 +117,11 @@ export const PROJECT_STYLES = [
     'node_modules/jquery-ui/themes/base/dialog.css',
     'node_modules/jquery-ui/themes/base/core.css',
     'node_modules/cmf-core/src/assets/style/styles.less',
-    {
+    ...THEMES.map(theme => ({
         'inject': false,
-        'bundleName': 'cmf.style.gray',
-        'input': 'node_modules/cmf-core/src/assets/style/themes/cmf.style.gray/cmf.style.gray.less'
-    },
-    {
-        'inject': false,
-        'bundleName': 'cmf.style.dark',
-        'input': 'node_modules/cmf-core/src/assets/style/themes/cmf.style.dark/cmf.style.dark.less'
-    },
-    {
-        'inject': false,
-        'bundleName': 'cmf.style.blue',
-        'input': 'node_modules/cmf-core/src/assets/style/themes/cmf.style.blue/cmf.style.blue.less'
-    }
+        'bundleName': theme,
+        'input': `node_modules/cmf-core/src/assets/style/themes/${theme}/${theme}.less`
+    }))
 ];
 
 /**
