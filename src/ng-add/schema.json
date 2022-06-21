@@ -15,6 +15,11 @@
             "type": "string",
             "description": "The npm registry to use.",
             "x-prompt": "What is your npm registry endpoint?"
+        },
+        "lint": {
+            "type": "boolean",
+            "description": "If eslint should be added.",
+            "x-prompt": "Add eslint to your project?"
         }
     },
     "required": []

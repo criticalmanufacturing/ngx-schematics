@@ -5,6 +5,7 @@ import {
     externalSchematic,
     mergeWith,
     move,
+    noop,
     Rule,
     SchematicContext,
     SchematicsException,
@@ -482,7 +483,7 @@ export default function (_options: any): Rule {
         return chain([
             externalSchematic('@angular/pwa', 'pwa', { project: _options.project }),
             externalSchematic('@angular/localize', 'ng-add', { name: _options.project, useAtRuntime: true }),
-            externalSchematic('@angular-eslint/schematics', 'ng-add', {}),
+            _options.lint ? externalSchematic('@angular-eslint/schematics', 'ng-add', {}) : noop(),
             installSchematics(_options)
         ]);
     };

@@ -10,8 +10,8 @@
   "keywords": [
     "schematics"
   ],
-  "author": "",
-  "license": "MIT",
+  "author": "Carlos Samouco",
+  "license": "BSD-3-Clause",
   "schematics": "./src/collection.json",
   "dependencies": {
     "@angular-devkit/core": "^14.0.0",

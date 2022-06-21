@@ -20,7 +20,7 @@ import { readWorkspace } from '@schematics/angular/utility';
 
 import { nameify } from '../utility/string';
 import { addSymbolToNgModuleMetadata, createSourceFile } from '../utility/ast';
-import { getAppModulePath, relativePathToWorkspaceRoot } from '../utility/workspace';
+import { getAppModulePath, ProjectType, relativePathToWorkspaceRoot } from '../utility/workspace';
 import { updateTsConfig } from '../utility/project';
 
 function updateAppModule(options: any) {
@@ -87,7 +87,7 @@ function createMetadataSubEntry(options: any) {
 }
 
 export default function (_options: any): Rule {
-    return async () => {
+    return async (tree: Tree) => {
         if (!_options.prefix) {
             const folderName = _options.name.startsWith('@') ? _options.name.substr(1) : _options.name;
 
@@ -96,8 +96,12 @@ export default function (_options: any): Rule {
             }
         }
 
+        const workspace = await readWorkspace(tree);
+        const project = Array.from(workspace.projects.values()).find(proj => proj.extensions.projectType === ProjectType.Application);        
+        const schematic = project?.targets?.get('lint')?.builder?.startsWith('@angular-eslint') ? '@angular-eslint/schematics' : '@schematics/angular';
+
         return chain([
-            await import('@angular-eslint/schematics' as any) ? externalSchematic('@angular-eslint/schematics', 'library', { ..._options }) : noop(),
+            externalSchematic(schematic, 'library', { ..._options }),
             createMetadataSubEntry({ ..._options })
         ]);
     }
