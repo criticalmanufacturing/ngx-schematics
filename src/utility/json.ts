@@ -23,33 +23,36 @@ export class JSONFile {
 
     private _jsonAst: Node | undefined;
     private get JsonAst(): Node | undefined {
+
         if (this._jsonAst) {
             return this._jsonAst;
         }
 
         const errors: ParseError[] = [];
-        this._jsonAst = parseTree(this.content, errors, {
-            allowTrailingComma: true,
-        });
+        this._jsonAst = parseTree(
+            this.content,
+            errors,
+            {
+                allowTrailingComma: true
+            }
+        );
 
-        if (errors.length) {
-            const { error, offset } = errors[0];
+        if (errors.length > 0) {
             throw new Error(
-                `Failed to parse "${
-                this.path
-                }" as JSON AST Object. ${printParseErrorCode(
-                error
-                )} at location: ${offset}.`
+                `Failed to parse JSON: ${printParseErrorCode(
+                    errors[0].error
+                )} at offset ${errors[0].offset}`
             );
         }
 
         return this._jsonAst;
     }
 
-    get(jsonPath: JSONPath): unknown {
+    get(jsonPath: JSONPath) {
         const jsonAstNode = this.JsonAst;
+
         if (!jsonAstNode) {
-            return undefined;
+            return;
         }
 
         if (jsonPath.length === 0) {
@@ -58,7 +61,11 @@ export class JSONFile {
 
         const node = findNodeAtLocation(jsonAstNode, jsonPath);
 
-        return node === undefined ? undefined : getNodeValue(node);
+        if (!node) {
+            return;
+        }
+
+        return getNodeValue(node);
     }
 
     modify(
@@ -68,9 +75,9 @@ export class JSONFile {
     ): void {
         let getInsertionIndex: InsertionIndex | undefined;
         if (insertInOrder === undefined) {
-        const property = jsonPath.slice(-1)[0];
-        getInsertionIndex = (properties) =>
-            [...properties, property].sort().findIndex((p) => p === property);
+            const property = jsonPath.slice(-1)[0];
+            getInsertionIndex = (properties) =>
+                [...properties, property].sort().findIndex((p) => p === property);
         } else if (insertInOrder !== false) {
             getInsertionIndex = insertInOrder;
         }
@@ -79,18 +86,12 @@ export class JSONFile {
             getInsertionIndex,
             formattingOptions: {
                 insertSpaces: true,
-                tabSize: 2,
-            },
+                tabSize: 4
+            }
         });
 
         this.content = applyEdits(this.content, edits);
         this.host.overwrite(this.path, this.content);
         this._jsonAst = undefined;
-    }
-
-    remove(jsonPath: JSONPath): void {
-        if (this.get(jsonPath) !== undefined) {
-            this.modify(jsonPath, undefined);
-        }
     }
 }
