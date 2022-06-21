@@ -1,4 +1,4 @@
-import { NodeDependency, NodeDependencyType } from "../utility/dependency";
+import { NodeDependency, NodeDependencyType } from '../utility/dependency';
 
 /**
  * Project Core Base Module
@@ -8,7 +8,7 @@ export const CORE_BASE_MODULE: [string, string] = ['cmf-core', 'CoreModule'];
 /**
  * Project MES Base Module
  */
- export const MES_BASE_MODULE: [string, string] = ['cmf-mes', 'MESModule'];
+export const MES_BASE_MODULE: [string, string] = ['cmf-mes', 'MESModule'];
 
 /**
  * Project Core Packages
@@ -155,7 +155,6 @@ export const PROJECT_SCRIPTS = [
     'node_modules/cmf.kendoui/js/kendo.data.xml.min.js',
     'node_modules/cmf.kendoui/js/kendo.data.min.js',
     'node_modules/cmf.kendoui/js/kendo.popup.min.js',
-    'node_modules/cmf.kendoui/js/kendo.popup.min.js',
     'node_modules/cmf.kendoui/js/kendo.menu.min.js',
     'node_modules/cmf.kendoui/js/kendo.userevents.min.js',
     'node_modules/cmf.kendoui/js/kendo.draganddrop.min.js',
@@ -179,9 +178,15 @@ export const PROJECT_SCRIPTS = [
     'node_modules/cmf.kendoui/js/kendo.pager.min.js',
     'node_modules/cmf.kendoui/js/kendo.grid.min.js',
     'node_modules/cmf.kendoui/js/kendo.splitter.min.js',
+    'node_modules/cmf.kendoui/js/kendo.tooltip.min.js',
     {
         'bundleName': 'jszip',
         'inject': false,
         'input': 'node_modules/cmf.kendoui/js/jszip.min.js'
+    },
+    {
+        'bundleName': 'fullcalendar',
+        'inject': false,
+        'input': 'node_modules/fullcalendar/dist/fullcalendar.min.js'
     }
 ];
