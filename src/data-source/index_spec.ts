@@ -126,7 +126,7 @@ describe('Generate Data Source', () => {
         const dataSourceSettingsName = `${strings.classify(dataSourceOptions.name)}DataSourceSettings`;
         
         const dataSourceContent = tree.readContent(defaultDataSourceFilePath);
-        expect(dataSourceContent).toContain(`name: $localize\`:@@lib/${dataSourceOptions.name}-data-source#NAME:${nameify(dataSourceOptions.name)}\``);
+        expect(dataSourceContent).toContain(`name: $localize\`:@@${strings.dasherize(dataSourceOptions.project)}/${dataSourceOptions.name}-data-source#NAME:${nameify(dataSourceOptions.name)}\``);
         expect(dataSourceContent).toContain(`factory: (util: UtilService) => new ${dataSourceClassName}(util),`);
         expect(dataSourceContent).toContain(`deps: [UtilService],`);
         expect(dataSourceContent).toMatch(new RegExp(`settingsComponent: {(\r*\n*(\\s*))component: ${dataSourceSettingsName}(\r*\n*(\\s*))}`, 'gm'));
@@ -212,7 +212,7 @@ describe('Generate Data Source', () => {
 
             const dataSourceSettingsContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.ts`);
             expect(dataSourceSettingsContent).toMatch(/@Component\(/);
-            expect(dataSourceSettingsContent).toContain(`selector: 'lib-${strings.dasherize(dataSourceOptions.name)}-data-source-settings'`);
+            expect(dataSourceSettingsContent).toContain(`selector: '${strings.dasherize(dataSourceOptions.project)}-${strings.dasherize(dataSourceOptions.name)}-data-source-settings'`);
             expect(dataSourceSettingsContent).toContain(`templateUrl: './${strings.dasherize(dataSourceOptions.name)}-data-source-settings.component.html'`);
             expect(dataSourceSettingsContent).toContain(`styleUrls: ['./${strings.dasherize(dataSourceOptions.name)}-data-source-settings.component.less']`);
         });

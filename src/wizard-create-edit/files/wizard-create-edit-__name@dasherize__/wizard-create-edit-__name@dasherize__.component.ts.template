@@ -87,7 +87,7 @@ import {
 @Component({
     selector: '<%= dasherize(project) %>-wizard-create-edit-<%= dasherize(name) %>',
     templateUrl: './wizard-create-edit-<%= dasherize(name) %>.component.html',
-    styleUrls: ['./wizard-create-edit-<%= dasherize(name) %>.component.<%= style %>']
+    <% if (style !== 'none') { %>styleUrls: ['./wizard-create-edit-<%= dasherize(name) %>.component.<%= style %>']<% } %>
 })
 export class WizardCreateEdit<%= classify(name) %>Component extends CustomizableComponent implements OnInit {
 

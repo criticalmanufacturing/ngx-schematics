@@ -45,7 +45,7 @@ import {
 @Component({
   selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget-settings',
   templateUrl: './<%= dasherize(name) %>-widget-settings.component.html',
-  styleUrls: ['./<%= dasherize(name) %>-widget-settings.component.less']
+  <% if (style !== 'none') { %>styleUrls: ['./<%= dasherize(name) %>-widget-settings.component.<%= style %>']<% } %>
 })
 export class <%= classify(name) %>WidgetSettingsComponent extends CustomizableComponent {
 

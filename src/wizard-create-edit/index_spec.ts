@@ -135,7 +135,7 @@ describe('Generate Wizard Create Edit', () => {
 
                 `<!-- General Data Step -->(\r*\n*(\\s*))` +
                 `<cmf-core-business-controls-createEditStepGeneralData(\r*\n*(\\s*))` +
-                    `i18n-mainTitle="@@lib/wizard-create-edit-${strings.dasherize(wizardOptions.name)}#GENERAL_DATA" mainTitle="General Data"(\r*\n*(\\s*))` +
+                    `i18n-mainTitle="@@${strings.dasherize(wizardOptions.project)}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}#GENERAL_DATA" mainTitle="General Data"(\r*\n*(\\s*))` +
                     `\\[instance\\]="instance"(\r*\n*(\\s*))` +
                     `\\[editMode\\]="editMode">(\r*\n*(\\s*))` +
                 `</cmf-core-business-controls-createEditStepGeneralData>(\r*\n*(\\s*))` +
@@ -155,7 +155,7 @@ describe('Generate Wizard Create Edit', () => {
 
         const wizardContent = tree.readContent(`${wizardPath}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.ts`);
         expect(wizardContent).toMatch(/@Component\(/);
-        expect(wizardContent).toContain(`selector: 'lib-wizard-create-edit-${strings.dasherize(wizardOptions.name)}'`);
+        expect(wizardContent).toContain(`selector: '${strings.dasherize(wizardOptions.project)}-wizard-create-edit-${strings.dasherize(wizardOptions.name)}'`);
         expect(wizardContent).toContain(`templateUrl: './wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.html'`);
         expect(wizardContent).toContain(`styleUrls: ['./wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.less']`);
     });

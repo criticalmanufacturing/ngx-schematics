@@ -127,7 +127,7 @@ describe('Generate Widget', () => {
             .toPromise();
         
         const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
-        expect(widgetContent).toContain(`name: $localize\`:@@lib/${strings.dasherize(widgetOptions.name)}-widget#NAME:${nameify(widgetOptions.name)} Widget\``);
+        expect(widgetContent).toContain(`name: $localize\`:@@${strings.dasherize(widgetOptions.project)}/${strings.dasherize(widgetOptions.name)}-widget#NAME:${nameify(widgetOptions.name)} Widget\``);
         expect(widgetContent).toContain(`iconClass: 'icon-core-st-lg-generic'`);
         expect(widgetContent).toMatch(new RegExp(`settingsComponent: {(\r*\n*(\\s*))component: ${strings.classify(widgetOptions.name)}WidgetSettingsComponent(\r*\n*(\\s*))}`, 'gm'));
     });
@@ -162,7 +162,7 @@ describe('Generate Widget', () => {
             .toPromise();
         
         const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
-        expect(widgetContent).toContain(`selector: 'lib-${strings.dasherize(widgetOptions.name)}-widget'`);
+        expect(widgetContent).toContain(`selector: '${strings.dasherize(widgetOptions.project)}-${strings.dasherize(widgetOptions.name)}-widget'`);
         expect(widgetContent).toContain(`templateUrl: './${strings.dasherize(widgetOptions.name)}-widget.component.html'`);
         expect(widgetContent).toContain(`styleUrls: ['./${strings.dasherize(widgetOptions.name)}-widget.component.less']`);
     });
@@ -246,7 +246,7 @@ describe('Generate Widget', () => {
 
             const widgetSettingsContent = tree.readContent(`${defaultWidgetSettingsComponentFilePath}.ts`);
             expect(widgetSettingsContent).toMatch(/@Component\(/);
-            expect(widgetSettingsContent).toContain(`selector: 'lib-${strings.dasherize(widgetOptions.name)}-widget-settings'`);
+            expect(widgetSettingsContent).toContain(`selector: '${strings.dasherize(widgetOptions.project)}-${strings.dasherize(widgetOptions.name)}-widget-settings'`);
             expect(widgetSettingsContent).toContain(`templateUrl: './${strings.dasherize(widgetOptions.name)}-widget-settings.component.html'`);
             expect(widgetSettingsContent).toContain(`styleUrls: ['./${strings.dasherize(widgetOptions.name)}-widget-settings.component.less']`);
         });

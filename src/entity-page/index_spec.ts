@@ -84,7 +84,7 @@ describe('Generate Entity Page', () => {
             `<cmf-core-business-controls-entityPage(\r*\n*(\\s*))` +
                 `\\[mainTitle\\]="epEntity\\?.Name!"(\r*\n*(\\s*))` +
                 `\\entityType="${strings.classify(entityPageOptions.name)}"(\r*\n*(\\s*))` +
-                `i18n-entityTypeName="@@lib/page-${strings.dasherize(entityPageOptions.name)}#ENTITY_TYPE"(\r*\n*(\\s*))` +
+                `i18n-entityTypeName="@@${strings.dasherize(entityPageOptions.project)}/page-${strings.dasherize(entityPageOptions.name)}#ENTITY_TYPE"(\r*\n*(\\s*))` +
                 `entityTypeName="${nameify(entityPageOptions.name)}">(\r*\n*(\\s*))` +
             `<\/cmf-core-business-controls-entityPage>`, 'gm');
 
@@ -100,7 +100,7 @@ describe('Generate Entity Page', () => {
 
         const entityPageContent = tree.readContent(`${pageEntityTypePath}/page-${strings.dasherize(entityPageOptions.name)}.component.ts`);
         expect(entityPageContent).toMatch(/@Component\(/);
-        expect(entityPageContent).toContain(`selector: 'lib-page-${strings.dasherize(entityPageOptions.name)}'`);
+        expect(entityPageContent).toContain(`selector: '${strings.dasherize(entityPageOptions.project)}-page-${strings.dasherize(entityPageOptions.name)}'`);
         expect(entityPageContent).toContain(`providers: [EntityPageService]`);
         expect(entityPageContent).toContain(`templateUrl: './page-${strings.dasherize(entityPageOptions.name)}.component.html'`);
         expect(entityPageContent).toContain(`viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Page${strings.classify(entityPageOptions.name)}Component) }]`);
@@ -237,7 +237,7 @@ describe('Generate Entity Page', () => {
     
             const entityPageContent = tree.readContent(`${pageEntityTypeDetailsViewPath}/page-${strings.dasherize(entityPageOptions.name)}-details-view.component.ts`);
             expect(entityPageContent).toMatch(/@Component\(/);
-            expect(entityPageContent).toContain(`selector: 'lib-page-${strings.dasherize(entityPageOptions.name)}-details-view'`);
+            expect(entityPageContent).toContain(`selector: '${strings.dasherize(entityPageOptions.project)}-page-${strings.dasherize(entityPageOptions.name)}-details-view'`);
             expect(entityPageContent).toContain(`templateUrl: './page-${strings.dasherize(entityPageOptions.name)}-details-view.component.html'`);
         });
 

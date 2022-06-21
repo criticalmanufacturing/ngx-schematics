@@ -126,13 +126,13 @@ describe('Generate Wizard', () => {
 
         const templateRegExp = new RegExp(
             `<cmf-core-controls-wizard \\[cmf-core-business-controls-transaction-wizard\\]="instance!"(\r*\n*(\\s*))` +
-                `i18n-mainTitle="@@lib/wizard-${dasherizedWizardName}#TITLE"(\r*\n*(\\s*))` +
+                `i18n-mainTitle="@@${strings.dasherize(wizardOptions.project)}/wizard-${dasherizedWizardName}#TITLE"(\r*\n*(\\s*))` +
                 `mainTitle="${nameify(wizardOptions.name)}"(\r*\n*(\\s*))`+
-                `i18n-action-name="lib/wizard-${dasherizedWizardName}#ACTION"(\r*\n*(\\s*))` +
+                `i18n-action-name="@@${strings.dasherize(wizardOptions.project)}/wizard-${dasherizedWizardName}#ACTION"(\r*\n*(\\s*))` +
                 `action-name="Finish">(\r*\n*(\\s*))`+
                     `<!-- Wizard steps -->(\r*\n*(\\s*))` +
                     `<cmf-core-controls-wizard-step(\r*\n*(\\s*))` +
-                        `i18n-mainTitle="@@lib/wizard-${dasherizedWizardName}#DETAILS"(\r*\n*(\\s*))` +
+                        `i18n-mainTitle="@@${strings.dasherize(wizardOptions.project)}/wizard-${dasherizedWizardName}#DETAILS"(\r*\n*(\\s*))` +
                         `mainTitle="Details">(\r*\n*(\\s*))` +
                         `<p>Wizard ${nameify(wizardOptions.name)} works!</p>(\r*\n*(\\s*))` +
                     `</cmf-core-controls-wizard-step>(\r*\n*(\\s*))` +
@@ -151,7 +151,7 @@ describe('Generate Wizard', () => {
 
         const wizardContent = tree.readContent(`${wizardPath}/wizard-${strings.dasherize(wizardOptions.name)}.component.ts`);
         expect(wizardContent).toMatch(/@Component\(/);
-        expect(wizardContent).toContain(`selector: 'lib-wizard-${strings.dasherize(wizardOptions.name)}'`);
+        expect(wizardContent).toContain(`selector: '${strings.dasherize(wizardOptions.project)}-wizard-${strings.dasherize(wizardOptions.name)}'`);
         expect(wizardContent).toContain(`templateUrl: './wizard-${strings.dasherize(wizardOptions.name)}.component.html'`);
         expect(wizardContent).toContain(`styleUrls: ['./wizard-${strings.dasherize(wizardOptions.name)}.component.less']`);
         expect(wizardContent).toContain(`viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Wizard${strings.classify(wizardOptions.name)}Component) }]`);

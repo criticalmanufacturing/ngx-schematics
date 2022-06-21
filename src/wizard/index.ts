@@ -3,8 +3,10 @@ import {
     apply,
     applyTemplates,
     chain,
+    filter,
     mergeWith,
     move,
+    noop,
     Rule,
     SchematicContext,
     SchematicsException,
@@ -70,12 +72,15 @@ export default function (_options: any): Rule {
         _options.name = parsedPath.name;
         _options.path = parsedPath.path;
 
+        const skipStyleFile = _options.style === 'none';
+
         const templateSource = apply(url('./files'), [
+            skipStyleFile ? filter((path) => !path.endsWith('.__style__.template')) : noop(),
             applyTemplates({
                 ...strings,
                 ..._options,
                 nameify,
-                project: project?.prefix ?? _options.project
+                project: _options.project
             }),
             move(parsedPath.path)
         ]);

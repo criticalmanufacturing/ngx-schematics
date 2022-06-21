@@ -2,11 +2,10 @@ import { join, normalize, dirname } from '@angular-devkit/core';
 import { chain, Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import { readWorkspace, ProjectDefinition } from '@schematics/angular/utility';
 
-import { JSONFile } from '@schematics/angular/utility/json-file';
-
 import { updatePackageInfoMetadata, PackageInfo } from '../utility/metadata';
 import { getMetadataFilePath } from '../utility/project';
 import { createSourceFile } from '../utility/ast';
+import { JSONFile } from '../utility/json';
 
 
 function getAllFiles(host: Tree, rootPath: string): string[] {

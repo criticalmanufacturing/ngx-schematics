@@ -87,7 +87,7 @@ describe('Generate Converter', () => {
         const converterClassName = `${strings.classify(converterOptions.name)}Pipe`;
 
         const pipeContent = tree.readContent(`${converterOptions.path}/${converterOptions.name}/${converterOptions.name}.pipe.ts`);
-        expect(pipeContent).toContain(`name: $localize\`:@@lib/${converterOptions.name}#NAME:${converterName}\``);
+        expect(pipeContent).toContain(`name: $localize\`:@@${strings.dasherize(converterOptions.project)}/${converterOptions.name}#NAME:${converterName}\``);
         expect(pipeContent).toContain(`factory: () => new ${converterClassName}(),`);
     });
 

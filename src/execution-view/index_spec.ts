@@ -126,10 +126,10 @@ describe('Generate Execution View', () => {
 
         const templateRegExp = new RegExp(
             `<cmf-core-controls-execution-view \\[cmf-core-business-controls-transaction-execution-view\\]="instance!"(\r*\n*(\\s*))` +
-                `i18n-mainTitle="@@lib/wizard-${dasherizedExecutionViewName}#TITLE" mainTitle="${nameify(executionViewOptions.name)}"(\r*\n*(\\s*))` +
-                `i18n-action-name="lib/wizard-${dasherizedExecutionViewName}#ACTION" action-name="Finish">(\r*\n*(\\s*))` +
+                `i18n-mainTitle="@@${strings.dasherize(executionViewOptions.project)}/wizard-${dasherizedExecutionViewName}#TITLE" mainTitle="${nameify(executionViewOptions.name)}"(\r*\n*(\\s*))` +
+                `i18n-action-name="@@${strings.dasherize(executionViewOptions.project)}/wizard-${dasherizedExecutionViewName}#ACTION" action-name="Finish">(\r*\n*(\\s*))` +
                     `<!-- Execution View steps -->(\r*\n*(\\s*))` +
-                    `<cmf-core-controls-execution-view-tab i18n-mainTitle="@@lib/wizard-${dasherizedExecutionViewName}#DETAILS" mainTitle="Details">(\r*\n*(\\s*))` +
+                    `<cmf-core-controls-execution-view-tab i18n-mainTitle="@@${strings.dasherize(executionViewOptions.project)}/wizard-${dasherizedExecutionViewName}#DETAILS" mainTitle="Details">(\r*\n*(\\s*))` +
                         `<p>${nameify(executionViewOptions.name)} Wizard works!</p>(\r*\n*(\\s*))` +
                     `</cmf-core-controls-execution-view-tab>(\r*\n*(\\s*))` +
             `</cmf-core-controls-execution-view>`,
@@ -147,7 +147,7 @@ describe('Generate Execution View', () => {
 
         const executionViewContent = tree.readContent(`${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`);
         expect(executionViewContent).toMatch(/@Component\(/);
-        expect(executionViewContent).toContain(`selector: 'lib-wizard-${strings.dasherize(executionViewOptions.name)}'`);
+        expect(executionViewContent).toContain(`selector: '${strings.dasherize(executionViewOptions.project)}-wizard-${strings.dasherize(executionViewOptions.name)}'`);
         expect(executionViewContent).toContain(`templateUrl: './wizard-${strings.dasherize(executionViewOptions.name)}.component.html'`);
         expect(executionViewContent).toContain(`styleUrls: ['./wizard-${strings.dasherize(executionViewOptions.name)}.component.less']`);
         expect(executionViewContent).toContain(`viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Wizard${strings.classify(executionViewOptions.name)}Component) }]`);
