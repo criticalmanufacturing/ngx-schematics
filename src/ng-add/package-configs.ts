@@ -1,4 +1,4 @@
-import { NodeDependency, NodeDependencyType } from '@schematics/angular/utility/dependencies';
+import { NodeDependency, NodeDependencyType } from "../utility/dependency";
 
 /**
  * Project Core Base Module

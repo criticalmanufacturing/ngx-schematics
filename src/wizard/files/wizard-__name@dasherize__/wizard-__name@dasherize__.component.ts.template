@@ -92,7 +92,7 @@ import {
 @Component({
     selector: '<%= dasherize(project) %>-wizard-<%= dasherize(name) %>',
     templateUrl: './wizard-<%= dasherize(name) %>.component.html',
-    styleUrls: ['./wizard-<%= dasherize(name) %>.component.<%= style %>'],
+    <% if (style !== 'none') { %>styleUrls: ['./wizard-<%= dasherize(name) %>.component.<%= style %>'],<% } %>
     viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Wizard<%= classify(name) %>Component) }]
 })
 export class Wizard<%= classify(name) %>Component extends CustomizableComponent implements TransactionWizard, OnInit {

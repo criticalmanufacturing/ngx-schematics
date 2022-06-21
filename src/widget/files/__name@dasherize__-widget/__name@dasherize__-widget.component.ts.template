@@ -83,7 +83,7 @@ import {
 @Component({
   selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget',
   templateUrl: './<%= dasherize(name) %>-widget.component.html',
-  styleUrls: ['./<%= dasherize(name) %>-widget.component.less']
+  <% if (style !== 'none') { %>styleUrls: ['./<%= dasherize(name) %>-widget.component.<%= style %>']<% } %>
 })
 export class <%= classify(name) %>WidgetComponent extends WidgetGeneric implements WidgetRepresentation {
 

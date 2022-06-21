@@ -26,9 +26,6 @@ import { ObjectLiteralExpression, PropertyAssignment, SourceFile, SyntaxKind } f
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 
-import { targetBuildNotFoundError } from '@schematics/angular/utility/project-targets';
-import { addPackageJsonDependency, NodeDependency } from '@schematics/angular/utility/dependencies';
-
 import {
     CORE_BASE_MODULE,
     MES_BASE_MODULE,
@@ -41,6 +38,7 @@ import {
 import { getAppModulePath, getMainPath } from '../utility/workspace';
 import { addSymbolToNgModuleMetadata, createSourceFile, insertImport } from '../utility/ast';
 import { updateTsConfig } from '../utility/project';
+import { addPackageJsonDependency, NodeDependency } from '../utility/dependency';
 
 /**
  * Updates index.html file with the themes and loading container
@@ -195,7 +193,7 @@ function installSchematics(_options: any) {
 
         const buildTarget = project.targets.get('build');
         if (!buildTarget) {
-            throw targetBuildNotFoundError();
+            throw new SchematicsException(`Project target "build" not found.`);
         }
 
         // Setup sources for the assets files to add to the project
@@ -481,11 +479,9 @@ export default function (_options: any): Rule {
             throw new SchematicsException(`Targets are not defined for this project.`);
         }
 
-        const externalOptions = { project: _options.project };
-
         return chain([
-            externalSchematic('@angular/pwa', 'pwa', externalOptions),
-            externalSchematic('@angular/localize', 'ng-add', { externalOptions, useAtRuntime: true }),
+            externalSchematic('@angular/pwa', 'pwa', { project: _options.project }),
+            externalSchematic('@angular/localize', 'ng-add', { name: _options.project, useAtRuntime: true }),
             externalSchematic('@angular-eslint/schematics', 'ng-add', {}),
             installSchematics(_options)
         ]);

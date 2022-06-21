@@ -76,7 +76,7 @@ export default function (_options: any): Rule {
         }
 
         if (!_options.namespace) {
-            throw new SchematicsException(`Entity Type mamespace is required`);
+            throw new SchematicsException(`Entity Type namespace is required`);
         }
 
         const workspace = await readWorkspace(tree);
@@ -99,7 +99,7 @@ export default function (_options: any): Rule {
                 ...strings,
                 ..._options,
                 nameify,
-                project: project?.prefix ?? _options.project
+                project: _options.project
             }),
             move(parsedPath.path),
         ]);

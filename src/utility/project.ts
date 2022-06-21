@@ -4,11 +4,10 @@ import { dirname, extname, join, normalize } from "@angular-devkit/core";
 import { Rule, Tree } from "@angular-devkit/schematics";
 import { ProjectDefinition } from "@schematics/angular/utility";
 
-import { JSONFile } from "@schematics/angular/utility/json-file";
-
 import { createSourceFile, insertExport } from "./ast";
 import { buildRelativePath, ProjectType } from "./workspace";
 import { insertMetadata, MetadataProperty } from "./metadata";
+import { JSONFile } from "./json";
 
 /**
  * Update Metadata Options
