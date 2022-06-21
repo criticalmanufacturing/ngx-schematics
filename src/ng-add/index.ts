@@ -16,7 +16,8 @@ import {
     join,
     JsonArray,
     JsonObject,
-    normalize
+    normalize,
+    strings
 } from '@angular-devkit/core';
 import { Readable, Writable } from 'stream';
 import { posix } from 'path';
@@ -29,9 +30,9 @@ import { targetBuildNotFoundError } from '@schematics/angular/utility/project-ta
 import { addPackageJsonDependency, NodeDependency } from '@schematics/angular/utility/dependencies';
 
 import {
-    CORE_METADATA_MODULES,
-    CORE_MODULE,
-    CORE_PACKAGES,
+    CORE_BASE_MODULE,
+    MES_BASE_MODULE,
+    PACKAGES,
     PROJECT_ASSETS,
     PROJECT_SCRIPTS,
     PROJECT_STYLES
@@ -73,9 +74,8 @@ function updateIndexFile(path: string): Rule {
             if (endTag.tagName === 'head') {
                 rewriter.emitRaw(`\
   <style id="initial-theme">
-    @import url("cmf.grey.css");
-    @import url("cmf.dark.css");
-    @import url("cmf.blue.css");
+    @import url("cmf.style.blue.css") (prefers-color-scheme: light);
+    @import url("cmf.style.dark.css") (prefers-color-scheme: dark);
   </style>
 `);
             }
@@ -222,12 +222,12 @@ function installSchematics(_options: any) {
         return chain([
             emptyDir(posix.join(sourcePath, 'assets', 'icons')),
             mergeWith(templateSource),
-            installDependencies(CORE_PACKAGES),
+            installDependencies(PACKAGES),
             ...[...indexFiles].map((path) => updateIndexFile(path)),
             overriteComponentTemplate(),
-            updateAppModule([...CORE_METADATA_MODULES, CORE_MODULE]),
+            updateAppModule(PACKAGES),
             updateMain(),
-            updateTsConfig({ 'compilerOptions.allowSyntheticDefaultImports': true })
+            updateTsConfig({ 'compilerOptions.skipLibCheck': true })
         ]);
     };
 }
@@ -271,17 +271,17 @@ function updateMain() {
             .filter((node) => node.getText() === moduleIdentifier)
             .find(node => node.getFirstAncestorByKind(SyntaxKind.ImportDeclaration));
 
-        if (!bootstrapImport) {
-            return;
-        }
-
+        bootstrapImport?.getFirstAncestorByKindOrThrow(SyntaxKind.ImportDeclaration).remove();
         bootstrapCall.getArguments()[0].replaceWithText(`m.${moduleIdentifier}`);
         bootstrapStatement.replaceWithText(`\
-loadApplicationConfig('assets/config.json'/* , 'assets/messages' */).then(() => {
+loadApplicationConfig('assets/config.json').then(() => {
     import(/* webpackMode: "eager" */'./app/app.module').then((m) => {
         ${bootstrapStatement.getText(true)}
     });
 });`)
+
+        insertImport(source, 'loadApplicationConfig', 'cmf-core');
+
         host.overwrite(mainPath, source.getFullText());
     };
 }
@@ -289,27 +289,40 @@ loadApplicationConfig('assets/config.json'/* , 'assets/messages' */).then(() => 
 /**
  * Updates app module adding the desired package modules
  */
-function updateAppModule(pkgs: [string, string][]): Rule {
+function updateAppModule(pkgs: NodeDependency[]): Rule {
     return async (host: Tree) => {
-        const modulePath = await getAppModulePath(host);
+        const appModulePath = await getAppModulePath(host);
 
-        if (!modulePath) {
+        if (!appModulePath) {
             return;
         }
 
         // add imports
-        const source = createSourceFile(host, modulePath);
+        const source = createSourceFile(host, appModulePath);
 
         if (!source) {
             return;
         }
 
-        for (const [_, moduleName] of pkgs) {
-            insertImport(source, moduleName, modulePath);
-            addSymbolToNgModuleMetadata(source, 'imports', moduleName, modulePath);
+        // add core module first
+        addSymbolToNgModuleMetadata(source, 'imports', CORE_BASE_MODULE[1], CORE_BASE_MODULE[0]);
+        const baseModules = [CORE_BASE_MODULE[0], MES_BASE_MODULE[0]];
+
+        // add other packages
+        for (const pkg of pkgs) {
+            if (pkg.name === CORE_BASE_MODULE[0]) {
+                continue;
+            }
+
+            const hasMetadata = !baseModules.includes(pkg.name);
+            const moduleName = strings.classify(pkg.name.substring(pkg.name.startsWith('cmf-') ? 4 : 0)) + (hasMetadata ? 'Metadata' : '') + 'Module';
+            const modulePath = pkg.name + (hasMetadata ? '/metadata' : '');
+
+            addSymbolToNgModuleMetadata(source, 'imports', moduleName, modulePath, CORE_BASE_MODULE[1]);
         }
 
-        host.overwrite(modulePath, source.getFullText());
+        source.formatText();
+        host.overwrite(appModulePath, source.getFullText());
 
         return;
     };
@@ -382,31 +395,19 @@ async function getBootstrapComponentPath(source: SourceFile): Promise<string | u
     return relativePath + '.ts';
 }
 
-interface TemplateInfo {
-    templateProp?: PropertyAssignment;
-    templateUrlProp?: PropertyAssignment;
-}
-
-function getComponentTemplateInfo(source: SourceFile): TemplateInfo | undefined {
-
+function getComponentMetadata(source: SourceFile): ObjectLiteralExpression | undefined {
     // Find the decorator declaration.
     let compMetadata: ObjectLiteralExpression | undefined;
     for (const classNode of source.getClasses()) {
-        compMetadata = classNode.getDecorator('NgModule')?.getArguments()[0]?.asKind(SyntaxKind.ObjectLiteralExpression);
+        compMetadata = classNode
+            .getDecorator('Component')
+            ?.getArguments()[0]
+            ?.asKind(SyntaxKind.ObjectLiteralExpression);
 
         if (compMetadata) {
-            break;
+            return compMetadata;
         }
     }
-
-    if (!compMetadata) {
-        return;
-    }
-
-    return {
-        templateProp: getMetadataProperty(compMetadata, 'template'),
-        templateUrlProp: getMetadataProperty(compMetadata, 'templateUrl'),
-    };
 }
 
 function overriteComponentTemplate() {
@@ -429,29 +430,28 @@ function overriteComponentTemplate() {
             return;
         }
 
-        const compSource = createSourceFile(host, join(dirname(normalize(modulePath)), compPath));
+        const compFilePath = join(dirname(normalize(modulePath)), compPath);
+        const compSource = createSourceFile(host, compFilePath);
 
         if (!compSource) {
             return;
         }
 
-        const tmplInfo = getComponentTemplateInfo(compSource);
+        const compMetadata = getComponentMetadata(compSource);
 
-        if (tmplInfo?.templateProp) {
-            tmplInfo.templateProp.replaceWithText('<router-outlet></router-outlet>');
+        if (!compMetadata) {
+            return;
+        }
+
+        const templateNode = getMetadataProperty(compMetadata, 'template')?.getInitializer()?.asKind(SyntaxKind.StringLiteral);
+        const templateUrlNode = getMetadataProperty(compMetadata, 'templateUrl')?.getInitializer()?.asKind(SyntaxKind.StringLiteral);
+
+        if (templateNode) {
+            templateNode.replaceWithText('<router-outlet></router-outlet>');
             host.overwrite(compPath, compSource.getFullText());
-        } else if (tmplInfo?.templateUrlProp) {
-            const templateUrl = tmplInfo.templateUrlProp
-                .getInitializer()
-                ?.asKind(SyntaxKind.StringLiteral)
-                ?.getLiteralValue();
-
-            if (!templateUrl) {
-                return;
-            }
-
-            const dir = dirname(normalize(compPath));
-            const templatePath = join(dir, templateUrl);
+        } else if (templateUrlNode) {
+            const templateUrl = templateUrlNode.getLiteralValue();
+            const templatePath = join(dirname(compFilePath), templateUrl);
             host.overwrite(templatePath, '<router-outlet></router-outlet>')
         }
     }
