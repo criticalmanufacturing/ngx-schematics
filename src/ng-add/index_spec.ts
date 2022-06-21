@@ -184,7 +184,7 @@ describe('Test ng-add', () => {
                 .toPromise();
     
             const indexHtmlContent = tree.readContent('/application/src/index.html');
-            expect(indexHtmlContent).toContain('<meta name="theme-color" content="#1976d2">');
+            expect(indexHtmlContent).toContain('<meta name="theme-color"');
         })
 
         it('should have the style themes', async() => {
@@ -194,9 +194,8 @@ describe('Test ng-add', () => {
 
             const styleRegExp = new RegExp(
                 `<style id="initial-theme">(\r*\n*(\\s*))` +
-                    `@import url\\("cmf\\.style\\.gray\\.css"\\);(\r*\n*(\\s*))` +
-                    `@import url\\("cmf\\.style\\.dark\\.css"\\);(\r*\n*(\\s*))` +
-                    `@import url\\("cmf\\.style\\.blue\\.css"\\);(\r*\n*(\\s*))` +
+                    `@import url\\("cmf\\.style\\.blue\\.css"\\) \\(prefers-color-scheme: light\\);(\r*\n*(\\s*))` +
+                    `@import url\\("cmf\\.style\\.dark\\.css"\\) \\(prefers-color-scheme: dark\\);(\r*\n*(\\s*))` +
                 `</style>`,
                 'gm')
     
