@@ -18,7 +18,8 @@
         },
         "lint": {
             "type": "boolean",
-            "description": "If eslint should be added.",
+            "description": "Adds eslint to the project.",
+            "default": true,
             "x-prompt": "Add eslint to your project?"
         }
     },

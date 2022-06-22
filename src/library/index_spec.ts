@@ -26,7 +26,7 @@ describe('Generate Library', () => {
         inlineTemplate: false,
         routing: false,
         skipTests: false,
-        skipPackageJson: false,
+        skipPackageJson: false
     };
 
     const libraryOptions = {
@@ -35,6 +35,7 @@ describe('Generate Library', () => {
         skipPackageJson: false,
         skipTsConfig: false,
         skipInstall: false,
+        lint: true
     };
 
     let appTree: UnitTestTree;

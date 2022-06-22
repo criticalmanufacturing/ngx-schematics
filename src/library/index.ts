@@ -97,11 +97,17 @@ export default function (_options: any): Rule {
         }
 
         const workspace = await readWorkspace(tree);
-        const project = Array.from(workspace.projects.values()).find(proj => proj.extensions.projectType === ProjectType.Application);        
-        const schematic = project?.targets?.get('lint')?.builder?.startsWith('@angular-eslint') ? '@angular-eslint/schematics' : '@schematics/angular';
+
+        let lint = _options.lint;
+        delete _options.lint;
+
+        if (lint === undefined) {
+            const project = Array.from(workspace.projects.values()).find(proj => proj.extensions.projectType === ProjectType.Application);
+            lint = project?.targets?.get('lint')?.builder?.startsWith('@angular-eslint');
+        }
 
         return chain([
-            externalSchematic(schematic, 'library', { ..._options }),
+            externalSchematic(lint ? '@angular-eslint/schematics' : '@schematics/angular', 'library', { ..._options }),
             createMetadataSubEntry({ ..._options })
         ]);
     }

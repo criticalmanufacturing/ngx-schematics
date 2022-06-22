@@ -18,7 +18,7 @@ describe('Test ng-add', () => {
         inlineTemplate: false,
         routing: false,
         skipTests: false,
-        skipPackageJson: false,
+        skipPackageJson: false
     };
 
     const ngAddOptions = {

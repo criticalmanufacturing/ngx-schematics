@@ -19,14 +19,14 @@ describe('Generate Wizard Create Edit', () => {
         inlineTemplate: false,
         routing: false,
         skipTests: false,
-        skipPackageJson: false,
+        skipPackageJson: false
     };
 
     const libraryOptions = {
         name: 'testlib',
         skipPackageJson: false,
         skipTsConfig: false,
-        skipInstall: false,
+        skipInstall: false
     };
 
     const wizardOptions = {
