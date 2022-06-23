@@ -1,5 +1,3 @@
-import { NodeDependency, NodeDependencyType } from '../utility/dependency';
-
 /**
  * Project Core Base Module
  */
@@ -13,63 +11,35 @@ export const MES_BASE_MODULE: [string, string] = ['cmf-mes', 'MESModule'];
 /**
  * Project Core Packages
  */
-export const PACKAGES: NodeDependency[] = [
-    {
-        type: NodeDependencyType.Default,
-        name: 'cmf-core',
-        version: 'dev-10x-next'
-    },
-    {
-        type: NodeDependencyType.Default,
-        name: 'cmf-core-admin-host',
-        version: 'dev-10x-next'
-    },
-    {
-        type: NodeDependencyType.Default,
-        name: 'cmf-core-admin-i18n',
-        version: 'dev-10x-next'
-    },
-    {
-        type: NodeDependencyType.Default,
-        name: 'cmf-core-business-controls',
-        version: 'dev-10x-next'
-    },
-    {
-        type: NodeDependencyType.Default,
-        name: 'cmf-core-camera',
-        version: 'dev-10x-next'
-    },
-    {
-        type: NodeDependencyType.Default,
-        name: 'cmf-core-checklist',
-        version: 'dev-10x-next'
-    },
-    {
-        type: NodeDependencyType.Default,
-        name: 'cmf-core-controls',
-        version: 'dev-10x-next'
-    },
-    {
-        type: NodeDependencyType.Default,
-        name: 'cmf-core-dashboards',
-        version: 'dev-10x-next'
-    },
-    {
-        type: NodeDependencyType.Default,
-        name: 'cmf-core-masterdata',
-        version: 'dev-10x-next'
-    },
-    {
-        type: NodeDependencyType.Default,
-        name: 'cmf-core-search',
-        version: 'dev-10x-next'
-    },
-    {
-        type: NodeDependencyType.Default,
-        name: 'cmf-core-shell',
-        version: 'dev-10x-next'
-    }
+export const PACKAGES: string[] = [
+    "cmf-core",
+    "cmf-core-admin-config",
+    "cmf-core-admin-dee",
+    "cmf-core-admin-entitytype",
+    "cmf-core-admin-host",
+    "cmf-core-admin-i18n",
+    "cmf-core-admin-queries",
+    "cmf-core-app",
+    "cmf-core-business-controls",
+    "cmf-core-camera",
+    "cmf-core-checklist",
+    "cmf-core-controls",
+    "cmf-core-dashboards",
+    "cmf-core-enterprise",
+    "cmf-core-folder",
+    "cmf-core-masterdata",
+    "cmf-core-multimedia",
+    "cmf-core-rule",
+    "cmf-core-search",
+    "cmf-core-security",
+    "cmf-core-shell",
+    "cmf-core-site"
 ];
+
+/**
+ * Current Version
+ */
+export const VERSION: string = 'dex-10x-next';
 
 /**
  * Project Assets

@@ -21,6 +21,55 @@
             "description": "Adds eslint to the project.",
             "default": true,
             "x-prompt": "Add eslint to your project?"
+        },
+        "baseApp": {
+            "type": "string",
+            "description": "What is the base app to use?",
+            "default": "Core",
+            "enum": [
+                "Core",
+                "MES"
+            ],
+            "x-prompt": {
+                "message": "Which stylesheet format would you like to use?",
+                "type": "list",
+                "items": [
+                    "Core",
+                    "MES"
+                ]
+            }
+        },
+        "packages": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "cmf-core",
+                    "cmf-core-admin-config",
+                    "cmf-core-admin-dee",
+                    "cmf-core-admin-entitytype",
+                    "cmf-core-admin-host",
+                    "cmf-core-admin-i18n",
+                    "cmf-core-admin-queries",
+                    "cmf-core-app",
+                    "cmf-core-business-controls",
+                    "cmf-core-camera",
+                    "cmf-core-checklist",
+                    "cmf-core-controls",
+                    "cmf-core-dashboards",
+                    "cmf-core-enterprise",
+                    "cmf-core-folder",
+                    "cmf-core-masterdata",
+                    "cmf-core-multimedia",
+                    "cmf-core-rule",
+                    "cmf-core-search",
+                    "cmf-core-security",
+                    "cmf-core-shell",
+                    "cmf-core-site"
+                ]
+            },
+            "default": null,
+            "description": "The packages to install."
         }
     },
     "required": []

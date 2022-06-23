@@ -33,13 +33,15 @@ import {
     PACKAGES,
     PROJECT_ASSETS,
     PROJECT_SCRIPTS,
-    PROJECT_STYLES
+    PROJECT_STYLES,
+    VERSION
 } from './package-configs';
 
 import { getAppModulePath, getMainPath } from '../utility/workspace';
 import { addSymbolToNgModuleMetadata, createSourceFile, insertImport } from '../utility/ast';
 import { updateTsConfig } from '../utility/project';
-import { addPackageJsonDependency, NodeDependency } from '../utility/dependency';
+import { addPackageJsonDependency, NodeDependency, NodeDependencyType } from '../utility/dependency';
+import * as inquirer from 'inquirer';
 
 /**
  * Updates index.html file with the themes and loading container
@@ -218,13 +220,21 @@ function installSchematics(_options: any) {
 
         await writeWorkspace(host, workspace);
 
+        const dependencies = PACKAGES
+            .filter(pkg => _options.packages.includes(pkg))
+            .map(pkg => ({
+                type: NodeDependencyType.Default,
+                name: pkg,
+                version: VERSION
+            }));
+
         return chain([
             emptyDir(posix.join(sourcePath, 'assets', 'icons')),
             mergeWith(templateSource),
-            installDependencies(PACKAGES),
+            installDependencies(dependencies),
             ...[...indexFiles].map((path) => updateIndexFile(path)),
             overriteComponentTemplate(),
-            updateAppModule(PACKAGES),
+            updateAppModule(dependencies),
             updateMain(),
             updateTsConfig({ 'compilerOptions.skipLibCheck': true })
         ]);
@@ -479,6 +489,48 @@ export default function (_options: any): Rule {
         if (project.targets.size === 0) {
             throw new SchematicsException(`Targets are not defined for this project.`);
         }
+
+        const packages = PACKAGES.sort();
+
+        const corePackages = ['cmf-core', 'cmf-core-controls', 'cmf-core-shell'];
+        const mesPackages = [...packages.filter(pkg => pkg.startsWith('cmf-core')), 'cmf-mes'];
+
+        if (!_options.packages || _options.packages.length === 0) {
+            const answers = await inquirer.prompt([
+                {
+                    type: 'checkbox',
+                    name: 'packages',
+                    message: 'What packages do you want to install?',
+                    choices: () => {
+                        if (_options.baseApp === 'Core') {
+                            return packages
+                                .filter(pkg => pkg.startsWith('cmf-core'))
+                                .map(pkg => ({
+                                    name: pkg,
+                                    checked: corePackages.includes(pkg),
+                                    disabled: corePackages.includes(pkg) && '✓'
+                                }));
+                        } else {
+                            return packages
+                                .map(pkg => ({
+                                    name: pkg,
+                                    checked: mesPackages.includes(pkg),
+                                    disabled: mesPackages.includes(pkg) && '✓'
+                                }));
+                        }
+                    },
+                    loop: false
+                }
+            ]);
+
+            _options.packages = answers.packages;
+        }
+
+        (_options.baseApp === 'Core' ? corePackages : mesPackages).forEach(pkg => {
+            if (!_options.packages.includes(pkg)) {
+                _options.packages.push(pkg);
+            }
+        });
 
         return chain([
             externalSchematic('@angular/pwa', 'pwa', { project: _options.project }),

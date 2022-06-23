@@ -24,6 +24,7 @@ describe('Test ng-add', () => {
     const ngAddOptions = {
         project: 'application',
         registry: 'https://test.registry.npmjs.org',
+        packages: ['cmf-core-business-controls']
     }
 
     let appTree: UnitTestTree;
