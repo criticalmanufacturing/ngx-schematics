@@ -33,7 +33,7 @@
             "schema": "./execution-view/schema.json"
         },
         "library": {
-            "description": "Generate a new widget.",
+            "description": "Generate a new library.",
             "factory": "./library",
             "schema": "./library/schema.json"
         },
