@@ -18,8 +18,6 @@
 
 ## **Project Startup Commands**
 
----------
-
 ### **ng-add**
 
 Update an application with HTML defaults.
@@ -44,8 +42,6 @@ ng add
 ```
 
 ## **Generate Commands**
-
----------
 
 ### **converter**
 
@@ -252,8 +248,6 @@ ng generate wizard-create-edit [name]
 
 ## **Getting Started**
 
----------
-
 1. Clone this repository into your repository root.
 
 2. Run:
@@ -263,8 +257,6 @@ npm install
 ```
 
 ## **Testing**
-
----------
 
 To test locally, install `@criticalmanufacturing/ng-schematics` globally and use the `schematics` command line tool. That tool acts the same as the `generate` command of the Angular CLI, but also has a debug mode.
 
@@ -276,13 +268,9 @@ schematics --help
 
 ## **Unit Testing**
 
----------
-
 `npm run test` will run the unit tests, using Jasmine as a runner and test framework.
 
 ## **Publishing**
-
----------
 
 To publish, simply do:
 
