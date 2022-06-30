@@ -24,14 +24,14 @@
         },
         "baseApp": {
             "type": "string",
-            "description": "What is the base app to use?",
+            "description": "The base app to use.",
             "default": "Core",
             "enum": [
                 "Core",
                 "MES"
             ],
             "x-prompt": {
-                "message": "Which stylesheet format would you like to use?",
+                "message": "What is the base app you want to use?",
                 "type": "list",
                 "items": [
                     "Core",

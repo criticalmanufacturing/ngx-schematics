@@ -39,7 +39,7 @@ export const PACKAGES: string[] = [
 /**
  * Current Version
  */
-export const VERSION: string = 'dex-10x-next';
+export const VERSION: string = 'dev-10x-next';
 
 /**
  * Project Assets

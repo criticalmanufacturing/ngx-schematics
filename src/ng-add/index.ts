@@ -134,7 +134,7 @@ function installSchematics(_options: any) {
             (workspace.extensions.cli as JsonObject).schematicCollections = [];
         }
 
-        ((workspace.extensions.cli as JsonObject).schematicCollections as JsonArray).push('@criticalmanufacturing/ng-schematics');
+        ((workspace.extensions.cli as JsonObject).schematicCollections as JsonArray).unshift('@criticalmanufacturing/ng-schematics');
 
         const buildTargets = [];
         const testTargets = [];
@@ -190,7 +190,7 @@ function installSchematics(_options: any) {
             }
         }
 
-        if (_options.registry) {
+        if (_options.registry && !host.exists('.npmrc')) {
             host.create('.npmrc', `registry=${_options.registry}`);
         }
 
