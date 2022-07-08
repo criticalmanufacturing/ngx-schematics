@@ -12,28 +12,38 @@ export const MES_BASE_MODULE: [string, string] = ['cmf-mes', 'MESModule'];
  * Project Core Packages
  */
 export const PACKAGES: string[] = [
-    "cmf-core",
-    "cmf-core-admin-config",
-    "cmf-core-admin-dee",
-    "cmf-core-admin-entitytype",
-    "cmf-core-admin-host",
-    "cmf-core-admin-i18n",
-    "cmf-core-admin-queries",
-    "cmf-core-app",
-    "cmf-core-business-controls",
-    "cmf-core-camera",
-    "cmf-core-checklist",
-    "cmf-core-controls",
-    "cmf-core-dashboards",
-    "cmf-core-enterprise",
-    "cmf-core-folder",
-    "cmf-core-masterdata",
-    "cmf-core-multimedia",
-    "cmf-core-rule",
-    "cmf-core-search",
-    "cmf-core-security",
-    "cmf-core-shell",
-    "cmf-core-site"
+    'cmf-core',
+    'cmf-core-controls',
+    'cmf-core-shell',
+    'cmf-core-reports',
+    'cmf-core-business-controls',
+    'cmf-core-folder',
+    'cmf-core-app',
+    'cmf-core-camera',
+    'cmf-core-search',
+    'cmf-core-admin-i18n',
+    'cmf-core-admin-host',
+    'cmf-core-masterdata',
+    'cmf-core-checklist',
+    'cmf-core-security',
+    'cmf-core-enterprise',
+    'cmf-core-site',
+    'cmf-core-admin-config',
+    'cmf-core-admin-entitytype',
+    'cmf-core-admin-dee',
+    'cmf-core-rule',
+    'cmf-core-admin-statemodel',
+    'cmf-core-admin-tables',
+    'cmf-core-admin-erp',
+    'cmf-core-dashboards',
+    'cmf-core-admin-queries',
+    'cmf-core-multimedia',
+    'cmf-core-documents',
+    'cmf-core-changeset',
+    'cmf-core-fablive',
+    'cmf-core-admin-messagebus',
+    'cmf-core-augmentedreality',
+    'cmf-core-examples'
 ];
 
 /**
@@ -69,6 +79,31 @@ export const PROJECT_ASSETS = [
         'glob': '**/*',
         'input': 'node_modules/monaco-editor/min/vs',
         'output': 'monaco-editor/vs'
+    },
+    {
+        "glob": "**/*",
+        "input": "projects/cmf-core-fablive/src/assets",
+        "output": "assets/fablive"
+    },
+    {
+        "glob": "**/*",
+        "input": "projects/cmf-core-augmentedreality/src/assets/tags",
+        "output": "assets/augmentedreality"
+    },
+    {
+        "glob": "artoolkit_wasm.wasm",
+        "input": "node_modules/cmf-artoolkit",
+        "output": "cmf-artoolkit"
+    },
+    {
+        "glob": "camera_para.dat",
+        "input": "node_modules/cmf-artoolkit",
+        "output": "cmf-artoolkit"
+    },
+    {
+        "glob": "**/*",
+        "input": "projects/cmf-core-examples/src/assets/test-inbrowser-viewer",
+        "output": "assets/examples"
     }
 ];
 
