@@ -191,14 +191,14 @@ describe('Generate Entity Page', () => {
         expect(routingModuleChildren).toMatch(historyViewRouteRegExp);
     });
 
-    it('should import RouterModule, DetailsView, HistoryViewModule, and ReferencesViewModule in Routing Module', async () => {
+    it('should import Page Module and Router Module', async () => {
         const tree = await schematicRunner
             .runSchematicAsync('entity-page', entityPageOptions, appTree)
             .toPromise();
 
         const routingModuleContent = tree.readContent(`${pageEntityTypePath}/page-${strings.dasherize(entityPageOptions.name)}-routing.module.ts`);
 
-        const routingModulesImportsRegExp = new RegExp(`imports: \\[\\s*((RouterModule\\.forChild\\(routes\\)|Page${strings.classify(entityPageOptions.name)}DetailsViewModule|HistoryViewModule|ReferencesViewModule)\\s*,?\\s*){4}\\]`, 'gm')
+        const routingModulesImportsRegExp = new RegExp(`imports: \\[\\s*((RouterModule\\.forChild\\(routes\\)|Page${strings.classify(entityPageOptions.name)}Module)\\s*,?\\s*){2}\\]`, 'gm')
         expect(routingModuleContent).toMatch(routingModulesImportsRegExp);
     });
 
