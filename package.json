@@ -10,13 +10,23 @@
   "keywords": [
     "schematics"
   ],
-  "author": "Carlos Samouco",
+  "author": "Critical Manufacturing",
+  "contributors": [
+    {
+      "name": "Carlos Samouco",
+      "url": "https://github.com/Carlosamouco"
+    },
+    {
+      "name": "Nelson Faria",
+      "url": "https://github.com/NelsonFaria14"
+    }
+  ],
   "license": "BSD-3-Clause",
   "schematics": "./src/collection.json",
   "dependencies": {
     "@angular-devkit/core": "^14.0.0",
     "@angular-devkit/schematics": "^14.0.0",
-    "@angular-eslint/schematics": "^13.2.1",
+    "@angular-eslint/schematics": "^14.0.0",
     "@angular/localize": "^14.0.1",
     "@angular/pwa": "^14.0.1",
     "@schematics/angular": "^14.0.0",

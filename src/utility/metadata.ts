@@ -112,7 +112,7 @@ public override get ${propertyIdentifier}(): ${Object.keys(PROPERTY_REFERENCE[pr
         return;
     }
 
-    array.addElement(toInsert);
+    array.addElement(toInsert).formatText();
 }
 
 /**
@@ -173,7 +173,7 @@ export function insertRoutesMetadata(
     }
 
     insertImports(source, requiredImports);
-    routes.addElement(toInsert);
+    routes.addElement(toInsert).formatText();
 }
 
 /**
