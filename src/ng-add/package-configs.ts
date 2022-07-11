@@ -134,9 +134,6 @@ export const PROJECT_STYLES = [
  */
 export const PROJECT_SCRIPTS = [
     'node_modules/jquery/dist/jquery.min.js',
-    'node_modules/lodash/lodash.js',
-    'node_modules/graphlib/dist/graphlib.core.js',
-    'node_modules/dagre/dist/dagre.core.js',
     'node_modules/toastr/toastr.js',
     'node_modules/jquery-ui/ui/version.js',
     'node_modules/jquery-ui/ui/data.js',
