@@ -1,26 +1,26 @@
 import {
-  Component,
-  forwardRef,
-  NgModule,
-  ViewContainerRef
+    Component,
+    forwardRef,
+    NgModule,
+    ViewContainerRef
 } from '@angular/core';
 
 import {
-  CommonModule
+    CommonModule
 } from '@angular/common';
 
 import Cmf from "cmf-lbos";
 
 import {
-  CustomizableComponent,
-  HOST_VIEW_COMPONENT
+    CustomizableComponent,
+    HOST_VIEW_COMPONENT
 } from 'cmf-core';
 
 import {
-  EntityPageModule,
-  EntityPageInterface,
-  LevelsToLoad,
-  EntityPageService
+    EntityPageModule,
+    EntityPageInterface,
+    LevelsToLoad,
+    EntityPageService
 } from 'cmf-core-business-controls';
 
 /**
@@ -79,40 +79,40 @@ import {
  *
  */
 @Component({
-  selector: '<%= dasherize(project) %>-page-<%= dasherize(name) %>',
-  providers: [EntityPageService],
-  templateUrl: './page-<%= dasherize(name) %>.component.html',
-  viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Page<%= classify(name) %>Component) }]
+    selector: '<%= dasherize(project) %>-page-<%= dasherize(name) %>',
+    providers: [EntityPageService],
+    templateUrl: './page-<%= dasherize(name) %>.component.html',
+    viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Page<%= classify(name) %>Component) }]
 })
 export class Page<%= classify(name) %>Component extends CustomizableComponent
-  implements EntityPageInterface<Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>>, LevelsToLoad {
+    implements EntityPageInterface<Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>>, LevelsToLoad {
 
-  /**
-   * Levels to load of the entity
-   */
-  public epLevelsToLoad: number = 1;
+    /**
+     * Levels to load of the entity
+     */
+    public epLevelsToLoad: number = 1;
 
-  /**
-   * The entity to be presented in this view
-   */
-  public epEntity!: Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
+    /**
+     * The entity to be presented in this view
+     */
+    public epEntity!: Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
 
-  /**
-   * Constructor
-   *
-   * @param viewContainerRef the reference to the component view container
-   */
-  constructor(viewContainerRef: ViewContainerRef) {
-    super(viewContainerRef);
-  }
+    /**
+     * Constructor
+     *
+     * @param viewContainerRef the reference to the component view container
+     */
+    constructor(viewContainerRef: ViewContainerRef) {
+        super(viewContainerRef);
+    }
 }
 
 @NgModule({
-  imports: [
-    CommonModule,
-    EntityPageModule
-  ],
-  declarations: [Page<%= classify(name) %>Component],
-  exports: [Page<%= classify(name) %>Component]
+    imports: [
+        CommonModule,
+        EntityPageModule
+    ],
+    declarations: [Page<%= classify(name) %>Component],
+    exports: [Page<%= classify(name) %>Component]
 })
 export class Page<%= classify(name) %>Module { }

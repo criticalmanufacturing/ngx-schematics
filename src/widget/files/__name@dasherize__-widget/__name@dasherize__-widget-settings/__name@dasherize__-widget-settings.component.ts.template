@@ -1,15 +1,15 @@
 import {
-  Component,
-  NgModule,
-  ViewContainerRef
+    Component,
+    NgModule,
+    ViewContainerRef
 } from '@angular/core';
 
 import {
-  CustomizableComponent
+    CustomizableComponent
 } from 'cmf-core';
 
 import {
-  WidgetSettingsModule
+    WidgetSettingsModule
 } from 'cmf-core-dashboards';
 
 /**
@@ -43,23 +43,23 @@ import {
  *
  */
 @Component({
-  selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget-settings',
-  templateUrl: './<%= dasherize(name) %>-widget-settings.component.html',
-  <% if (style !== 'none') { %>styleUrls: ['./<%= dasherize(name) %>-widget-settings.component.<%= style %>']<% } %>
+    selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget-settings',
+    templateUrl: './<%= dasherize(name) %>-widget-settings.component.html',
+    <% if (style !== 'none') { %>styleUrls: ['./<%= dasherize(name) %>-widget-settings.component.<%= style %>']<% } %>
 })
 export class <%= classify(name) %>WidgetSettingsComponent extends CustomizableComponent {
 
-  /**
-   * Constructor
-   */
-  constructor(viewContainerRef: ViewContainerRef) {
-    super(viewContainerRef);
-  }
+    /**
+     * Constructor
+     */
+    constructor(viewContainerRef: ViewContainerRef) {
+        super(viewContainerRef);
+    }
 }
 
 @NgModule({
-  imports: [WidgetSettingsModule],
-  declarations: [<%= classify(name) %>WidgetSettingsComponent],
-  exports: [<%= classify(name) %>WidgetSettingsComponent]
+    imports: [WidgetSettingsModule],
+    declarations: [<%= classify(name) %>WidgetSettingsComponent],
+    exports: [<%= classify(name) %>WidgetSettingsComponent]
 })
 export class <%= classify(name) %>WidgetSettingsModule { }

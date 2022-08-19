@@ -1,23 +1,23 @@
 import {
-  Component,
-  ElementRef,
-  NgModule,
-  ViewContainerRef
+    Component,
+    ElementRef,
+    NgModule,
+    ViewContainerRef
 } from '@angular/core';
 
 import {
-  FeedbackService
+    FeedbackService
 } from 'cmf-core';
 
 import {
-  Widget,
-  WidgetGeneric,
-  WidgetRepresentation,
-  WidgetViewMode
+    Widget,
+    WidgetGeneric,
+    WidgetRepresentation,
+    WidgetViewMode
 } from 'cmf-core-dashboards';
 
 import {
-  <%= classify(name) %>WidgetSettingsComponent
+    <%= classify(name) %>WidgetSettingsComponent
 } from './<%= dasherize(name) %>-widget-settings/<%= dasherize(name) %>-widget-settings.component';
 
 /**
@@ -74,39 +74,39 @@ import {
  *
  */
 @Widget({
-  name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>-widget#NAME:<%= nameify(name) %> Widget`,
-  iconClass: 'icon-core-st-lg-generic',
-  settingsComponent: {
-    component: <%= classify(name) %>WidgetSettingsComponent
-  }
+    name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>-widget#NAME:<%= nameify(name) %> Widget`,
+    iconClass: 'icon-core-st-lg-generic',
+    settingsComponent: {
+        component: <%= classify(name) %>WidgetSettingsComponent
+    }
 })
 @Component({
-  selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget',
-  templateUrl: './<%= dasherize(name) %>-widget.component.html',
-  <% if (style !== 'none') { %>styleUrls: ['./<%= dasherize(name) %>-widget.component.<%= style %>']<% } %>
+    selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget',
+    templateUrl: './<%= dasherize(name) %>-widget.component.html',
+    <% if (style !== 'none') { %>styleUrls: ['./<%= dasherize(name) %>-widget.component.<%= style %>']<% } %>
 })
 export class <%= classify(name) %>WidgetComponent extends WidgetGeneric implements WidgetRepresentation {
 
-  /**
-   * Defines how the widget will be represented
-   */
-  public uiWidgetViewMode: WidgetViewMode = WidgetViewMode.Normal;
+    /**
+     * Defines how the widget will be represented
+     */
+    public uiWidgetViewMode: WidgetViewMode = WidgetViewMode.Normal;
 
-  /**
-   * Constructor
-   */
-  constructor(
-    viewContainerRef: ViewContainerRef,
-    elementRef: ElementRef,
-    feedback: FeedbackService
-  ) {
-    super(viewContainerRef, elementRef, feedback);
-  }
+    /**
+     * Constructor
+     */
+    constructor(
+        viewContainerRef: ViewContainerRef,
+        elementRef: ElementRef,
+        feedback: FeedbackService
+    ) {
+        super(viewContainerRef, elementRef, feedback);
+    }
 }
 
 @NgModule({
-  imports: [],
-  declarations: [<%= classify(name) %>WidgetComponent],
-  exports: [<%= classify(name) %>WidgetComponent]
+    imports: [],
+    declarations: [<%= classify(name) %>WidgetComponent],
+    exports: [<%= classify(name) %>WidgetComponent]
 })
 export class <%= classify(name) %>WidgetModule { }

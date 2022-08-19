@@ -1,37 +1,37 @@
 import {
-  Component,
-  forwardRef,
-  NgModule,
-  ViewEncapsulation,
-  OnInit,
-  ViewChild,
-  ViewContainerRef
+    Component,
+    forwardRef,
+    NgModule,
+    ViewEncapsulation,
+    OnInit,
+    ViewChild,
+    ViewContainerRef
 } from '@angular/core';
 
 import {
-  CommonModule
+    CommonModule
 } from '@angular/common';
 
 import Cmf from "cmf-lbos";
 
 import {
-  CustomizableComponent,
-  HOST_VIEW_COMPONENT,
-  EntityTypeService,
-  UtilService
+    CustomizableComponent,
+    HOST_VIEW_COMPONENT,
+    EntityTypeService,
+    UtilService
 } from 'cmf-core';
 
 import {
-  ExecutionViewModule,
-  ExecutionView,
-  ExecutionViewEventArgs,
-  PageBag
+    ExecutionViewModule,
+    ExecutionView,
+    ExecutionViewEventArgs,
+    PageBag
 } from 'cmf-core-controls';
 
 import {
-  TransactionExecutionView,
-  TransactionExecutionViewModule,
-  TransactionEventArgs
+    TransactionExecutionView,
+    TransactionExecutionViewModule,
+    TransactionEventArgs
 } from 'cmf-core-business-controls'
 
 /**
@@ -90,106 +90,106 @@ import {
  *
  */
 @Component({
-  selector: '<%= dasherize(project) %>-wizard-<%= dasherize(name) %>',
-  templateUrl: './wizard-<%= dasherize(name) %>.component.html',
-  <% if (style !== 'none') { %>styleUrls: ['./wizard-<%= dasherize(name) %>.component.<%= style %>'],<% } %>
-  viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Wizard<%= classify(name) %>Component) }]
+    selector: '<%= dasherize(project) %>-wizard-<%= dasherize(name) %>',
+    templateUrl: './wizard-<%= dasherize(name) %>.component.html',
+    <% if (style !== 'none') { %>styleUrls: ['./wizard-<%= dasherize(name) %>.component.<%= style %>'],<% } %>
+    viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Wizard<%= classify(name) %>Component) }]
 })
 export class Wizard<%= classify(name) %>Component extends CustomizableComponent implements TransactionExecutionView, OnInit {
 
-  /**
-   * Nested execution view
-   */
-  @ViewChild(ExecutionView, { static: true })
-  private _nestedExecutionView!: ExecutionView;
+    /**
+     * Nested execution view
+     */
+    @ViewChild(ExecutionView, { static: true })
+    private _nestedExecutionView!: ExecutionView;
 
-  /**
-   * The instance of the execution view
-   */
-  public instance: Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %> | null = null;
+    /**
+     * The instance of the execution view
+     */
+    public instance: Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %> | null = null;
 
-  /**
-   * Constructor
-   */
-  constructor(
-    viewContainerRef: ViewContainerRef,
-    private pageBag: PageBag,
-    private util: UtilService,
-    private entityTypes: EntityTypeService
-  ) {
-    super(viewContainerRef);
-  }
-
-  /**
-   * Method that prepares the data for the execution view
-   */
-  public async prepareDataInput(): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput[]> {
-    const inputs: Cmf.Foundation.BusinessOrchestration.BaseInput[] = [];
-
-    const instanceInput = new Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.GetObjectByIdInput();
-    instanceInput.IgnoreLastServiceId = true;
-    instanceInput.Id = this.pageBag.context.instance.Id;
-    instanceInput.Type = this.entityTypes.getEntityTypeNameFromInstance(this.pageBag.context.instance);
-    inputs.push(instanceInput);
-
-    return inputs;
-  }
-
-  /**
-   * Method that receive the data from prepareDataInput
-   */
-  public async handleDataOutput(outputs: Cmf.Foundation.BusinessOrchestration.BaseOutput[], executionViewArgs?: ExecutionViewEventArgs): Promise<void> {
-    if (outputs != null && outputs.length >= 1) {
-      const loadInstanceOutput =
-        outputs[0] as Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.OutputObjects.GetObjectByIdOutput;
-
-      this.instance = loadInstanceOutput.Instance;
+    /**
+     * Constructor
+     */
+    constructor(
+        viewContainerRef: ViewContainerRef,
+        private pageBag: PageBag,
+        private util: UtilService,
+        private entityTypes: EntityTypeService
+    ) {
+        super(viewContainerRef);
     }
 
-    await this._nestedExecutionView.reEvaluateContextPreConditions({ instance: this.instance }, true);
-  }
+    /**
+     * Method that prepares the data for the execution view
+     */
+    public async prepareDataInput(): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput[]> {
+        const inputs: Cmf.Foundation.BusinessOrchestration.BaseInput[] = [];
 
-  /**
-   * The execution view prepareTransactionInput method where we can append the input for the final execution view
-   * @param args Current inputs where the user can append or simply resolve its own input.
-   */
-  public async prepareTransactionInput(args: TransactionEventArgs): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput> {
-    const input = new Cmf.Foundation.BusinessOrchestration.BaseInput();
-    input.IgnoreLastServiceId = true;
+        const instanceInput = new Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.GetObjectByIdInput();
+        instanceInput.IgnoreLastServiceId = true;
+        instanceInput.Id = this.pageBag.context.instance.Id;
+        instanceInput.Type = this.entityTypes.getEntityTypeNameFromInstance(this.pageBag.context.instance);
+        inputs.push(instanceInput);
 
-    return input;
-  }
-
-  /**
-   * The execution view hook for handling the above service call.
-   * @param output output object, result of the input created in the prepareTransactionInput
-   */
-  public async handleTransactionOutput(output: Cmf.Foundation.BusinessOrchestration.BaseOutput): Promise<void> {
-    return;
-  }
-
-  /**
-   * NgOnInit. Sets the basic wizard content according to the pageBag context.
-   */
-  public ngOnInit(): void {
-    if (this.pageBag != null && this.pageBag.context != null) {
-      if (this.pageBag.context.instance == null
-        || !this.util.instanceof(this.pageBag.context.instance, Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>)) {
-        throw new Error($localize`:@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#NO_INSTANCE_FOUND:No Instance Found`);
-      }
-    } else {
-      throw new Error($localize`:@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#MISSING_CONTEXT:Missing context`);
+        return inputs;
     }
-  }
+
+    /**
+     * Method that receive the data from prepareDataInput
+     */
+    public async handleDataOutput(outputs: Cmf.Foundation.BusinessOrchestration.BaseOutput[], executionViewArgs?: ExecutionViewEventArgs): Promise<void> {
+        if (outputs != null && outputs.length >= 1) {
+            const loadInstanceOutput =
+                outputs[0] as Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.OutputObjects.GetObjectByIdOutput;
+
+            this.instance = loadInstanceOutput.Instance;
+        }
+
+        await this._nestedExecutionView.reEvaluateContextPreConditions({ instance: this.instance }, true);
+    }
+
+    /**
+     * The execution view prepareTransactionInput method where we can append the input for the final execution view
+     * @param args Current inputs where the user can append or simply resolve its own input.
+     */
+    public async prepareTransactionInput(args: TransactionEventArgs): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput> {
+        const input = new Cmf.Foundation.BusinessOrchestration.BaseInput();
+        input.IgnoreLastServiceId = true;
+
+        return input;
+    }
+
+    /**
+     * The execution view hook for handling the above service call.
+     * @param output output object, result of the input created in the prepareTransactionInput
+     */
+    public async handleTransactionOutput(output: Cmf.Foundation.BusinessOrchestration.BaseOutput): Promise<void> {
+        return;
+    }
+
+    /**
+     * NgOnInit. Sets the basic wizard content according to the pageBag context.
+     */
+    public ngOnInit(): void {
+        if (this.pageBag != null && this.pageBag.context != null) {
+            if (this.pageBag.context.instance == null
+                || !this.util.instanceof(this.pageBag.context.instance, Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>)) {
+                throw new Error($localize`:@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#NO_INSTANCE_FOUND:No Instance Found`);
+            }
+        } else {
+            throw new Error($localize`:@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#MISSING_CONTEXT:Missing context`);
+        }
+    }
 }
 
 @NgModule({
-  imports: [
-    CommonModule,
-    ExecutionViewModule,
-    TransactionExecutionViewModule
-  ],
-  declarations: [Wizard<%= classify(name) %>Component],
-  exports: [Wizard<%= classify(name) %>Component]
+    imports: [
+        CommonModule,
+        ExecutionViewModule,
+        TransactionExecutionViewModule
+    ],
+    declarations: [Wizard<%= classify(name) %>Component],
+    exports: [Wizard<%= classify(name) %>Component]
 })
 export class Wizard<%= classify(name) %>Module { }
