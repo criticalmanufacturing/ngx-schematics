@@ -59,22 +59,6 @@ describe('Generate Library', () => {
 
         expect(files).toEqual(
             jasmine.arrayContaining([
-                `projects/${libraryOptions.name}/.browserslistrc`,
-                `projects/${libraryOptions.name}/karma.conf.js`,
-                `projects/${libraryOptions.name}/ng-package.json`,
-                `projects/${libraryOptions.name}/package.json`,
-                `projects/${libraryOptions.name}/README.md`,
-                `projects/${libraryOptions.name}/tsconfig.lib.json`,
-                `projects/${libraryOptions.name}/tsconfig.lib.prod.json`,
-                `projects/${libraryOptions.name}/tsconfig.spec.json`,
-                `projects/${libraryOptions.name}/.eslintrc.json`,
-                `projects/${libraryOptions.name}/src/test.ts`,
-                `projects/${libraryOptions.name}/src/${libraryOptions.entryFile}.ts`,
-                `projects/${libraryOptions.name}/src/lib/${libraryOptions.name}.module.ts`,
-                `projects/${libraryOptions.name}/src/lib/${libraryOptions.name}.component.spec.ts`,
-                `projects/${libraryOptions.name}/src/lib/${libraryOptions.name}.component.ts`,
-                `projects/${libraryOptions.name}/src/lib/${libraryOptions.name}.service.spec.ts`,
-                `projects/${libraryOptions.name}/src/lib/${libraryOptions.name}.service.ts`,
                 `projects/${libraryOptions.name}/metadata/ng-package.json`,
                 `projects/${libraryOptions.name}/metadata/src/public-api.ts`,
                 `projects/${libraryOptions.name}/metadata/src/lib/${libraryOptions.name}-metadata.module.ts`,
