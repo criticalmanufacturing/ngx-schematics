@@ -1,24 +1,24 @@
 import {
-  Component,
-  NgModule,
-  OnDestroy,
-  ViewContainerRef
+    Component,
+    NgModule,
+    OnDestroy,
+    ViewContainerRef
 } from '@angular/core';
 
 import {
-  CommonModule
+    CommonModule
 } from '@angular/common';
 
 import { Subscription } from 'rxjs';
 import Cmf from 'cmf-lbos';
 
 import {
-  CustomizableComponent,
+    CustomizableComponent,
 } from 'cmf-core';
 
 import {
-  EntityPageService,
-  DetailsViewModule
+    EntityPageService,
+    DetailsViewModule
 } from 'cmf-core-business-controls';
 
 /**
@@ -77,54 +77,54 @@ import {
  *
  */
 @Component({
-  selector: '<%= dasherize(project) %>-page-<%= dasherize(name) %>-details-view',
-  templateUrl: './page-<%= dasherize(name) %>-details-view.component.html'
+    selector: '<%= dasherize(project) %>-page-<%= dasherize(name) %>-details-view',
+    templateUrl: './page-<%= dasherize(name) %>-details-view.component.html'
 })
 export class Page<%= classify(name) %>DetailsViewComponent extends CustomizableComponent implements OnDestroy {
 
-  /**
-   * Subscription of the ep entity loaded event from the entity page service.
-   */
-  private _epEntityLoadedSubscription: Subscription;
+    /**
+     * Subscription of the ep entity loaded event from the entity page service.
+     */
+    private _epEntityLoadedSubscription: Subscription;
 
-  /**
-   * The entity to be presented in this view
-   */
-  public epEntity!: Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
+    /**
+     * The entity to be presented in this view
+     */
+    public epEntity!: Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
 
-  /**
-   * Constructor
-   *
-   * @param viewContainerRef the reference to the component view container
-   */
-  constructor(viewContainerRef: ViewContainerRef, private entityPage: EntityPageService) {
-    super(viewContainerRef);
+    /**
+     * Constructor
+     *
+     * @param viewContainerRef the reference to the component view container
+     */
+    constructor(viewContainerRef: ViewContainerRef, private entityPage: EntityPageService) {
+        super(viewContainerRef);
 
-    this.epOnEntityLoaded();
-    this._epEntityLoadedSubscription = this.entityPage.epEntityLoaded.subscribe(this.epOnEntityLoaded.bind(this));
-  }
+        this.epOnEntityLoaded();
+        this._epEntityLoadedSubscription = this.entityPage.epEntityLoaded.subscribe(this.epOnEntityLoaded.bind(this));
+    }
 
-  /**
-    * When the entity is loaded by the Entity Page, chooses which properties to display
-    */
-  public epOnEntityLoaded() {
-    this.epEntity = this.entityPage.epEntity as Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
-  }
+    /**
+     * When the entity is loaded by the Entity Page, chooses which properties to display
+     */
+    public epOnEntityLoaded() {
+        this.epEntity = this.entityPage.epEntity as Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
+    }
 
-  /**
-   * Unsubscribes subscriptions
-   */
-  public ngOnDestroy(): void {
-    this._epEntityLoadedSubscription?.unsubscribe();
-  }
+    /**
+     * Unsubscribes subscriptions
+     */
+    public ngOnDestroy(): void {
+        this._epEntityLoadedSubscription?.unsubscribe();
+    }
 }
 
 @NgModule({
-  imports: [
-    CommonModule,
-    DetailsViewModule
-  ],
-  declarations: [Page<%= classify(name) %>DetailsViewComponent],
-  exports: [Page<%= classify(name) %>DetailsViewComponent]
+    imports: [
+        CommonModule,
+        DetailsViewModule
+    ],
+    declarations: [Page<%= classify(name) %>DetailsViewComponent],
+    exports: [Page<%= classify(name) %>DetailsViewComponent]
 })
 export class Page<%= classify(name) %>DetailsViewModule { }

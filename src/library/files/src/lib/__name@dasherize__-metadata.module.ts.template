@@ -4,14 +4,14 @@ import { MetadataLoader } from 'cmf-core';
 import { <%= classify(name) %>MetadataService } from './<%= dasherize(name) %>-metadata.service';
 
 @NgModule({
-  providers: [<%= classify(name) %>MetadataService]
+    providers: [<%= classify(name) %>MetadataService]
 })
 export class <%= classify(name) %>MetadataModule {
 
-  /**
-   * Constructor
-   */
-  constructor(loader: MetadataLoader) {
-    loader.loadMetadata(<%= classify(name) %>MetadataService);
-  }
+    /**
+     * Constructor
+     */
+    constructor(loader: MetadataLoader) {
+        loader.loadMetadata(<%= classify(name) %>MetadataService);
+    }
 }

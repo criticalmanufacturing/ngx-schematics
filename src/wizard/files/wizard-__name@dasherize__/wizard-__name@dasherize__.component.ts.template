@@ -184,11 +184,11 @@ export class Wizard<%= classify(name) %>Component extends CustomizableComponent 
 }
 
 @NgModule({
-  imports: [
-    CommonModule,
-    TransactionWizardModule
-  ],
-  declarations: [Wizard<%= classify(name) %>Component],
-  exports: [Wizard<%= classify(name) %>Component]
+    imports: [
+        CommonModule,
+        TransactionWizardModule
+    ],
+    declarations: [Wizard<%= classify(name) %>Component],
+    exports: [Wizard<%= classify(name) %>Component]
 })
 export class Wizard<%= classify(name) %>Module { }
