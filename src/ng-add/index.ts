@@ -137,13 +137,10 @@ function installSchematics(_options: any) {
         ((workspace.extensions.cli as JsonObject).schematicCollections as JsonArray).unshift('@criticalmanufacturing/ng-schematics');
 
         const buildTargets = [];
-        const testTargets = [];
 
         for (const target of project.targets.values()) {
             if (target.builder === '@angular-devkit/build-angular:browser') {
                 buildTargets.push(target);
-            } else if (target.builder === '@angular-devkit/build-angular:karma') {
-                testTargets.push(target);
             }
         }
 
