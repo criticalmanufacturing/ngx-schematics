@@ -57,7 +57,7 @@ describe('Test ng-add', () => {
                 '/application/.eslintrc.json',
                 '/application/src/index.html',
                 '/application/src/main.ts',
-                '/application/src/polyfills.ts',
+                '/application/src/styles.css',
                 '/application/src/manifest.webmanifest',
                 '/application/src/assets/config.json',
                 '/application/src/app/app.module.ts',
@@ -260,17 +260,6 @@ describe('Test ng-add', () => {
             const mainContent = tree.readContent('/application/src/main.ts');
             expect(mainContent).toMatch(functionRegExp);
         })
-    });
-
-    describe('- Generate polyfills.ts', () => {
-        it('should import @angular/localize/init', async() => {
-            const tree = await schematicRunner
-                .runSchematicAsync('ng-add', ngAddOptions, appTree)
-                .toPromise();
-    
-            const polyfillContent = tree.readContent('/application/src/polyfills.ts');
-            expect(polyfillContent).toContain(`import '@angular/localize/init';`);
-        });
     });
 
     describe('- Generate App component', () => {
