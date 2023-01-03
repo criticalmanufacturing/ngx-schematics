@@ -17,8 +17,7 @@ import {
     join,
     JsonArray,
     JsonObject,
-    normalize,
-    strings
+    normalize
 } from '@angular-devkit/core';
 import { Readable, Writable } from 'stream';
 import { posix } from 'path';
@@ -28,9 +27,10 @@ import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 
 import {
+    BaseApp,
     CORE_BASE_MODULE,
     MES_BASE_MODULE,
-    PACKAGES,
+    METADATA_ROUTING_MODULE,
     PROJECT_ASSETS,
     PROJECT_SCRIPTS,
     PROJECT_STYLES,
@@ -41,7 +41,6 @@ import { getAppModulePath, getMainPath } from '../utility/workspace';
 import { addSymbolToNgModuleMetadata, createSourceFile, insertImport } from '../utility/ast';
 import { updateTsConfig } from '../utility/project';
 import { addPackageJsonDependency, NodeDependency, NodeDependencyType } from '../utility/dependency';
-import * as inquirer from 'inquirer';
 
 /**
  * Updates index.html file with the themes and loading container
@@ -217,21 +216,28 @@ function installSchematics(_options: any) {
 
         await writeWorkspace(host, workspace);
 
-        const dependencies = PACKAGES
-            .filter(pkg => _options.packages.includes(pkg))
-            .map(pkg => ({
+        const dependencies = [];
+        if (_options.baseApp === BaseApp.MES) {
+            dependencies.push({
                 type: NodeDependencyType.Default,
-                name: pkg,
+                name: MES_BASE_MODULE[0],
                 version: VERSION
-            }));
+            });
+        } else {
+            dependencies.push({
+                type: NodeDependencyType.Default,
+                name: CORE_BASE_MODULE[0],
+                version: VERSION
+            });
+        }
 
         return chain([
             emptyDir(posix.join(sourcePath, 'assets', 'icons')),
             mergeWith(templateSource),
             installDependencies(dependencies),
             ...[...indexFiles].map((path) => updateIndexFile(path)),
-            overriteComponentTemplate(),
-            updateAppModule(dependencies),
+            overrideComponentTemplate(),
+            updateAppModule(_options.baseApp),
             updateMain(),
             updateTsConfig({ 'compilerOptions.skipLibCheck': true })
         ]);
@@ -295,7 +301,7 @@ loadApplicationConfig('assets/config.json').then(() => {
 /**
  * Updates app module adding the desired package modules
  */
-function updateAppModule(pkgs: NodeDependency[]): Rule {
+function updateAppModule(baseApp: string): Rule {
     return async (host: Tree) => {
         const appModulePath = await getAppModulePath(host);
 
@@ -310,22 +316,13 @@ function updateAppModule(pkgs: NodeDependency[]): Rule {
             return;
         }
 
-        // add core module first
-        addSymbolToNgModuleMetadata(source, 'imports', CORE_BASE_MODULE[1], CORE_BASE_MODULE[0]);
-        const baseModules = [CORE_BASE_MODULE[0], MES_BASE_MODULE[0]];
-
-        // add other packages
-        for (const pkg of pkgs) {
-            if (pkg.name === CORE_BASE_MODULE[0]) {
-                continue;
-            }
-
-            const hasMetadata = !baseModules.includes(pkg.name);
-            const moduleName = strings.classify(pkg.name.substring(pkg.name.startsWith('cmf-') ? 4 : 0)) + (hasMetadata ? 'Metadata' : '') + 'Module';
-            const modulePath = pkg.name + (hasMetadata ? '/metadata' : '');
-
-            addSymbolToNgModuleMetadata(source, 'imports', moduleName, modulePath, CORE_BASE_MODULE[1]);
+        if (baseApp === BaseApp.MES) {
+            addSymbolToNgModuleMetadata(source, 'imports', MES_BASE_MODULE[1], MES_BASE_MODULE[0]);
+        } else {
+            addSymbolToNgModuleMetadata(source, 'imports', CORE_BASE_MODULE[1], CORE_BASE_MODULE[0]);
         }
+
+        addSymbolToNgModuleMetadata(source, 'imports', METADATA_ROUTING_MODULE[1], METADATA_ROUTING_MODULE[0]);
 
         source.formatText();
         host.overwrite(appModulePath, source.getFullText());
@@ -416,7 +413,7 @@ function getComponentMetadata(source: SourceFile): ObjectLiteralExpression | und
     }
 }
 
-function overriteComponentTemplate() {
+function overrideComponentTemplate() {
     return async (host: Tree) => {
         const modulePath = await getAppModulePath(host);
 
@@ -487,51 +484,9 @@ export default function (_options: any): Rule {
             throw new SchematicsException(`Targets are not defined for this project.`);
         }
 
-        const packages = PACKAGES.sort();
-
-        const corePackages = ['cmf-core', 'cmf-core-controls', 'cmf-core-shell'];
-        const mesPackages = [...packages.filter(pkg => pkg.startsWith('cmf-core')), 'cmf-mes'];
-
-        if (!_options.packages || _options.packages.length === 0) {
-            const answers = await inquirer.prompt([
-                {
-                    type: 'checkbox',
-                    name: 'packages',
-                    message: 'What packages do you want to install?',
-                    choices: () => {
-                        if (_options.baseApp === 'Core') {
-                            return packages
-                                .filter(pkg => pkg.startsWith('cmf-core'))
-                                .map(pkg => ({
-                                    name: pkg,
-                                    checked: corePackages.includes(pkg),
-                                    disabled: corePackages.includes(pkg) && '✓'
-                                }));
-                        } else {
-                            return packages
-                                .map(pkg => ({
-                                    name: pkg,
-                                    checked: mesPackages.includes(pkg),
-                                    disabled: mesPackages.includes(pkg) && '✓'
-                                }));
-                        }
-                    },
-                    loop: false
-                }
-            ]);
-
-            _options.packages = answers.packages;
-        }
-
-        (_options.baseApp === 'Core' ? corePackages : mesPackages).forEach(pkg => {
-            if (!_options.packages.includes(pkg)) {
-                _options.packages.push(pkg);
-            }
-        });
-
         return chain([
             externalSchematic('@angular/pwa', 'pwa', { project: _options.project }),
-            externalSchematic('@angular/localize', 'ng-add', { name: _options.project, useAtRuntime: true }),
+            externalSchematic('@angular/localize', 'ng-add', { project: _options.project, useAtRuntime: true }),
             _options.lint ? externalSchematic('@angular-eslint/schematics', 'ng-add', {}) : noop(),
             installSchematics(_options)
         ]);

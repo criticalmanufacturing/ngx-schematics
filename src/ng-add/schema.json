@@ -38,49 +38,6 @@
                     "MES"
                 ]
             }
-        },
-        "packages": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "enum": [
-                    "cmf-core",
-                    "cmf-core-admin-config",
-                    "cmf-core-admin-dee",
-                    "cmf-core-admin-entitytype",
-                    "cmf-core-admin-erp",
-                    "cmf-core-admin-host",
-                    "cmf-core-admin-i18n",
-                    "cmf-core-admin-messagebus",
-                    "cmf-core-admin-queries",
-                    "cmf-core-admin-statemodel",
-                    "cmf-core-admin-tables",
-                    "cmf-core-app",
-                    "cmf-core-augmentedreality",
-                    "cmf-core-business-controls",
-                    "cmf-core-camera",
-                    "cmf-core-changeset",
-                    "cmf-core-checklist",
-                    "cmf-core-connect-iot",
-                    "cmf-core-controls",
-                    "cmf-core-dashboards",
-                    "cmf-core-documents",
-                    "cmf-core-enterprise",
-                    "cmf-core-fablive",
-                    "cmf-core-folder",
-                    "cmf-core-iotevents",
-                    "cmf-core-masterdata",
-                    "cmf-core-multimedia",
-                    "cmf-core-reports",
-                    "cmf-core-rule",
-                    "cmf-core-search",
-                    "cmf-core-security",
-                    "cmf-core-shell",
-                    "cmf-core-site"
-                ]
-            },
-            "default": null,
-            "description": "The packages to install."
         }
     },
     "required": []
