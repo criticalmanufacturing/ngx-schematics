@@ -24,7 +24,7 @@ describe('Test ng-add', () => {
     const ngAddOptions = {
         project: 'application',
         registry: 'https://test.registry.npmjs.org',
-        packages: ['cmf-core-business-controls']
+        baseApp: 'Core'
     }
 
     let appTree: UnitTestTree;
@@ -143,7 +143,7 @@ describe('Test ng-add', () => {
             expect(packageJsonContent.scripts.lint).toBe('ng lint');
         })
 
-        it('should have core packages in the dependencies', async () => {
+        it('should have cmf-core-ui package in the dependencies', async () => {
             const tree = await schematicRunner
                 .runSchematicAsync('ng-add', ngAddOptions, appTree)
                 .toPromise();
@@ -151,8 +151,26 @@ describe('Test ng-add', () => {
             const packageJsonContent = JSON.parse(tree.readContent('/package.json'));
             expect(Object.getOwnPropertyNames(packageJsonContent.dependencies)).toEqual(
                 jasmine.arrayContaining([
-                    'cmf-core',
-                    'cmf-core-shell'
+                    'cmf-core-ui'
+                ])
+            );
+        })
+
+        it('should have cmf-mes-ui package in the dependencies', async () => {
+
+            const ngAddMesOptions = {
+                ...ngAddOptions,
+                baseApp: 'MES'
+            }
+
+            const tree = await schematicRunner
+                .runSchematicAsync('ng-add', ngAddMesOptions, appTree)
+                .toPromise();
+
+            const packageJsonContent = JSON.parse(tree.readContent('/package.json'));
+            expect(Object.getOwnPropertyNames(packageJsonContent.dependencies)).toEqual(
+                jasmine.arrayContaining([
+                    'cmf-mes-ui'
                 ])
             );
         })
@@ -272,19 +290,40 @@ describe('Test ng-add', () => {
             expect(appComponentHtmlContent).toEqual('<router-outlet></router-outlet>');
         })
 
-        it('should import the CoreModule and CoreShellMetadataModule', async() => {
+        it('should import the CoreUIModule and MetadataRoutingModule', async() => {
             const tree = await schematicRunner
                 .runSchematicAsync('ng-add', ngAddOptions, appTree)
                 .toPromise();
     
             const appModuleContent = tree.readContent('/application/src/app/app.module.ts');
-            expect(appModuleContent).toContain(`import { CoreModule } from 'cmf-core';`);
-            expect(appModuleContent).toContain(`import { CoreShellMetadataModule } from 'cmf-core-shell/metadata';`);
+            expect(appModuleContent).toContain(`import { CoreUIModule } from 'cmf-core-ui';`);
+            expect(appModuleContent).toContain(`import { MetadataRoutingModule } from 'cmf-core';`);
 
             const appModuleImports = appModuleContent.match(/imports: \[((\W|\w|\n|\r|\s)*)\]/gm)?.[0];
             expect(appModuleImports).not.toBeNull();
-            expect(appModuleImports).toContain('CoreModule');
-            expect(appModuleImports).toContain('CoreShellMetadataModule');
+            expect(appModuleImports).toContain('CoreUIModule');
+            expect(appModuleImports).toContain('MetadataRoutingModule');
+        })
+
+        it('should import the MesUIModule and MetadataRoutingModule', async() => {
+
+            const ngAddMesOptions = {
+                ...ngAddOptions,
+                baseApp: 'MES'
+            }
+
+            const tree = await schematicRunner
+                .runSchematicAsync('ng-add', ngAddMesOptions, appTree)
+                .toPromise();
+    
+            const appModuleContent = tree.readContent('/application/src/app/app.module.ts');
+            expect(appModuleContent).toContain(`import { MesUIModule } from 'cmf-mes-ui';`);
+            expect(appModuleContent).toContain(`import { MetadataRoutingModule } from 'cmf-core';`);
+
+            const appModuleImports = appModuleContent.match(/imports: \[((\W|\w|\n|\r|\s)*)\]/gm)?.[0];
+            expect(appModuleImports).not.toBeNull();
+            expect(appModuleImports).toContain('MesUIModule');
+            expect(appModuleImports).toContain('MetadataRoutingModule');
         })
     });
 });

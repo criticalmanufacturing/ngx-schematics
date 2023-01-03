@@ -1,50 +1,25 @@
 /**
  * Project Core Base Module
  */
-export const CORE_BASE_MODULE: [string, string] = ['cmf-core', 'CoreModule'];
+export const CORE_BASE_MODULE: [string, string] = ['cmf-core-ui', 'CoreUIModule'];
 
 /**
  * Project MES Base Module
  */
-export const MES_BASE_MODULE: [string, string] = ['cmf-mes', 'MESModule'];
+export const MES_BASE_MODULE: [string, string] = ['cmf-mes-ui', 'MesUIModule'];
 
 /**
- * Project Core Packages
+ * Project Metadata Routing Module
  */
-export const PACKAGES: string[] = [
-    'cmf-core',
-    'cmf-core-controls',
-    'cmf-core-shell',
-    'cmf-core-reports',
-    'cmf-core-business-controls',
-    'cmf-core-folder',
-    'cmf-core-app',
-    'cmf-core-camera',
-    'cmf-core-search',
-    'cmf-core-admin-i18n',
-    'cmf-core-admin-host',
-    'cmf-core-masterdata',
-    'cmf-core-checklist',
-    'cmf-core-security',
-    'cmf-core-enterprise',
-    'cmf-core-site',
-    'cmf-core-admin-config',
-    'cmf-core-admin-entitytype',
-    'cmf-core-admin-dee',
-    'cmf-core-rule',
-    'cmf-core-admin-statemodel',
-    'cmf-core-admin-tables',
-    'cmf-core-admin-erp',
-    'cmf-core-dashboards',
-    'cmf-core-admin-queries',
-    'cmf-core-multimedia',
-    'cmf-core-documents',
-    'cmf-core-changeset',
-    'cmf-core-fablive',
-    'cmf-core-admin-messagebus',
-    'cmf-core-augmentedreality',
-    'cmf-core-examples'
-];
+export const METADATA_ROUTING_MODULE: [string, string] = ['cmf-core', 'MetadataRoutingModule'];
+
+/**
+ * Base Application
+ */
+export enum BaseApp {
+    Core = 'Core',
+    MES = 'MES'
+}
 
 /**
  * Current Version
