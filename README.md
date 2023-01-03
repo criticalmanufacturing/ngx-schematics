@@ -34,7 +34,6 @@ Update an application with HTML defaults.
 | `--registry`     | The npm registry to use.         | `string`    |               |
 | `--lint`         | Adds eslint to the project.      | `boolean`   | `true`        |
 | `--baseApp`      | The base app to be used.         | `string`    | `Core`        |
-| `--packages`     | The packages to install.         | `array`     |               |
 
 #### **Usage:**
 ```
