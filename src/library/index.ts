@@ -98,7 +98,9 @@ export default function (_options: any): Rule {
 
         const workspace = await readWorkspace(tree);
 
+        let skipMetadata = _options.skipMetadata;
         let lint = _options.lint;
+        delete _options.skipMetadata;
         delete _options.lint;
 
         if (lint === undefined) {
@@ -106,9 +108,15 @@ export default function (_options: any): Rule {
             lint = project?.targets?.get('lint')?.builder?.startsWith('@angular-eslint');
         }
 
-        return chain([
-            externalSchematic(lint ? '@angular-eslint/schematics' : '@schematics/angular', 'library', { ..._options }),
-            createMetadataSubEntry({ ..._options })
-        ]);
+        const rules = [
+            externalSchematic(lint ? '@angular-eslint/schematics' : '@schematics/angular', 'library', { ..._options })
+        ];
+
+        // If the user hasn't specified to skip the metadata sub-entry, add it
+        if (!skipMetadata) {
+            rules.push(createMetadataSubEntry({ ..._options }));
+        }
+
+        return chain(rules);
     }
 }

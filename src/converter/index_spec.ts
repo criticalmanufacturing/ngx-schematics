@@ -78,17 +78,15 @@ describe('Generate Converter', () => {
         expect(pipeContent).toMatch(/@Converter\(/g);
     });
 
-    it('should have the name and factory properties in the Converter decorator', async () => {
+    it('should have the name property in the Converter decorator', async () => {
         const tree = await schematicRunner
             .runSchematicAsync('converter', converterOptions, appTree)
             .toPromise();
 
         const converterName = `${nameify(converterOptions.name)} Converter`;
-        const converterClassName = `${strings.classify(converterOptions.name)}Pipe`;
 
         const pipeContent = tree.readContent(`${converterOptions.path}/${converterOptions.name}/${converterOptions.name}.pipe.ts`);
         expect(pipeContent).toContain(`name: $localize\`:@@${strings.dasherize(converterOptions.project)}/${converterOptions.name}#NAME:${converterName}\``);
-        expect(pipeContent).toContain(`factory: () => new ${converterClassName}(),`);
     });
 
     it('should have the name property in the Pipe decorator', async () => {

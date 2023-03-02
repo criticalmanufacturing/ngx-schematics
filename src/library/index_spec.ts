@@ -35,6 +35,7 @@ describe('Generate Library', () => {
         skipPackageJson: false,
         skipTsConfig: false,
         skipInstall: false,
+        skipMetadata: false,
         lint: true
     };
 
@@ -234,5 +235,23 @@ describe('Generate Library', () => {
         const fileContent = tree.readContent(`/projects/${libraryOptions.name}/metadata/src/public-api.ts`);
         expect(fileContent).toMatch(new RegExp(`from './lib/${libraryOptions.name}\-metadata\.service';`));
         expect(fileContent).toMatch(new RegExp(`from './lib/${libraryOptions.name}\-metadata\.module';`));
+    });
+
+    it('should not add the metadata sub-entry', async () => {
+
+        const options = { ...libraryOptions, skipMetadata: true };
+
+        const tree = await schematicRunner
+            .runSchematicAsync('library', options, appTree)
+            .toPromise();
+        const files = getAllFilesFromDir(`projects/${libraryOptions.name}`, tree);
+        expect(files).not.toEqual(
+            jasmine.arrayContaining([
+                `projects/${libraryOptions.name}/metadata/ng-package.json`,
+                `projects/${libraryOptions.name}/metadata/src/public-api.ts`,
+                `projects/${libraryOptions.name}/metadata/src/lib/${libraryOptions.name}-metadata.module.ts`,
+                `projects/${libraryOptions.name}/metadata/src/lib/${libraryOptions.name}-metadata.service.ts`
+            ])
+        );
     });
 });
