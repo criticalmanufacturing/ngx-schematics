@@ -108,15 +108,9 @@ export default function (_options: any): Rule {
             lint = project?.targets?.get('lint')?.builder?.startsWith('@angular-eslint');
         }
 
-        const rules = [
-            externalSchematic(lint ? '@angular-eslint/schematics' : '@schematics/angular', 'library', { ..._options })
-        ];
-
-        // If the user hasn't specified to skip the metadata sub-entry, add it
-        if (!skipMetadata) {
-            rules.push(createMetadataSubEntry({ ..._options }));
-        }
-
-        return chain(rules);
+        return chain([
+            externalSchematic(lint ? '@angular-eslint/schematics' : '@schematics/angular', 'library', { ..._options }),
+            !skipMetadata ? createMetadataSubEntry({ ..._options }) : noop()
+        ]);
     }
 }
