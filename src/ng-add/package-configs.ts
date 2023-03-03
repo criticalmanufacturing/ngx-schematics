@@ -24,7 +24,51 @@ export enum BaseApp {
 /**
  * Current Version
  */
-export const VERSION: string = 'dev-10x-next';
+export const VERSION: string = 'dev';
+
+/**
+ * THEMES
+ */
+export const THEMES = [
+    'cmf.style.blue',
+    'cmf.style.blue.accessibility',
+    'cmf.style.contrast',
+    'cmf.style.contrast.accessibility',
+    'cmf.style.dark',
+    'cmf.style.dark.accessibility',
+    'cmf.style.gray',
+    'cmf.style.gray.accessibility'
+];
+
+/**
+ * Project Allowed CommonJS Dependencies
+ */
+export const PROJECT_ALLOWED_COMMONJS_DEPENDENCIES = [
+    'quagga',
+    'html2canvas',
+    'zipson',
+    'decimal.js',
+    'moment',
+    'moment-duration-format',
+    'backbone',
+    'jquery',
+    'lodash',
+    'raf',
+    'rgbcolor',
+    'core-js',
+    'dompurify',
+    'jsonata',
+    'xpath',
+    'xmldom',
+    'inversify',
+    'escape-latex',
+    'fraction.js',
+    'complex.js',
+    'javascript-natural-sort',
+    'seedrandom',
+    'typed-function',
+    'buffer'
+];
 
 /**
  * Project Assets
@@ -37,17 +81,17 @@ export const PROJECT_ASSETS = [
     },
     {
         'glob': '**/icon-*.png',
-        'input': 'node_modules/cmf-core/src/assets/img/icons',
+        'input': 'node_modules/cmf-core/assets/img/icons',
         'output': 'assets/icons'
     },
     {
         'glob': '**/*',
-        'input': 'node_modules/cmf-core/src/assets/img/flags',
+        'input': 'node_modules/cmf-core/assets/img/flags',
         'output': 'assets/flags'
     },
     {
         'glob': '**/*',
-        'input': 'node_modules/cmf-core/src/assets/img/themes',
+        'input': 'node_modules/cmf-core/assets/img/themes',
         'output': 'assets/themes'
     },
     {
@@ -56,51 +100,78 @@ export const PROJECT_ASSETS = [
         'output': 'monaco-editor/vs'
     },
     {
-        "glob": "**/*",
-        "input": "projects/cmf-core-fablive/src/assets",
-        "output": "assets/fablive"
+        'glob': '**/*',
+        'input': 'node_modules/cmf-core-fablive/assets',
+        'output': 'assets/fablive'
     },
     {
-        "glob": "**/*",
-        "input": "projects/cmf-core-augmentedreality/src/assets/tags",
-        "output": "assets/augmentedreality"
+        'glob': '**/*',
+        'input': 'node_modules/cmf-core-augmentedreality/assets',
+        'output': 'assets/augmentedreality'
     },
     {
-        "glob": "artoolkit_wasm.wasm",
-        "input": "node_modules/cmf-artoolkit",
-        "output": "cmf-artoolkit"
+        'glob': '**/*',
+        'input': 'node_modules/cmf-core-shell/assets',
+        'output': 'assets/shell'
     },
     {
-        "glob": "camera_para.dat",
-        "input": "node_modules/cmf-artoolkit",
-        "output": "cmf-artoolkit"
+        'glob': 'artoolkit_wasm.wasm',
+        'input': 'node_modules/cmf-artoolkit',
+        'output': 'cmf-artoolkit'
     },
     {
-        "glob": "**/*",
-        "input": "projects/cmf-core-examples/src/assets/test-inbrowser-viewer",
-        "output": "assets/examples"
+        'glob': 'camera_para.dat',
+        'input': 'node_modules/cmf-artoolkit',
+        'output': 'cmf-artoolkit'
     }
 ];
 
 /**
- * THEMES
+ * Project MES Assets
  */
-export const THEMES = ['cmf.style.gray', 'cmf.style.dark', 'cmf.style.blue'];
+export const PROJECT_MES_ASSETS = [
+    ...PROJECT_ASSETS,
+    {
+        'glob': '**/*.svg',
+        'input': 'node_modules/cmf-mes-business-controls/assets/product/img',
+        'output': 'assets/business-controls/product'
+    }
+]
 
 /**
- * Project Styles
+ * Generic Project Styles
  */
-export const PROJECT_STYLES = [
+const GENERIC_STYLES = [
     'node_modules/toastr/toastr.less',
     'node_modules/bootstrap/dist/css/bootstrap.css',
     'node_modules/cmf.kendoui/styles/kendo.common.min.css',
     'node_modules/jquery-ui/themes/base/dialog.css',
-    'node_modules/jquery-ui/themes/base/core.css',
-    'node_modules/cmf-core/src/assets/style/styles.less',
+    'node_modules/jquery-ui/themes/base/core.css'
+];
+
+/**
+ * Project Core Styles
+ */
+export const PROJECT_CORE_STYLES = [
+    ...GENERIC_STYLES,
+    'node_modules/cmf-core/assets/style/styles.less',
     ...THEMES.map(theme => ({
         'inject': false,
         'bundleName': theme,
-        'input': `node_modules/cmf-core/src/assets/style/themes/${theme}/${theme}.less`
+        'input': `node_modules/cmf-core/assets/style/themes/${theme}/${theme}.less`
+    }))
+];
+
+/**
+ * Project MES Styles
+ */
+export const PROJECT_MES_STYLES = [
+    ...GENERIC_STYLES,
+    'node_modules/cmf-mes/assets/style/styles.less',
+    ...THEMES.map(theme => ({
+        'inject': false,
+        'bundleName': theme,
+        'input': `node_modules/cmf-mes/assets/style/themes/${theme}/${theme}.less`
     }))
 ];
 
@@ -112,6 +183,8 @@ export const PROJECT_SCRIPTS = [
     'node_modules/toastr/toastr.js',
     'node_modules/jquery-ui/ui/version.js',
     'node_modules/jquery-ui/ui/data.js',
+    'node_modules/jquery-ui/ui/plugin.js',
+    'node_modules/jquery-ui/ui/scroll-parent.js',
     'node_modules/jquery-ui/ui/safe-active-element.js',
     'node_modules/jquery-ui/ui/unique-id.js',
     'node_modules/jquery-ui/ui/focusable.js',
@@ -120,7 +193,9 @@ export const PROJECT_SCRIPTS = [
     'node_modules/jquery-ui/ui/safe-blur.js',
     'node_modules/jquery-ui/ui/widget.js',
     'node_modules/jquery-ui/ui/widgets/button.js',
+    'node_modules/jquery-ui/ui/widgets/mouse.js',
     'node_modules/jquery-ui/ui/widgets/dialog.js',
+    'node_modules/jquery-ui/ui/widgets/draggable.js',
     'node_modules/bootstrap/js/collapse.js',
     'node_modules/bootstrap/js/transition.js',
     'node_modules/bootstrap/js/dropdown.js',
@@ -156,6 +231,13 @@ export const PROJECT_SCRIPTS = [
     'node_modules/cmf.kendoui/js/kendo.grid.min.js',
     'node_modules/cmf.kendoui/js/kendo.splitter.min.js',
     'node_modules/cmf.kendoui/js/kendo.tooltip.min.js',
+    'node_modules/cmf.kendoui/js/kendo.drawing.min.js',
+    'node_modules/cmf.kendoui/js/kendo.dataviz.core.min.js',
+    'node_modules/cmf.kendoui/js/kendo.dataviz.chart.min.js',
+    'node_modules/cmf.kendoui/js/kendo.dataviz.themes.min.js',
+    'node_modules/cmf.kendoui/js/kendo.dataviz.treemap.min.js',
+    'node_modules/cmf.kendoui/js/kendo.calendar.min.js',
+    'node_modules/cmf.kendoui/js/kendo.multiviewcalendar.min.js',
     {
         'bundleName': 'jszip',
         'inject': false,
