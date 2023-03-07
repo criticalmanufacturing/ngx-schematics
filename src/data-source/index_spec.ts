@@ -117,18 +117,15 @@ describe('Generate Data Source', () => {
         expect(dataSourceContent).toMatch(/@DataSource\(/);
     });
 
-    it('should have the name, factory, deps, and settingsComponent properties in the DataSource decorator', async () => {
+    it('should have the name and settingsComponent properties in the DataSource decorator', async () => {
         const tree = await schematicRunner
             .runSchematicAsync('data-source', dataSourceOptions, appTree)
             .toPromise();
 
-        const dataSourceClassName = `${strings.classify(dataSourceOptions.name)}DataSource`;
         const dataSourceSettingsName = `${strings.classify(dataSourceOptions.name)}DataSourceSettings`;
         
         const dataSourceContent = tree.readContent(defaultDataSourceFilePath);
         expect(dataSourceContent).toContain(`name: $localize\`:@@${strings.dasherize(dataSourceOptions.project)}/${dataSourceOptions.name}-data-source#NAME:${nameify(dataSourceOptions.name)}\``);
-        expect(dataSourceContent).toContain(`factory: (util: UtilService) => new ${dataSourceClassName}(util),`);
-        expect(dataSourceContent).toContain(`deps: [UtilService],`);
         expect(dataSourceContent).toMatch(new RegExp(`settingsComponent: {\\s*component: ${dataSourceSettingsName}\\s*}`, 'gm'));
     });
 

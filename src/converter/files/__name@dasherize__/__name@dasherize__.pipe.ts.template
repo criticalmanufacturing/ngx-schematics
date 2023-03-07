@@ -21,8 +21,6 @@ import {
  */
 @Converter({
     name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>#NAME:<%= nameify(name) %> Converter`,
-    factory: () => new <%= classify(name) %>Pipe(),
-    deps: [],
     input: [],
     output: null
 })

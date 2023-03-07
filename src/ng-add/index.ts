@@ -31,9 +31,12 @@ import {
     CORE_BASE_MODULE,
     MES_BASE_MODULE,
     METADATA_ROUTING_MODULE,
+    PROJECT_ALLOWED_COMMONJS_DEPENDENCIES,
     PROJECT_ASSETS,
+    PROJECT_CORE_STYLES,
+    PROJECT_MES_ASSETS,
+    PROJECT_MES_STYLES,
     PROJECT_SCRIPTS,
-    PROJECT_STYLES,
     VERSION
 } from './package-configs';
 
@@ -145,8 +148,19 @@ function installSchematics(_options: any) {
 
         // Configure project options
         for (const target of buildTargets) {
+            if (!target.options) {
+                continue;
+            }
+
+            // Add allowedCommonJsDependencies
+            if (target.options.allowedCommonJsDependencies instanceof Array) {
+                target.options.allowedCommonJsDependencies.push(...PROJECT_ALLOWED_COMMONJS_DEPENDENCIES);
+            } else {
+                target.options.allowedCommonJsDependencies = PROJECT_ALLOWED_COMMONJS_DEPENDENCIES;
+            }
+
             // Add assets
-            if (target.options?.assets instanceof Array) {
+            if (target.options.assets instanceof Array) {
                 const index = target.options.assets.indexOf('src/favicon.ico');
                 if (index >= 0) {
                     target.options.assets.splice(index, 1);
@@ -154,16 +168,24 @@ function installSchematics(_options: any) {
                         host.delete('src/favicon.ico');
                     }
                 }
-                target.options.assets.push(...PROJECT_ASSETS);
+                target.options.assets.push(
+                    ...(_options.baseApp === BaseApp.MES
+                        ? PROJECT_MES_ASSETS
+                        : PROJECT_ASSETS)
+                );
             }
 
             // Add styles
-            if (target.options?.styles instanceof Array) {
-                target.options.styles.push(...PROJECT_STYLES);
+            if (target.options.styles instanceof Array) {
+                target.options.styles.push(
+                    ...(_options.baseApp === BaseApp.MES
+                        ? PROJECT_MES_STYLES
+                        : PROJECT_CORE_STYLES)
+                );
             }
 
             // Add scripts
-            if (target.options?.scripts instanceof Array) {
+            if (target.options.scripts instanceof Array) {
                 target.options.scripts.push(...PROJECT_SCRIPTS);
             }
         }
@@ -207,8 +229,13 @@ function installSchematics(_options: any) {
     ]`,
                 supportedThemes: `[
       "cmf.style.blue",
+      "cmf.style.blue.accessibility",
       "cmf.style.dark",
-      "cmf.style.grey"
+      "cmf.style.dark.accessibility",
+      "cmf.style.gray",
+      "cmf.style.gray.accessibility",
+      "cmf.style.contrast",
+      "cmf.style.contrast.accessibility"
     ]`
             }),
             move(posix.join(sourcePath, 'assets')),
@@ -292,7 +319,7 @@ loadApplicationConfig('assets/config.json').then(() => {
     });
 });`)
 
-        insertImport(source, 'loadApplicationConfig', 'cmf-core');
+        insertImport(source, 'loadApplicationConfig', 'cmf-core/init');
 
         host.overwrite(mainPath, source.getFullText());
     };

@@ -98,7 +98,9 @@ export default function (_options: any): Rule {
 
         const workspace = await readWorkspace(tree);
 
+        let skipMetadata = _options.skipMetadata;
         let lint = _options.lint;
+        delete _options.skipMetadata;
         delete _options.lint;
 
         if (lint === undefined) {
@@ -108,7 +110,7 @@ export default function (_options: any): Rule {
 
         return chain([
             externalSchematic(lint ? '@angular-eslint/schematics' : '@schematics/angular', 'library', { ..._options }),
-            createMetadataSubEntry({ ..._options })
+            !skipMetadata ? createMetadataSubEntry({ ..._options }) : noop()
         ]);
     }
 }

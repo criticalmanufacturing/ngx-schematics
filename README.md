@@ -28,12 +28,12 @@ Update an application with HTML defaults.
 
 #### **Options:** 
 
-| Name             | Description                      | Value Type  | Default Value |
-| ---------------- | -------------------------------- | ----------- | ------------- |
-| `--project`      | The name of the project.         | `string`    |               |
-| `--registry`     | The npm registry to use.         | `string`    |               |
-| `--lint`         | Adds eslint to the project.      | `boolean`   | `true`        |
-| `--baseApp`      | The base app to be used.         | `string`    | `Core`        |
+| Name              | Description                      | Value Type  | Default Value |
+| ----------------- | -------------------------------- | ----------- | ------------- |
+| `--project`       | The name of the project.         | `string`    |               |
+| `--registry`      | The npm registry to use.         | `string`    |               |
+| `--lint`          | Adds eslint to the project.      | `boolean`   | `true`        |
+| `--base-app`      | The base app to be used.         | `string`    | `Core`        |
 
 #### **Usage:**
 ```
@@ -113,10 +113,10 @@ Creates a new, generic Execution View definition in the given or default project
 
 #### **Arguments:** 
 
-| Name          | Description                                                        | Value Type  |
-| ------------- | ------------------------------------------------------------------ | ----------- |
-| `name`        | The name of the action that the execution view will perform.       | `string`    |
-| `entityType`  | The name of the entity type to be performed.                       | `string`    |
+| Name           | Description                                                        | Value Type  |
+| -------------- | ------------------------------------------------------------------ | ----------- |
+| `name`         | The name of the action that the execution view will perform.       | `string`    |
+| `entity-type`  | The name of the entity type to be performed.                       | `string`    |
 
 #### **Options:** 
 
@@ -128,7 +128,7 @@ Creates a new, generic Execution View definition in the given or default project
 
 #### **Usage:**
 ```
-ng generate execution-view [name] --entityType [entityType]
+ng generate execution-view [name] --entity-type [entityType]
 ```
 
 ### **library**
@@ -143,14 +143,15 @@ Creates a new, generic Library project in the current workspace
 
 #### **Options:** 
 
-| Name                 | Description                                                                                | Value Type  | Default Value  |
-| -------------------- | ------------------------------------------------------------------------------------------ | ----------- | -------------- |
-| `--entry-file`       | The path at which to create the library's public API file, relative to the workspace root. | `string`    | `public-api`   |
-| `--prefix`           | A prefix to apply to generated selectors.                                                  | `string`    | `lib`          |
-| `--skipPackageJson`  | Do not add dependencies to the "package.json" file.                                        | `boolean`   | `false`        |
-| `--skipInstall`      | Do not install dependency packages.                                                        | `boolean`   | `false`        |
-| `--skipTsConfig`     | Do not update "tsconfig.json" to add a path mapping for the new library.                   | `boolean`   | `false`        |
-| `--lint`             | Adds eslint to the library.                                                                | `boolean`   |                |
+| Name                  | Description                                                                                | Value Type  | Default Value  |
+| --------------------- | ------------------------------------------------------------------------------------------ | ----------- | -------------- |
+| `--entry-file`        | The path at which to create the library's public API file, relative to the workspace root. | `string`    | `public-api`   |
+| `--prefix`            | A prefix to apply to generated selectors.                                                  | `string`    | `lib`          |
+| `--skip-package-json` | Do not add dependencies to the "package.json" file.                                        | `boolean`   | `false`        |
+| `--skip-install`      | Do not install dependency packages.                                                        | `boolean`   | `false`        |
+| `--skip-ts-config`    | Do not update "tsconfig.json" to add a path mapping for the new library.                   | `boolean`   | `false`        |
+| `--skip-metadata`     | Do not generate metadata for the new library.                                              | `boolean`   | `false`        |
+| `--lint`              | Adds eslint to the library.                                                                | `boolean`   |                |
 
 #### **Usage:**
 ```
@@ -204,10 +205,10 @@ Creates a new, generic Wizard definition in the given or default project
 
 #### **Arguments:** 
 
-| Name          | Description                                          | Value Type  |
-| ------------- | ---------------------------------------------------- | ----------- |
-| `name`        | The name of the action that the wizard will perform. | `string`    |
-| `entityType`  | The name of the entity type to be performed.         | `string`    |
+| Name           | Description                                          | Value Type  |
+| -------------- | ---------------------------------------------------- | ----------- |
+| `name`         | The name of the action that the wizard will perform. | `string`    |
+| `entity-type`  | The name of the entity type to be performed.         | `string`    |
 
 #### **Options:** 
 
@@ -219,7 +220,7 @@ Creates a new, generic Wizard definition in the given or default project
 
 #### **Usage:**
 ```
-ng generate wizard [name] --entityType [entityType]
+ng generate wizard [name] --entity-type [entityType]
 ```
 
 ### **wizard-create-edit**

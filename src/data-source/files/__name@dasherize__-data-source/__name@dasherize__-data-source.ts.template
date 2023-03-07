@@ -1,3 +1,5 @@
+import { Injectable } from '@angular/core';
+
 import {
     UtilService
 } from 'cmf-core';
@@ -39,10 +41,9 @@ import {
  * ### DataSource Outputs
  * * `string` : **value** _(default)_ - Output description
  */
+@Injectable()
 @DataSource({
     name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>-data-source#NAME:<%= nameify(name) %>`,
-    factory: (util: UtilService) => new <%= classify(name) %>DataSource(util),
-    deps: [UtilService],
     settingsComponent: {
         component: <%= classify(name) %>DataSourceSettings
     }

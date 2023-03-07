@@ -155,40 +155,15 @@ describe('Generate Entity Page', () => {
         expect(entityPageContent).toContain(`export class Page${strings.classify(entityPageOptions.name)}Module { }`);
     });
 
-    it('should have defined the path `` for the main component in Routing Module', async() => {
-        const tree = await schematicRunner
-            .runSchematicAsync('entity-page', entityPageOptions, appTree)
-            .toPromise();
-
-        const pathRegExp = new RegExp(`path: '',\\s*component: Page${strings.classify(entityPageOptions.name)}Component`, 'gm');
-
-        const routingModuleContent = tree.readContent(`${pageEntityTypePath}/page-${strings.dasherize(entityPageOptions.name)}-routing.module.ts`);
-        expect(routingModuleContent).toMatch(pathRegExp);
-    });
-
-    it('should have children routes defined in Routing Module', async () => {
+    it('should get the routes for an entity in Routing Module', async () => {
 
         const tree = await schematicRunner
             .runSchematicAsync('entity-page', entityPageOptions, appTree)
             .toPromise();
 
         const routingModuleContent = tree.readContent(`${pageEntityTypePath}/page-${strings.dasherize(entityPageOptions.name)}-routing.module.ts`);
-        const routingModuleChildren = routingModuleContent.match(/children: \[(\r*\n*\s*)(\W|\w)+\]/gm)?.[0];
-        expect(routingModuleChildren).not.toBeNull();
-
-        // Details View
-        const detailsViewRedirectRouteRegExp = new RegExp(`{\\s*path: '',\\s*redirectTo: 'View/Details',\\s*pathMatch: 'full'\\s*}`, 'gm');
-        expect(routingModuleChildren).toMatch(detailsViewRedirectRouteRegExp);
-        const detailsViewRouteRegExp = new RegExp(`{\\s*path: 'View/Details',\\s*component: Page${strings.classify(entityPageOptions.name)}DetailsViewComponent\\s*}`, 'gm');
-        expect(routingModuleChildren).toMatch(detailsViewRouteRegExp);
-
-        // References View
-        const referencesViewRouteRegExp = new RegExp(`{\\s*path: 'View/References',\\s*component: ReferencesView\\s*}`, 'gm');
-        expect(routingModuleChildren).toMatch(referencesViewRouteRegExp);
-
-        // History View
-        const historyViewRouteRegExp = new RegExp(`{\\s*path: 'View/History',\\s*component: HistoryView\\s*}`, 'gm');
-        expect(routingModuleChildren).toMatch(historyViewRouteRegExp);
+        const getRoutes =`const routes: Routes = EntityTypeMetadataService.getRoutes('${strings.classify(entityPageOptions.name)}', Page${strings.classify(entityPageOptions.name)}Component);`;
+        expect(routingModuleContent).toContain(getRoutes);
     });
 
     it('should import Page Module and Router Module', async () => {
@@ -200,15 +175,6 @@ describe('Generate Entity Page', () => {
 
         const routingModulesImportsRegExp = new RegExp(`imports: \\[\\s*((RouterModule\\.forChild\\(routes\\)|Page${strings.classify(entityPageOptions.name)}Module)\\s*,?\\s*){2}\\]`, 'gm')
         expect(routingModuleContent).toMatch(routingModulesImportsRegExp);
-    });
-
-    it('should provide ViewGuard in Routing Module', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('entity-page', entityPageOptions, appTree)
-            .toPromise();
-
-        const routingModuleContent = tree.readContent(`${pageEntityTypePath}/page-${strings.dasherize(entityPageOptions.name)}-routing.module.ts`);
-        expect(routingModuleContent).toContain(`providers: [ViewGuard]`);
     });
 
     it('should export the Routing Module', async () => {
@@ -316,6 +282,17 @@ describe('Generate Entity Page', () => {
             expect(entityPageDetailsViewContent).toContain(`declarations: [Page${strings.classify(entityPageOptions.name)}DetailsViewComponent]`);
             expect(entityPageDetailsViewContent).toContain(`exports: [Page${strings.classify(entityPageOptions.name)}DetailsViewComponent]`);
             expect(entityPageDetailsViewContent).toContain(`export class Page${strings.classify(entityPageOptions.name)}DetailsViewModule { }`);
+        });
+
+        it('should have the Details View route defined in Routing Module', async () => {
+
+            const tree = await schematicRunner
+                .runSchematicAsync('entity-page', entityPageOptions, appTree)
+                .toPromise();
+    
+            const routingModuleContent = tree.readContent(`${pageEntityTypeDetailsViewPath}/page-${strings.dasherize(entityPageOptions.name)}-details-view-routing.module.ts`);
+            const detailsViewRouteRegExp = new RegExp(`{\\s*path: '',\\s*component: Page${strings.classify(entityPageOptions.name)}DetailsViewComponent\\s*}`, 'gm');
+            expect(routingModuleContent).toMatch(detailsViewRouteRegExp);
         });
     });
 });
