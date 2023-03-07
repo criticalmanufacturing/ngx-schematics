@@ -1,5 +1,5 @@
 {
-  "name": "@criticalmanufacturing/ng-schematics",
+  "name": "@criticalmanufacturing/ngx-schematics",
   "version": "10.0.0",
   "description": "Critical Manufacturing angular schematics",
   "scripts": {
