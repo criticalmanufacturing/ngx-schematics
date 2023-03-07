@@ -136,7 +136,7 @@ function installSchematics(_options: any) {
             (workspace.extensions.cli as JsonObject).schematicCollections = [];
         }
 
-        ((workspace.extensions.cli as JsonObject).schematicCollections as JsonArray).unshift('@criticalmanufacturing/ng-schematics');
+        ((workspace.extensions.cli as JsonObject).schematicCollections as JsonArray).unshift('@criticalmanufacturing/ngx-schematics');
 
         const buildTargets = [];
 

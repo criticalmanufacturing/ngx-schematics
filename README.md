@@ -258,7 +258,7 @@ npm install
 
 ## **Testing**
 
-To test locally, install `@criticalmanufacturing/ng-schematics` globally and use the `schematics` command line tool. That tool acts the same as the `generate` command of the Angular CLI, but also has a debug mode.
+To test locally, install `@criticalmanufacturing/ngx-schematics` globally and use the `schematics` command line tool. That tool acts the same as the `generate` command of the Angular CLI, but also has a debug mode.
 
 Check the documentation with
 

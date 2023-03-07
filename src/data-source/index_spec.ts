@@ -5,7 +5,7 @@ import { nameify } from "../utility/string";
 
 describe('Generate Data Source', () => {
     const schematicRunner = new SchematicTestRunner(
-        '@criticalmanufacturing/ng-schematics',
+        '@criticalmanufacturing/ngx-schematics',
         require.resolve('../collection.json'),
     );
 
@@ -43,23 +43,15 @@ describe('Generate Data Source', () => {
     let appTree: UnitTestTree;
 
     beforeEach(async () => {
-        appTree = await schematicRunner
-            .runExternalSchematicAsync('@schematics/angular', 'workspace', workspaceOptions)
-            .toPromise();
+        appTree = await schematicRunner.runExternalSchematic('@schematics/angular', 'workspace', workspaceOptions);
 
-        appTree = await schematicRunner
-            .runExternalSchematicAsync('@schematics/angular', 'application', appOptions, appTree)
-            .toPromise();
+        appTree = await schematicRunner.runExternalSchematic('@schematics/angular', 'application', appOptions, appTree);
 
-        appTree = await schematicRunner
-            .runSchematicAsync('library', libraryOptions, appTree)
-            .toPromise();
+        appTree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
     });
 
     it('should create the data source files', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('data-source', dataSourceOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
 
         const files = getAllFilesFromDir(`projects/${libraryOptions.name}/src/lib/${dataSourceOptions.name}-data-source`, tree);
 
@@ -77,9 +69,7 @@ describe('Generate Data Source', () => {
 
         const options = { ...dataSourceOptions, style: 'css' };
 
-        const tree = await schematicRunner
-            .runSchematicAsync('data-source', options, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('data-source', options, appTree);
 
         const files = getAllFilesFromDir(`projects/${libraryOptions.name}/src/lib/${dataSourceOptions.name}-data-source/${dataSourceOptions.name}-data-source-settings`, tree);
 
@@ -93,9 +83,7 @@ describe('Generate Data Source', () => {
     it('should not create the data source style file', async () => {
         const options = { ...dataSourceOptions, style: 'none' };
 
-        const tree = await schematicRunner
-            .runSchematicAsync('data-source', options, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('data-source', options, appTree);
 
         const files = getAllFilesFromDir(`projects/${libraryOptions.name}/src/lib/${dataSourceOptions.name}-data-source/${dataSourceOptions.name}-data-source-settings`, tree);
 
@@ -109,18 +97,14 @@ describe('Generate Data Source', () => {
     });
 
     it('should have the DataSource decorator', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('data-source', dataSourceOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
 
         const dataSourceContent = tree.readContent(defaultDataSourceFilePath);
         expect(dataSourceContent).toMatch(/@DataSource\(/);
     });
 
     it('should have the name and settingsComponent properties in the DataSource decorator', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('data-source', dataSourceOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
 
         const dataSourceSettingsName = `${strings.classify(dataSourceOptions.name)}DataSourceSettings`;
         
@@ -130,9 +114,7 @@ describe('Generate Data Source', () => {
     });
 
     it('should extend DataSourceGeneric and implement DataSourceSetting Def', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('data-source', dataSourceOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
 
         const dataSourceClassName = `${strings.classify(dataSourceOptions.name)}DataSource`;
 
@@ -141,18 +123,14 @@ describe('Generate Data Source', () => {
     });
 
     it('should have the constructor receiving the UtilService and providing it to the super', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('data-source', dataSourceOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
 
         const dataSourceContent = tree.readContent(defaultDataSourceFilePath);
         expect(dataSourceContent).toMatch(/constructor\(util: UtilService\) {\s*super\(util\);\s*}/gm)
     });
 
     it('should have the function `execute` declared', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('data-source', dataSourceOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
 
         const dataSourceContent = tree.readContent(defaultDataSourceFilePath);
         expect(dataSourceContent).toContain("public async execute(): Promise<DataSourceExecutionOutput | void> {");
@@ -161,9 +139,7 @@ describe('Generate Data Source', () => {
     describe('- Generate Data Source Settings', () => {
 
         it('should create the data source settings file', async () => { 
-            const tree = await schematicRunner
-                .runSchematicAsync('data-source', dataSourceOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
 
             const files = getAllFilesFromDir(`projects/${libraryOptions.name}/src/lib/${dataSourceOptions.name}-data-source/${dataSourceOptions.name}-data-source-settings`, tree);
 
@@ -177,9 +153,7 @@ describe('Generate Data Source', () => {
         });
 
         it('should generate the html file with `cmf-core-dashboards-datasource-settings` component selector', async () => {
-            const tree = await schematicRunner
-                .runSchematicAsync('data-source', dataSourceOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
 
             const dataSourceName = nameify(dataSourceOptions.name);
             const templateRegExp = new RegExp(
@@ -194,18 +168,14 @@ describe('Generate Data Source', () => {
         });
 
         it('should generate the style file empty', async () => {
-            const tree = await schematicRunner
-                .runSchematicAsync('data-source', dataSourceOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
 
             const dataSourceSettingsStyleContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.less`);
             expect(dataSourceSettingsStyleContent).toEqual('');
         });
 
         it('should have the Component decorator with properties selector, templateUrl, and styleUrls', async () => {
-            const tree = await schematicRunner
-                .runSchematicAsync('data-source', dataSourceOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
 
             const dataSourceSettingsContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.ts`);
             expect(dataSourceSettingsContent).toMatch(/@Component\(/);
@@ -218,9 +188,7 @@ describe('Generate Data Source', () => {
 
             const options = { ...dataSourceOptions, style: 'css' };
 
-            const tree = await schematicRunner
-                .runSchematicAsync('data-source', options, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('data-source', options, appTree);
 
             const dataSourceSettingsContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.ts`);
             expect(dataSourceSettingsContent).toContain(`styleUrls: ['./${strings.dasherize(dataSourceOptions.name)}-data-source-settings.component.${options.style}']`);
@@ -230,18 +198,14 @@ describe('Generate Data Source', () => {
 
             const options = { ...dataSourceOptions, style: 'none' };
 
-            const tree = await schematicRunner
-                .runSchematicAsync('data-source', options, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('data-source', options, appTree);
 
             const dataSourceSettingsContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.ts`);
             expect(dataSourceSettingsContent).withContext('The styleUrls should not be fulfilled').not.toMatch(/styleUrls: \['.\/(\w*-*)+.component.\w*'\]/);
         });
 
         it('should extend CustomizableComponent', async () => {
-            const tree = await schematicRunner
-                .runSchematicAsync('data-source', dataSourceOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
 
             const dataSourceSettingsClassName = `${strings.classify(dataSourceOptions.name)}DataSourceSettingsComponent`;
 
@@ -250,27 +214,21 @@ describe('Generate Data Source', () => {
         });
 
         it('should have the constructor receiving the ViewContainerRef and providing it to the super', async () => {
-            const tree = await schematicRunner
-                .runSchematicAsync('data-source', dataSourceOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
     
             const dataSourceSettingsContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.ts`);
             expect(dataSourceSettingsContent).toMatch(/constructor\(viewContainerRef: ViewContainerRef\) {\s*super\(viewContainerRef\);\s*}/gm)
         });
 
         it('should import CommonModule and DataSourceSettingsModule in NgModule', async () => {
-            const tree = await schematicRunner
-                .runSchematicAsync('data-source', dataSourceOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
     
             const dataSourceSettingsContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.ts`);
             expect(dataSourceSettingsContent).toMatch(/imports: \[\s*((CommonModule|DataSourceSettingsModule)\s*,?\s*){2}\]/gm);
         });
 
         it('should be declared and exported in NgModule', async () => {
-            const tree = await schematicRunner
-                .runSchematicAsync('data-source', dataSourceOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
     
             const dataSourceSettingsClassName = `${strings.classify(dataSourceOptions.name)}DataSourceSettings`;
     

@@ -3,7 +3,7 @@ import { SchematicTestRunner, UnitTestTree } from "@angular-devkit/schematics/te
 
 describe('Generate Package Info', () => {
     const schematicRunner = new SchematicTestRunner(
-        '@criticalmanufacturing/ng-schematics',
+        '@criticalmanufacturing/ngx-schematics',
         require.resolve('../collection.json'),
     );
 
@@ -38,36 +38,27 @@ describe('Generate Package Info', () => {
     let appTree: UnitTestTree;
 
     beforeEach(async () => {
-        appTree = await schematicRunner
-            .runExternalSchematicAsync('@schematics/angular', 'workspace', workspaceOptions)
-            .toPromise();
+        appTree = await schematicRunner.runExternalSchematic('@schematics/angular', 'workspace', workspaceOptions);
 
-        appTree = await schematicRunner
-            .runExternalSchematicAsync('@schematics/angular', 'application', appOptions, appTree)
-            .toPromise();
+        appTree = await schematicRunner.runExternalSchematic('@schematics/angular', 'application', appOptions, appTree);
 
-        appTree = await schematicRunner
-            .runSchematicAsync('library', libraryOptions, appTree)
-            .toPromise();
+        appTree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
     });
 
     it('should generate the package-info having a Widget', async () => {
 
         const widgetName = 'test-widget';
 
-        let tree = await schematicRunner
-            .runSchematicAsync(
+        let tree = await schematicRunner.runSchematic(
                 'widget',
                 {
                     name: widgetName,
                     project: libraryOptions.name
                 },
                 appTree
-            ).toPromise();
+            );
 
-        tree = await schematicRunner
-            .runSchematicAsync('package-info', packageInfoOptions, tree)
-            .toPromise();
+        tree = await schematicRunner.runSchematic('package-info', packageInfoOptions, tree);
 
         const widgetComponentName = `${strings.classify(widgetName)}WidgetComponent`;
 
@@ -81,19 +72,16 @@ describe('Generate Package Info', () => {
 
         const dataSourceName = 'test-data-source';
 
-        let tree = await schematicRunner
-            .runSchematicAsync(
+        let tree = await schematicRunner.runSchematic(
                 'data-source',
                 {
                     name: dataSourceName,
                     project: libraryOptions.name
                 },
                 appTree
-            ).toPromise();
+            );
 
-        tree = await schematicRunner
-            .runSchematicAsync('package-info', packageInfoOptions, tree)
-            .toPromise();
+        tree = await schematicRunner.runSchematic('package-info', packageInfoOptions, tree);
 
         const dataSourceComponentName = `${strings.classify(dataSourceName)}DataSource`;
 
@@ -107,8 +95,7 @@ describe('Generate Package Info', () => {
 
         const converterName = 'test-converter';
 
-        let tree = await schematicRunner
-            .runSchematicAsync(
+        let tree = await schematicRunner.runSchematic(
                 'converter',
                 {
                     name: converterName,
@@ -116,11 +103,9 @@ describe('Generate Package Info', () => {
                     project: libraryOptions.name
                 },
                 appTree
-            ).toPromise();
+            );
 
-        tree = await schematicRunner
-            .runSchematicAsync('package-info', packageInfoOptions, tree)
-            .toPromise();
+        tree = await schematicRunner.runSchematic('package-info', packageInfoOptions, tree);
 
         const converterComponentName = `${strings.classify(converterName)}Pipe`;
 
@@ -134,8 +119,7 @@ describe('Generate Package Info', () => {
 
         const entityPageName = 'test-entity-page';
 
-        let tree = await schematicRunner
-            .runSchematicAsync(
+        let tree = await schematicRunner.runSchematic(
                 'entity-page',
                 {
                     name: entityPageName,
@@ -143,11 +127,9 @@ describe('Generate Package Info', () => {
                     namespace: 'TestNamespace'
                 },
                 appTree
-            ).toPromise();
+            );
 
-        tree = await schematicRunner
-            .runSchematicAsync('package-info', packageInfoOptions, tree)
-            .toPromise();
+        tree = await schematicRunner.runSchematic('package-info', packageInfoOptions, tree);
 
         const entityPageClassName = `Page${strings.classify(entityPageName)}Component`;
 

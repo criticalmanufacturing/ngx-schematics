@@ -5,7 +5,7 @@ import { nameify } from "../utility/string";
 describe('Generate Converter', () => {
 
     const schematicRunner = new SchematicTestRunner(
-        '@criticalmanufacturing/ng-schematics',
+        '@criticalmanufacturing/ngx-schematics',
         require.resolve('../collection.json'),
     );
 
@@ -40,23 +40,15 @@ describe('Generate Converter', () => {
     let appTree: UnitTestTree;
 
     beforeEach(async () => {
-        appTree = await schematicRunner
-            .runExternalSchematicAsync('@schematics/angular', 'workspace', workspaceOptions)
-            .toPromise();
+        appTree = await schematicRunner.runExternalSchematic('@schematics/angular', 'workspace', workspaceOptions);
 
-        appTree = await schematicRunner
-            .runExternalSchematicAsync('@schematics/angular', 'application', appOptions, appTree)
-            .toPromise();
+        appTree = await schematicRunner.runExternalSchematic('@schematics/angular', 'application', appOptions, appTree);
 
-        appTree = await schematicRunner
-            .runSchematicAsync('library', libraryOptions, appTree)
-            .toPromise();
+        appTree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
     });
 
     it('should create the converter file', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('converter', converterOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('converter', converterOptions, appTree);
 
         expect(tree.getDir(`${converterOptions.path}/${converterOptions.name}`).subfiles).toEqual(
             jasmine.arrayContaining([
@@ -66,9 +58,7 @@ describe('Generate Converter', () => {
     });
 
     it('should have the Pipe and Converter decorators', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('converter', converterOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('converter', converterOptions, appTree);
 
         const pipeContent = tree.readContent(`${converterOptions.path}/${converterOptions.name}/${converterOptions.name}.pipe.ts`);
 
@@ -79,9 +69,7 @@ describe('Generate Converter', () => {
     });
 
     it('should have the name property in the Converter decorator', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('converter', converterOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('converter', converterOptions, appTree);
 
         const converterName = `${nameify(converterOptions.name)} Converter`;
 
@@ -90,9 +78,7 @@ describe('Generate Converter', () => {
     });
 
     it('should have the name property in the Pipe decorator', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('converter', converterOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('converter', converterOptions, appTree);
 
         const converterName = `${strings.camelize(converterOptions.name)}`;
 
@@ -101,9 +87,7 @@ describe('Generate Converter', () => {
     });
 
     it('should implement PipeTransform', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('converter', converterOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('converter', converterOptions, appTree);
 
         const converterClassName = `${strings.classify(converterOptions.name)}Pipe`;
 
@@ -113,9 +97,7 @@ describe('Generate Converter', () => {
     });
 
     it('should be declared and exported in NgModule', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('converter', converterOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('converter', converterOptions, appTree);
 
         const converterClassName = `${strings.classify(converterOptions.name)}Pipe`;
 

@@ -4,7 +4,7 @@ import { nameify } from "../utility/string";
 
 describe('Generate Execution View', () => {
     const schematicRunner = new SchematicTestRunner(
-        '@criticalmanufacturing/ng-schematics',
+        '@criticalmanufacturing/ngx-schematics',
         require.resolve('../collection.json'),
     );
 
@@ -42,23 +42,15 @@ describe('Generate Execution View', () => {
     let appTree: UnitTestTree;
 
     beforeEach(async () => {
-        appTree = await schematicRunner
-            .runExternalSchematicAsync('@schematics/angular', 'workspace', workspaceOptions)
-            .toPromise();
+        appTree = await schematicRunner.runExternalSchematic('@schematics/angular', 'workspace', workspaceOptions);
 
-        appTree = await schematicRunner
-            .runExternalSchematicAsync('@schematics/angular', 'application', appOptions, appTree)
-            .toPromise();
+        appTree = await schematicRunner.runExternalSchematic('@schematics/angular', 'application', appOptions, appTree);
 
-        appTree = await schematicRunner
-            .runSchematicAsync('library', libraryOptions, appTree)
-            .toPromise();
+        appTree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
     });
 
     it('should create the execution view files', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('execution-view', executionViewOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('execution-view', executionViewOptions, appTree);
 
         const dasherizedExecutionViewName = strings.dasherize(executionViewOptions.name);
 
@@ -75,9 +67,7 @@ describe('Generate Execution View', () => {
 
         const options = { ...executionViewOptions, style: 'css' };
 
-        const tree = await schematicRunner
-            .runSchematicAsync('execution-view', options, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('execution-view', options, appTree);
 
         const dasherizedExecutionViewName = strings.dasherize(executionViewOptions.name);
 
@@ -91,9 +81,7 @@ describe('Generate Execution View', () => {
     it('should not create the execution view style file', async () => {
         const options = { ...executionViewOptions, style: 'none' };
 
-        const tree = await schematicRunner
-            .runSchematicAsync('execution-view', options, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('execution-view', options, appTree);
 
         const files = tree.getDir(executionViewPath).subfiles;
 
@@ -107,9 +95,7 @@ describe('Generate Execution View', () => {
     });
 
     it('should generate the style file empty', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('execution-view', executionViewOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('execution-view', executionViewOptions, appTree);
 
         const dasherizedExecutionViewName = strings.dasherize(executionViewOptions.name);
 
@@ -118,9 +104,7 @@ describe('Generate Execution View', () => {
     });
 
     it('should generate the html file with `cmf-core-controls-execution-view` component selector', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('execution-view', executionViewOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('execution-view', executionViewOptions, appTree);
 
         const dasherizedExecutionViewName = strings.dasherize(executionViewOptions.name);
 
@@ -141,9 +125,7 @@ describe('Generate Execution View', () => {
 
     it('should have the Component decorator with properties selector, templateUrl, styleUrls, and viewProviders', async () => {
 
-        const tree = await schematicRunner
-            .runSchematicAsync('execution-view', executionViewOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('execution-view', executionViewOptions, appTree);
 
         const executionViewContent = tree.readContent(`${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`);
         expect(executionViewContent).toMatch(/@Component\(/);
@@ -154,18 +136,14 @@ describe('Generate Execution View', () => {
     });
 
     it('should extend CustomizableComponent', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('execution-view', executionViewOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('execution-view', executionViewOptions, appTree);
 
         const executionViewContent = tree.readContent(`${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`);
         expect(executionViewContent).toContain(`export class Wizard${strings.classify(executionViewOptions.name)}Component extends CustomizableComponent`);
     });
 
     it('should implement TransactionExecutionView and OnInit', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('execution-view', executionViewOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('execution-view', executionViewOptions, appTree);
 
         const executionViewContent = tree.readContent(`${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`);
         expect(executionViewContent).toContain(`implements TransactionExecutionView, OnInit`);
@@ -177,9 +155,7 @@ describe('Generate Execution View', () => {
     });
 
     it('should have the constructor receiving the ViewContainerRef, PageBag, UtilService, and EntityTypeService', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('execution-view', executionViewOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('execution-view', executionViewOptions, appTree);
 
         const executionViewContent = tree.readContent(`${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`);
         expect(executionViewContent).toMatch(/constructor\(\s*((viewContainerRef: ViewContainerRef|private pageBag: PageBag|private util: UtilService|private entityTypes: EntityTypeService)\s*,?\s*){4}\)/gm);
@@ -187,18 +163,14 @@ describe('Generate Execution View', () => {
     });
 
     it('should import CommonModule, ExecutionViewModule, and TransactionExecutionViewModule in NgModule', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('execution-view', executionViewOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('execution-view', executionViewOptions, appTree);
 
         const executionViewContent = tree.readContent(`${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`);
         expect(executionViewContent).toMatch(/imports: \[\s*((CommonModule|ExecutionViewModule|TransactionExecutionViewModule)\s*,?\s*){3}\]/gm);
     });
 
     it('should be declared and exported in NgModule', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('execution-view', executionViewOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('execution-view', executionViewOptions, appTree);
 
         const executionViewContent = tree.readContent(`${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`);
         expect(executionViewContent).toContain(`declarations: [Wizard${strings.classify(executionViewOptions.name)}Component]`);

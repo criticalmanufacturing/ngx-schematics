@@ -5,7 +5,7 @@ import { nameify } from "../utility/string";
 
 describe('Generate Widget', () => {
     const schematicRunner = new SchematicTestRunner(
-        '@criticalmanufacturing/ng-schematics',
+        '@criticalmanufacturing/ngx-schematics',
         require.resolve('../collection.json'),
     );
 
@@ -43,23 +43,15 @@ describe('Generate Widget', () => {
     let appTree: UnitTestTree;
 
     beforeEach(async () => {
-        appTree = await schematicRunner
-            .runExternalSchematicAsync('@schematics/angular', 'workspace', workspaceOptions)
-            .toPromise();
+        appTree = await schematicRunner.runExternalSchematic('@schematics/angular', 'workspace', workspaceOptions);
 
-        appTree = await schematicRunner
-            .runExternalSchematicAsync('@schematics/angular', 'application', appOptions, appTree)
-            .toPromise();
+        appTree = await schematicRunner.runExternalSchematic('@schematics/angular', 'application', appOptions, appTree);
 
-        appTree = await schematicRunner
-            .runSchematicAsync('library', libraryOptions, appTree)
-            .toPromise();
+        appTree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
     });
 
     it('should create the widget files', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('widget', widgetOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
 
         const files = getAllFilesFromDir(`projects/${libraryOptions.name}/src/lib/${widgetOptions.name}-widget`, tree);
 
@@ -79,9 +71,7 @@ describe('Generate Widget', () => {
 
         const options = { ...widgetOptions, style: 'css' };
 
-        const tree = await schematicRunner
-            .runSchematicAsync('widget', options, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('widget', options, appTree);
 
         const files = getAllFilesFromDir(`projects/${libraryOptions.name}/src/lib/${widgetOptions.name}-widget/${widgetOptions.name}-widget-settings`, tree);
 
@@ -95,9 +85,7 @@ describe('Generate Widget', () => {
     it('should not create the widget style file', async () => {
         const options = { ...widgetOptions, style: 'none' };
 
-        const tree = await schematicRunner
-            .runSchematicAsync('widget', options, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('widget', options, appTree);
 
         const files = getAllFilesFromDir(`projects/${libraryOptions.name}/src/lib/${widgetOptions.name}-widget`, tree);
         expect(files).toHaveSize(4);
@@ -112,9 +100,7 @@ describe('Generate Widget', () => {
     });
 
     it('should have the Component and Widget decorators', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('widget', widgetOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
 
         const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
         expect(widgetContent).toMatch(/@Widget\(/);
@@ -122,9 +108,7 @@ describe('Generate Widget', () => {
     });
 
     it('should have the name, iconClass, and settingsComponent properties in the Widget decorator', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('widget', widgetOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
         
         const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
         expect(widgetContent).toContain(`name: $localize\`:@@${strings.dasherize(widgetOptions.project)}/${strings.dasherize(widgetOptions.name)}-widget#NAME:${nameify(widgetOptions.name)} Widget\``);
@@ -136,9 +120,7 @@ describe('Generate Widget', () => {
 
         const options = { ...widgetOptions, style: 'css' };
 
-        const tree = await schematicRunner
-            .runSchematicAsync('widget', options, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('widget', options, appTree);
 
         const widgetSettingsContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
         expect(widgetSettingsContent).toContain(`styleUrls: ['./${strings.dasherize(widgetOptions.name)}-widget.component.${options.style}']`);
@@ -148,18 +130,14 @@ describe('Generate Widget', () => {
 
         const options = { ...widgetOptions, style: 'none' };
 
-        const tree = await schematicRunner
-            .runSchematicAsync('widget', options, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('widget', options, appTree);
 
         const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
         expect(widgetContent).withContext('The styleUrls should not be fulfilled').not.toMatch(/styleUrls: \['.\/(\w*-*)+-widget.component.\w*'\]/);
     });
 
     it('should have the selector, templateUrl, and styleUrls properties in the Component decorator', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('widget', widgetOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
         
         const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
         expect(widgetContent).toContain(`selector: '${strings.dasherize(widgetOptions.project)}-${strings.dasherize(widgetOptions.name)}-widget'`);
@@ -168,9 +146,7 @@ describe('Generate Widget', () => {
     });
 
     it('should extend WidgetGeneric and implement WidgetRepresentation', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('widget', widgetOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
 
         const widgetClassName = `${strings.classify(widgetOptions.name)}WidgetComponent`;
 
@@ -179,9 +155,7 @@ describe('Generate Widget', () => {
     });
 
     it('should have the constructor receiving the ViewContainerRef, ElementRef and FeedbackService.', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('widget', widgetOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
 
         const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
         expect(widgetContent).toMatch(/constructor\(\s*((viewContainerRef: ViewContainerRef|elementRef: ElementRef|feedback: FeedbackService)\s*,?\s*){3}\)/gm);
@@ -189,9 +163,7 @@ describe('Generate Widget', () => {
     });
 
     it('should be declared and exported in NgModule', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('widget', widgetOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
 
         const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
         expect(widgetContent).toContain(`declarations: [${strings.classify(widgetOptions.name)}WidgetComponent]`);
@@ -202,9 +174,7 @@ describe('Generate Widget', () => {
     describe('- Generate Widget Settings', () => {
 
         it('should create the widget settings file', async () => { 
-            const tree = await schematicRunner
-                .runSchematicAsync('widget', widgetOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
 
             const files = getAllFilesFromDir(`projects/${libraryOptions.name}/src/lib/${widgetOptions.name}-widget/${widgetOptions.name}-widget-settings`, tree);
 
@@ -218,9 +188,7 @@ describe('Generate Widget', () => {
         });
 
         it('should generate the html file with `cmf-core-dashboards-widgetSettings` component selector', async () => {
-            const tree = await schematicRunner
-                .runSchematicAsync('widget', widgetOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
 
             const templateRegExp = new RegExp(
                 `<cmf-core-dashboards-widgetSettings>\\s*\\` +
@@ -231,18 +199,14 @@ describe('Generate Widget', () => {
         });
 
         it('should generate the style file empty', async () => {
-            const tree = await schematicRunner
-                .runSchematicAsync('widget', widgetOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
 
             const widgetSettingsStyleContent = tree.readContent(`${defaultWidgetSettingsComponentFilePath}.less`);
             expect(widgetSettingsStyleContent).toEqual('');
         });
 
         it('should have the Component decorator with properties selector, templateUrl, and styleUrls', async () => {
-            const tree = await schematicRunner
-                .runSchematicAsync('widget', widgetOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
 
             const widgetSettingsContent = tree.readContent(`${defaultWidgetSettingsComponentFilePath}.ts`);
             expect(widgetSettingsContent).toMatch(/@Component\(/);
@@ -255,9 +219,7 @@ describe('Generate Widget', () => {
 
             const options = { ...widgetOptions, style: 'css' };
 
-            const tree = await schematicRunner
-                .runSchematicAsync('widget', options, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('widget', options, appTree);
 
             const widgetSettingsContent = tree.readContent(`${defaultWidgetSettingsComponentFilePath}.ts`);
             expect(widgetSettingsContent).toContain(`styleUrls: ['./${strings.dasherize(widgetOptions.name)}-widget-settings.component.${options.style}']`);
@@ -267,18 +229,14 @@ describe('Generate Widget', () => {
 
             const options = { ...widgetOptions, style: 'none' };
 
-            const tree = await schematicRunner
-                .runSchematicAsync('widget', options, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('widget', options, appTree);
 
             const widgetSettingsContent = tree.readContent(`${defaultWidgetSettingsComponentFilePath}.ts`);
             expect(widgetSettingsContent).withContext('The styleUrls should not be fulfilled').not.toMatch(/styleUrls: \['.\/(\w*-*)+.component.\w*'\]/);
         });
 
         it('should extend CustomizableComponent', async () => {
-            const tree = await schematicRunner
-                .runSchematicAsync('widget', widgetOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
 
             const widgetSettingsClassName = `${strings.classify(widgetOptions.name)}WidgetSettingsComponent`;
 
@@ -287,27 +245,21 @@ describe('Generate Widget', () => {
         });
 
         it('should have the constructor receiving the ViewContainerRef and providing it to the super', async () => {
-            const tree = await schematicRunner
-                .runSchematicAsync('widget', widgetOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
     
             const widgetSettingsContent = tree.readContent(`${defaultWidgetSettingsComponentFilePath}.ts`);
             expect(widgetSettingsContent).toMatch(/constructor\(viewContainerRef: ViewContainerRef\) {\s*super\(viewContainerRef\);\s*}/gm)
         });
 
         it('should import WidgetSettingsModule in NgModule', async () => {
-            const tree = await schematicRunner
-                .runSchematicAsync('widget', widgetOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
     
             const widgetSettingsContent = tree.readContent(`${defaultWidgetSettingsComponentFilePath}.ts`);
             expect(widgetSettingsContent).toContain('imports: [WidgetSettingsModule]');
         });
 
         it('should be declared and exported in NgModule', async () => {
-            const tree = await schematicRunner
-                .runSchematicAsync('widget', widgetOptions, appTree)
-                .toPromise();
+            const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
     
             const widgetSettingsClassName = `${strings.classify(widgetOptions.name)}WidgetSettings`;
     

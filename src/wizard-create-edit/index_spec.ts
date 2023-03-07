@@ -3,7 +3,7 @@ import { SchematicTestRunner, UnitTestTree } from "@angular-devkit/schematics/te
 
 describe('Generate Wizard Create Edit', () => {
     const schematicRunner = new SchematicTestRunner(
-        '@criticalmanufacturing/ng-schematics',
+        '@criticalmanufacturing/ngx-schematics',
         require.resolve('../collection.json'),
     );
 
@@ -41,23 +41,15 @@ describe('Generate Wizard Create Edit', () => {
     let appTree: UnitTestTree;
 
     beforeEach(async () => {
-        appTree = await schematicRunner
-            .runExternalSchematicAsync('@schematics/angular', 'workspace', workspaceOptions)
-            .toPromise();
+        appTree = await schematicRunner.runExternalSchematic('@schematics/angular', 'workspace', workspaceOptions);
 
-        appTree = await schematicRunner
-            .runExternalSchematicAsync('@schematics/angular', 'application', appOptions, appTree)
-            .toPromise();
+        appTree = await schematicRunner.runExternalSchematic('@schematics/angular', 'application', appOptions, appTree);
 
-        appTree = await schematicRunner
-            .runSchematicAsync('library', libraryOptions, appTree)
-            .toPromise();
+        appTree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
     });
 
     it('should create the wizard files', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('wizard-create-edit', wizardOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('wizard-create-edit', wizardOptions, appTree);
 
         const dasherizedWizardName = strings.dasherize(wizardOptions.name);
 
@@ -74,9 +66,7 @@ describe('Generate Wizard Create Edit', () => {
 
         const options = { ...wizardOptions, style: 'css' };
 
-        const tree = await schematicRunner
-            .runSchematicAsync('wizard-create-edit', options, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('wizard-create-edit', options, appTree);
 
         const dasherizedWizardName = strings.dasherize(wizardOptions.name);
 
@@ -90,9 +80,7 @@ describe('Generate Wizard Create Edit', () => {
     it('should not create the wizard style file', async () => {
         const options = { ...wizardOptions, style: 'none' };
 
-        const tree = await schematicRunner
-            .runSchematicAsync('wizard-create-edit', options, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('wizard-create-edit', options, appTree);
 
         const files = tree.getDir(wizardPath).subfiles;
 
@@ -106,9 +94,7 @@ describe('Generate Wizard Create Edit', () => {
     });
 
     it('should generate the style file empty', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('wizard-create-edit', wizardOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('wizard-create-edit', wizardOptions, appTree);
 
         const dasherizedWizardName = strings.dasherize(wizardOptions.name);
 
@@ -117,9 +103,7 @@ describe('Generate Wizard Create Edit', () => {
     });
 
     it('should generate the html file with `cmf-core-business-controls-createEditEntity` component selector', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('wizard-create-edit', wizardOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('wizard-create-edit', wizardOptions, appTree);
 
         const dasherizedWizardName = strings.dasherize(wizardOptions.name);
 
@@ -149,9 +133,7 @@ describe('Generate Wizard Create Edit', () => {
 
     it('should have the Component decorator with properties selector, templateUrl, and styleUrls', async () => {
 
-        const tree = await schematicRunner
-            .runSchematicAsync('wizard-create-edit', wizardOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('wizard-create-edit', wizardOptions, appTree);
 
         const wizardContent = tree.readContent(`${wizardPath}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.ts`);
         expect(wizardContent).toMatch(/@Component\(/);
@@ -161,18 +143,14 @@ describe('Generate Wizard Create Edit', () => {
     });
 
     it('should extend CustomizableComponent', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('wizard-create-edit', wizardOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('wizard-create-edit', wizardOptions, appTree);
 
         const wizardContent = tree.readContent(`${wizardPath}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.ts`);
         expect(wizardContent).toContain(`export class WizardCreateEdit${strings.classify(wizardOptions.name)}Component extends CustomizableComponent`);
     });
 
     it('should implement OnInit', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('wizard-create-edit', wizardOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('wizard-create-edit', wizardOptions, appTree);
 
         const wizardContent = tree.readContent(`${wizardPath}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.ts`);
         expect(wizardContent).toContain(`implements OnInit`);
@@ -180,9 +158,7 @@ describe('Generate Wizard Create Edit', () => {
     });
 
     it('should have the constructor receiving the ViewContainerRef, PageBag, UtilService, and EntityTypeService', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('wizard-create-edit', wizardOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('wizard-create-edit', wizardOptions, appTree);
 
         const wizardContent = tree.readContent(`${wizardPath}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.ts`);
         expect(wizardContent).toMatch(/constructor\(\s*((viewContainerRef: ViewContainerRef|private _pageBag: PageBag|private util: UtilService|private entityTypes: EntityTypeService)\s*,?\s*){4}\)/gm);
@@ -190,9 +166,7 @@ describe('Generate Wizard Create Edit', () => {
     });
 
     it('should implement the onInitialSetupStart, onInitialSetupFinish, and onBeforeServiceCall functions', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('wizard-create-edit', wizardOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('wizard-create-edit', wizardOptions, appTree);
         
         const wizardContent = tree.readContent(`${wizardPath}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.ts`);
         expect(wizardContent).toContain('public onInitialSetupStart = (): Cmf.Foundation.BusinessOrchestration.BaseInput[] => {');
@@ -201,18 +175,14 @@ describe('Generate Wizard Create Edit', () => {
     });
 
     it('should import CommonModule, CreateEditEntityModule, and CreateEditStepGeneralDataModule in NgModule', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('wizard-create-edit', wizardOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('wizard-create-edit', wizardOptions, appTree);
 
         const wizardContent = tree.readContent(`${wizardPath}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.ts`);
         expect(wizardContent).toMatch(/imports: \[\s*((CommonModule|CreateEditEntityModule|CreateEditStepGeneralDataModule)\s*,?\s*){3}\]/gm);
     });
 
     it('should be declared and exported in NgModule', async () => {
-        const tree = await schematicRunner
-            .runSchematicAsync('wizard-create-edit', wizardOptions, appTree)
-            .toPromise();
+        const tree = await schematicRunner.runSchematic('wizard-create-edit', wizardOptions, appTree);
 
         const wizardContent = tree.readContent(`${wizardPath}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.ts`);
         expect(wizardContent).toContain(`declarations: [WizardCreateEdit${strings.classify(wizardOptions.name)}Component]`);
