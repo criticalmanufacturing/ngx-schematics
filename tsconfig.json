@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "baseUrl": "tsconfig",
-    "lib": ["es2018", "dom"],
+    "lib": ["es2020", "dom"],
     "declaration": true,
+    "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": true,
@@ -16,9 +17,8 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strictNullChecks": true,
-    "target": "es6",
     "types": ["jasmine", "node"]
   },
   "include": ["src/**/*"],
-  "exclude": ["src/*/files/**/*"]
+  "exclude": ["src/**/files/**/*"]
 }
