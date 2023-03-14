@@ -12,11 +12,12 @@
     "noImplicitThis": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
-    "rootDir": "src/",
+    "rootDir": ".",
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strictNullChecks": true,
+    "resolveJsonModule": true,
     "types": ["jasmine", "node"]
   },
   "include": ["src/**/*"],

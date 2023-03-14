@@ -1,3 +1,5 @@
+import { version } from '../../package.json';
+
 /**
  * Project Core Base Module
  */
@@ -21,10 +23,16 @@ export enum BaseApp {
     MES = 'MES'
 }
 
+// 10.0.0 -> release-100; 10.1.0 -> release-101; 10.1.1 -> release-1011
+let distTag = /^([1-9]\d*|0)(\.(([1-9]\d*)|0)){2}/.exec(version)?.[0].replace(/\./g, '');
+if (distTag?.endsWith('0')) {
+    distTag = 'release-' + distTag.slice(0, -1);
+}
+
 /**
  * Current Version
  */
-export const VERSION: string = 'dev';
+export const VERSION: string = distTag ?? '*';
 
 /**
  * THEMES

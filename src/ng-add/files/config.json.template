@@ -25,7 +25,8 @@
     "startup": {
       "startupCulture": "<%= startupCulture %>",
       "startupTheme": "<%= startupTheme %>"
-    }
+    },
+    "localizationFiles": ""
   },
   "version": "0.0.1"
 }

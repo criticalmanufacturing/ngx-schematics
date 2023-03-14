@@ -12,6 +12,16 @@ import {
     Tree,
     url
 } from '@angular-devkit/schematics';
+
+import {
+    readWorkspace,
+    writeWorkspace
+} from '@schematics/angular/utility';
+
+import {
+    NodePackageInstallTask
+} from '@angular-devkit/schematics/tasks';
+
 import {
     dirname,
     join,
@@ -19,12 +29,19 @@ import {
     JsonObject,
     normalize
 } from '@angular-devkit/core';
-import { Readable, Writable } from 'stream';
-import { posix } from 'path';
-import { ObjectLiteralExpression, PropertyAssignment, SourceFile, SyntaxKind } from 'ts-morph';
 
-import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
+import { posix } from 'path';
+
+import {
+    ObjectLiteralExpression,
+    PropertyAssignment,
+    SourceFile,
+    SyntaxKind
+} from 'ts-morph';
+
+import {
+    parse
+} from 'node-html-parser';
 
 import {
     BaseApp,
@@ -44,74 +61,58 @@ import { getAppModulePath, getMainPath } from '../utility/workspace';
 import { addSymbolToNgModuleMetadata, createSourceFile, insertImport } from '../utility/ast';
 import { updateTsConfig } from '../utility/project';
 import { addPackageJsonDependency, NodeDependency, NodeDependencyType } from '../utility/dependency';
+import { isDeepStrictEqual } from 'util';
+
+/**
+ * Adds elements to json array if not already present.
+ * @param array array of elements
+ * @param elementsToAdd elements to add to array
+ */
+function addToJsonArray(array: JsonArray, elementsToAdd: any[]) {
+    elementsToAdd.forEach((toAdd) => {
+        if (!array.some(existing => isDeepStrictEqual(typeof existing === 'object' ? { ...existing } : existing, toAdd))) {
+            array.push(toAdd);
+        }
+    })
+}
 
 /**
  * Updates index.html file with the themes and loading container
  */
 function updateIndexFile(path: string): Rule {
     return async (tree: Tree) => {
-        const buffer = tree.read(path);
-        if (buffer === null) {
-            throw new SchematicsException(`Could not read index file: ${path}`);
+        const indexText = tree.readText(path);
+        const index = parse(indexText, { comment: true });
+
+        const title = index.querySelector('head > title');
+        if (title) {
+            title.textContent = 'MES';
         }
 
-        const rewriter = new (await import('parse5-html-rewriting-stream'));
-
-        rewriter.on('startTag', (startTag) => {
-            rewriter.emitStartTag(startTag);
-
-            if (startTag.tagName === 'body') {
-                rewriter.emitRaw(`
+        const body = index.querySelector('body');
+        if (body && !body.querySelector('div#loading-container')) {
+            body.insertAdjacentHTML('afterbegin', `
   <div id="loading-container" class="cmf-loading-container">
     <div class="cmf-loading-center">
-      <div class="cmf-loading-cmf-logo"></div>
-      <div class="cmf-loading-spinner"></div>
+    <div class="cmf-loading-cmf-logo"></div>
+    <div class="cmf-loading-spinner"></div>
     </div>
   </div>`);
-            }
-        });
+        }
 
-        rewriter.on('endTag', (endTag) => {
-
-
-            if (endTag.tagName === 'head') {
-                rewriter.emitRaw(`\
+        const head = index.querySelector('head');
+        if (head && !head.querySelector('style#initial-theme')) {
+            head.appendChild(
+                parse(`\
   <style id="initial-theme">
     @import url("cmf.style.blue.css") (prefers-color-scheme: light);
     @import url("cmf.style.dark.css") (prefers-color-scheme: dark);
-  </style>
-`);
-            }
+  </style>\n`
+                ));
+        }
 
-            rewriter.emitEndTag(endTag);
-        });
-
-        return new Promise<void>((resolve) => {
-            const input = new Readable({
-                encoding: 'utf8',
-                read(): void {
-                    this.push(buffer);
-                    this.push(null);
-                },
-            });
-
-            const chunks: Array<Buffer> = [];
-            const output = new Writable({
-                write(chunk: string | Buffer, encoding: BufferEncoding, callback: Function): void {
-                    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk, encoding) : chunk);
-                    callback();
-                },
-                final(callback: (error?: Error) => void): void {
-                    const full = Buffer.concat(chunks);
-                    tree.overwrite(path, full.toString());
-                    callback();
-                    resolve();
-                },
-            });
-
-            input.pipe(rewriter).pipe(output);
-        });
-    };
+        tree.overwrite(path, index.toString());
+    }
 }
 
 
@@ -136,7 +137,9 @@ function installSchematics(_options: any) {
             (workspace.extensions.cli as JsonObject).schematicCollections = [];
         }
 
-        ((workspace.extensions.cli as JsonObject).schematicCollections as JsonArray).unshift('@criticalmanufacturing/ngx-schematics');
+        if (!((workspace.extensions.cli as JsonObject).schematicCollections as JsonArray).includes('@criticalmanufacturing/ngx-schematics')) {
+            ((workspace.extensions.cli as JsonObject).schematicCollections as JsonArray).unshift('@criticalmanufacturing/ngx-schematics');
+        }
 
         const buildTargets = [];
 
@@ -148,45 +151,51 @@ function installSchematics(_options: any) {
 
         // Configure project options
         for (const target of buildTargets) {
-            if (!target.options) {
-                continue;
-            }
+            // override configurations
+            if (target.configurations) {
+                const budgets = target.configurations!['production']?.['budgets'] as JsonArray | undefined;
+                const initialBudget = budgets?.findIndex(budget => (budget as JsonObject).type === 'initial');
 
-            // Add allowedCommonJsDependencies
-            if (target.options.allowedCommonJsDependencies instanceof Array) {
-                target.options.allowedCommonJsDependencies.push(...PROJECT_ALLOWED_COMMONJS_DEPENDENCIES);
-            } else {
-                target.options.allowedCommonJsDependencies = PROJECT_ALLOWED_COMMONJS_DEPENDENCIES;
-            }
-
-            // Add assets
-            if (target.options.assets instanceof Array) {
-                const index = target.options.assets.indexOf('src/favicon.ico');
-                if (index >= 0) {
-                    target.options.assets.splice(index, 1);
-                    if (host.exists('src/favicon.ico')) {
-                        host.delete('src/favicon.ico');
-                    }
+                if (budgets && initialBudget != null && initialBudget >= 0) {
+                    budgets[initialBudget] = {
+                        ...(budgets[initialBudget] as JsonObject),
+                        maximumWarning: _options.baseApp === BaseApp.MES ? '11mb' : '10mb',
+                        maximumError: _options.baseApp === BaseApp.MES ? '12mb' : '11mb'
+                    };
                 }
-                target.options.assets.push(
-                    ...(_options.baseApp === BaseApp.MES
-                        ? PROJECT_MES_ASSETS
-                        : PROJECT_ASSETS)
-                );
             }
 
-            // Add styles
-            if (target.options.styles instanceof Array) {
-                target.options.styles.push(
-                    ...(_options.baseApp === BaseApp.MES
-                        ? PROJECT_MES_STYLES
-                        : PROJECT_CORE_STYLES)
-                );
-            }
+            // override options
+            if (target.options) {
+                // Add allowedCommonJsDependencies
+                if (target.options.allowedCommonJsDependencies instanceof Array) {
+                    addToJsonArray(target.options.allowedCommonJsDependencies, PROJECT_ALLOWED_COMMONJS_DEPENDENCIES);
+                } else {
+                    target.options.allowedCommonJsDependencies = PROJECT_ALLOWED_COMMONJS_DEPENDENCIES;
+                }
 
-            // Add scripts
-            if (target.options.scripts instanceof Array) {
-                target.options.scripts.push(...PROJECT_SCRIPTS);
+                // Add assets
+                if (target.options.assets instanceof Array) {
+                    const index = target.options.assets.indexOf('src/favicon.ico');
+                    if (index >= 0) {
+                        target.options.assets.splice(index, 1);
+                        if (host.exists('src/favicon.ico')) {
+                            host.delete('src/favicon.ico');
+                        }
+                    }
+
+                    addToJsonArray(target.options.assets, _options.baseApp === BaseApp.MES ? PROJECT_MES_ASSETS : PROJECT_ASSETS);
+                }
+
+                // Add styles
+                if (target.options.styles instanceof Array) {
+                    addToJsonArray(target.options.styles, _options.baseApp === BaseApp.MES ? PROJECT_MES_STYLES : PROJECT_CORE_STYLES);
+                }
+
+                // Add scripts
+                if (target.options.scripts instanceof Array) {
+                    addToJsonArray(target.options.scripts, PROJECT_SCRIPTS);
+                }
             }
         }
 
@@ -225,7 +234,16 @@ function installSchematics(_options: any) {
                 startupCulture: 'en-US',
                 startupTheme: 'cmf.style.blue',
                 supportedCultures: `[
-      "en-US"
+      "en-US",
+      "pt-PT",
+      "de-DE",
+      "vi-VN",
+      "zh-CN",
+      "zh-TW",
+      "es-ES",
+      "pl-PL",
+      "sv-SE",
+      "fr-FR"
     ]`,
                 supportedThemes: `[
       "cmf.style.blue",
@@ -266,7 +284,12 @@ function installSchematics(_options: any) {
             overrideComponentTemplate(),
             updateAppModule(_options.baseApp),
             updateMain(),
-            updateTsConfig({ 'compilerOptions.skipLibCheck': true })
+            updateTsConfig({
+                "compilerOptions.strictFunctionTypes": false,
+                "compilerOptions.noImplicitAny": false,
+                "compilerOptions.strictNullChecks": false,
+                "compilerOptions.allowSyntheticDefaultImports": true
+            })
         ]);
     };
 }
@@ -289,6 +312,15 @@ function updateMain() {
             return;
         }
 
+        const loadAppConfigCall = source
+            .getDescendantsOfKind(SyntaxKind.CallExpression)
+            .find(node => node.getExpression().getText().endsWith('loadApplicationConfig'));
+
+        // already added -> nothing to do
+        if (loadAppConfigCall) {
+            return;
+        }
+
         const bootstrapCall = source
             .getDescendantsOfKind(SyntaxKind.CallExpression)
             .find(node => node.getExpression().getText().endsWith('bootstrapModule'));
@@ -299,19 +331,22 @@ function updateMain() {
         }
 
         const bootstrapStatement = bootstrapCall.getFirstAncestorByKind(SyntaxKind.ExpressionStatement);
+        const moduleIdentifier = bootstrapCall.getArguments()[0]?.asKind(SyntaxKind.Identifier);
 
-        if (!bootstrapStatement) {
+        if (!bootstrapStatement || !moduleIdentifier) {
             return;
         }
 
-        const moduleIdentifier = bootstrapCall.getArguments()[0]?.getText();
-        const bootstrapImport = source
+        // remove app module import declaration
+        source
             .getDescendantsOfKind(SyntaxKind.Identifier)
-            .filter((node) => node.getText() === moduleIdentifier)
-            .find(node => node.getFirstAncestorByKind(SyntaxKind.ImportDeclaration));
+            .filter((node) => node.getText() === moduleIdentifier.getText())
+            .find(node => node.getFirstAncestorByKind(SyntaxKind.ImportDeclaration))
+            ?.getFirstAncestorByKindOrThrow(SyntaxKind.ImportDeclaration)
+            .remove();
 
-        bootstrapImport?.getFirstAncestorByKindOrThrow(SyntaxKind.ImportDeclaration).remove();
-        bootstrapCall.getArguments()[0].replaceWithText(`m.${moduleIdentifier}`);
+        // add load application config statement
+        moduleIdentifier.replaceWithText(`m.${moduleIdentifier.getText()}`);
         bootstrapStatement.replaceWithText(`\
 loadApplicationConfig('assets/config.json').then(() => {
     import(/* webpackMode: "eager" */'./app/app.module').then((m) => {
@@ -320,6 +355,8 @@ loadApplicationConfig('assets/config.json').then(() => {
 });`)
 
         insertImport(source, 'loadApplicationConfig', 'cmf-core/init');
+
+        source.formatText({ indentSize: 2 });
 
         host.overwrite(mainPath, source.getFullText());
     };
@@ -511,8 +548,11 @@ export default function (_options: any): Rule {
             throw new SchematicsException(`Targets are not defined for this project.`);
         }
 
+        const packjson = tree.readJson('package.json') as JsonObject;
+        const allDeps = [...Object.keys(packjson.dependencies as JsonObject), ...Object.keys(packjson.devDependencies as JsonObject)];
+
         return chain([
-            externalSchematic('@angular/pwa', 'pwa', { project: _options.project }),
+            !allDeps.includes('@angular/service-worker') ? externalSchematic('@angular/pwa', 'pwa', { project: _options.project }) : noop(),
             externalSchematic('@angular/localize', 'ng-add', { project: _options.project, useAtRuntime: true }),
             _options.lint ? externalSchematic('@angular-eslint/schematics', 'ng-add', {}) : noop(),
             installSchematics(_options)

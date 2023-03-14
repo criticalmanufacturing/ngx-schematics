@@ -11,11 +11,6 @@
                 "$source": "projectName"
             }
         },
-        "registry": {
-            "type": "string",
-            "description": "The npm registry to use.",
-            "x-prompt": "What is your npm registry endpoint?"
-        },
         "lint": {
             "type": "boolean",
             "description": "Adds eslint to the project.",
@@ -25,7 +20,7 @@
         "baseApp": {
             "type": "string",
             "description": "The base app to use.",
-            "default": "Core",
+            "default": "MES",
             "enum": [
                 "Core",
                 "MES"
