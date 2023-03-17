@@ -70,9 +70,9 @@ import { Schema } from './schema';
 /**
  * List ngx-schematics release tags of the current version
  */
-function listNpmReleaseTags() {
+function listNpmReleaseTags(pkg: string) {
     return new Promise<string[]>((resolve, reject) => {
-        exec(`npm dist-tag ls ${pkgName}@${pkgVersion}`, (error, stdout, stderr) => {
+        exec(`npm dist-tag ls ${pkg}`, (error, stdout, stderr) => {
             if (error) {
                 return reject(new Error(stderr))
             }
@@ -544,11 +544,22 @@ function overrideComponentTemplate() {
 export default function (_options: Schema): Rule {
     return async (tree: Tree, _context: SchematicContext) => {
         if (!_options.version) {
+            const [appTags, pkgTags] = await Promise.all([
+                listNpmReleaseTags(_options.application === 'MES' ? MES_BASE_MODULE[0] : CORE_BASE_MODULE[0]),
+                listNpmReleaseTags(`${pkgName}@${pkgVersion}`)
+            ]);
+
+            const valideTags = pkgTags.filter(t => appTags.includes(t)) // only include matching app package tags
+
+            if (valideTags.length === 0) {
+                throw new SchematicsException('There are no matching npm dist-tags for the current application');
+            }
+
             const question: inquirer.ListQuestion = {
                 type: 'list',
                 name: 'distTag',
                 message: 'What is the distribution to utilize?',
-                choices: await listNpmReleaseTags()
+                choices: valideTags
             };
 
             _options.version = (await inquirer.prompt([question])).namespace;
