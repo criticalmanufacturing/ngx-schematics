@@ -1,5 +1,3 @@
-import { version } from '../../package.json';
-
 /**
  * Project Core Base Module
  */
@@ -14,25 +12,6 @@ export const MES_BASE_MODULE: [string, string] = ['cmf-mes-ui', 'MesUIModule'];
  * Project Metadata Routing Module
  */
 export const METADATA_ROUTING_MODULE: [string, string] = ['cmf-core', 'MetadataRoutingModule'];
-
-/**
- * Base Application
- */
-export enum BaseApp {
-    Core = 'Core',
-    MES = 'MES'
-}
-
-// 10.0.0 -> release-100; 10.1.0 -> release-101; 10.1.1 -> release-1011
-let distTag = /^([1-9]\d*|0)(\.(([1-9]\d*)|0)){2}/.exec(version)?.[0].replace(/\./g, '');
-if (distTag?.endsWith('0')) {
-    distTag = 'release-' + distTag.slice(0, -1);
-}
-
-/**
- * Current Version
- */
-export const VERSION: string = distTag ?? '*';
 
 /**
  * THEMES

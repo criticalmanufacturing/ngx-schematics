@@ -13,10 +13,8 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "rootDir": ".",
-    "skipDefaultLibCheck": true,
-    "skipLibCheck": true,
     "sourceMap": true,
-    "strictNullChecks": true,
+    "strict": true,
     "resolveJsonModule": true,
     "types": ["jasmine", "node"]
   },

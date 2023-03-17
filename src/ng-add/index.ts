@@ -31,6 +31,8 @@ import {
 } from '@angular-devkit/core';
 
 import { posix } from 'path';
+import { isDeepStrictEqual } from 'util';
+import { exec } from 'child_process';
 
 import {
     ObjectLiteralExpression,
@@ -43,8 +45,9 @@ import {
     parse
 } from 'node-html-parser';
 
+import * as inquirer from 'inquirer';
+
 import {
-    BaseApp,
     CORE_BASE_MODULE,
     MES_BASE_MODULE,
     METADATA_ROUTING_MODULE,
@@ -53,15 +56,31 @@ import {
     PROJECT_CORE_STYLES,
     PROJECT_MES_ASSETS,
     PROJECT_MES_STYLES,
-    PROJECT_SCRIPTS,
-    VERSION
+    PROJECT_SCRIPTS
 } from './package-configs';
 
 import { getAppModulePath, getMainPath } from '../utility/workspace';
 import { addSymbolToNgModuleMetadata, createSourceFile, insertImport } from '../utility/ast';
 import { updateTsConfig } from '../utility/project';
 import { addPackageJsonDependency, NodeDependency, NodeDependencyType } from '../utility/dependency';
-import { isDeepStrictEqual } from 'util';
+
+import { version as pkgVersion, name as pkgName } from '../../package.json';
+import { Schema } from './schema';
+
+/**
+ * List ngx-schematics release tags of the current version
+ */
+function listNpmReleaseTags() {
+    return new Promise<string[]>((resolve, reject) => {
+        exec(`npm dist-tag ls ${pkgName}@${pkgVersion}`, (error, stdout, stderr) => {
+            if (error) {
+                return reject(new Error(stderr))
+            }
+
+            return resolve(stdout.match(/^[^:]+/gm)?.reverse() ?? []);
+        });
+    });
+}
 
 /**
  * Adds elements to json array if not already present.
@@ -119,7 +138,7 @@ function updateIndexFile(path: string): Rule {
 /**
  * Updates main.ts file adding the load config method
  */
-function installSchematics(_options: any) {
+function installSchematics(_options: Required<Schema>) {
     return async (host: Tree, _context: SchematicContext) => {
         const workspace = await readWorkspace(host);
 
@@ -159,8 +178,8 @@ function installSchematics(_options: any) {
                 if (budgets && initialBudget != null && initialBudget >= 0) {
                     budgets[initialBudget] = {
                         ...(budgets[initialBudget] as JsonObject),
-                        maximumWarning: _options.baseApp === BaseApp.MES ? '11mb' : '10mb',
-                        maximumError: _options.baseApp === BaseApp.MES ? '12mb' : '11mb'
+                        maximumWarning: _options.application === 'MES' ? '11mb' : '10mb',
+                        maximumError: _options.application === 'MES' ? '12mb' : '11mb'
                     };
                 }
             }
@@ -184,12 +203,12 @@ function installSchematics(_options: any) {
                         }
                     }
 
-                    addToJsonArray(target.options.assets, _options.baseApp === BaseApp.MES ? PROJECT_MES_ASSETS : PROJECT_ASSETS);
+                    addToJsonArray(target.options.assets, _options.application === 'MES' ? PROJECT_MES_ASSETS : PROJECT_ASSETS);
                 }
 
                 // Add styles
                 if (target.options.styles instanceof Array) {
-                    addToJsonArray(target.options.styles, _options.baseApp === BaseApp.MES ? PROJECT_MES_STYLES : PROJECT_CORE_STYLES);
+                    addToJsonArray(target.options.styles, _options.application === 'MES' ? PROJECT_MES_STYLES : PROJECT_CORE_STYLES);
                 }
 
                 // Add scripts
@@ -215,10 +234,6 @@ function installSchematics(_options: any) {
                     indexFiles.add(options.index);
                 }
             }
-        }
-
-        if (_options.registry && !host.exists('.npmrc')) {
-            host.create('.npmrc', `registry=${_options.registry}`);
         }
 
         const buildTarget = project.targets.get('build');
@@ -262,17 +277,17 @@ function installSchematics(_options: any) {
         await writeWorkspace(host, workspace);
 
         const dependencies = [];
-        if (_options.baseApp === BaseApp.MES) {
+        if (_options.application === 'MES') {
             dependencies.push({
                 type: NodeDependencyType.Default,
                 name: MES_BASE_MODULE[0],
-                version: VERSION
+                version: _options.version
             });
         } else {
             dependencies.push({
                 type: NodeDependencyType.Default,
                 name: CORE_BASE_MODULE[0],
-                version: VERSION
+                version: _options.version
             });
         }
 
@@ -282,7 +297,7 @@ function installSchematics(_options: any) {
             installDependencies(dependencies),
             ...[...indexFiles].map((path) => updateIndexFile(path)),
             overrideComponentTemplate(),
-            updateAppModule(_options.baseApp),
+            updateAppModule(_options.application),
             updateMain(),
             updateTsConfig({
                 "compilerOptions.strictFunctionTypes": false,
@@ -380,7 +395,7 @@ function updateAppModule(baseApp: string): Rule {
             return;
         }
 
-        if (baseApp === BaseApp.MES) {
+        if (baseApp === 'MES') {
             addSymbolToNgModuleMetadata(source, 'imports', MES_BASE_MODULE[1], MES_BASE_MODULE[0]);
         } else {
             addSymbolToNgModuleMetadata(source, 'imports', CORE_BASE_MODULE[1], CORE_BASE_MODULE[0]);
@@ -526,14 +541,28 @@ function overrideComponentTemplate() {
 
 // You don't have to export the function as default. You can also have more than one rule factory
 // per file.
-export default function (_options: any): Rule {
+export default function (_options: Schema): Rule {
     return async (tree: Tree, _context: SchematicContext) => {
-        const workspace = await readWorkspace(tree);
+        if (!_options.version) {
+            const question: inquirer.ListQuestion = {
+                type: 'list',
+                name: 'distTag',
+                message: 'What is the distribution to utilize?',
+                choices: await listNpmReleaseTags()
+            };
+
+            _options.version = (await inquirer.prompt([question])).namespace;
+        }
+
+        if (!_options.version) {
+            throw new SchematicsException('Option "version" is required.');
+        }
 
         if (!_options.project) {
             throw new SchematicsException('Option "project" is required.');
         }
 
+        const workspace = await readWorkspace(tree);
         const project = workspace.projects.get(_options.project);
         if (!project) {
             throw new SchematicsException(`Project is not defined in this workspace.`);
@@ -554,8 +583,8 @@ export default function (_options: any): Rule {
         return chain([
             !allDeps.includes('@angular/service-worker') ? externalSchematic('@angular/pwa', 'pwa', { project: _options.project }) : noop(),
             externalSchematic('@angular/localize', 'ng-add', { project: _options.project, useAtRuntime: true }),
-            _options.lint ? externalSchematic('@angular-eslint/schematics', 'ng-add', {}) : noop(),
-            installSchematics(_options)
+            _options.eslint ? externalSchematic('@angular-eslint/schematics', 'ng-add', {}) : noop(),
+            installSchematics(_options as Required<typeof _options>)
         ]);
     };
 }

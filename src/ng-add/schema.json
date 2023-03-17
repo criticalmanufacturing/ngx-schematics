@@ -1,39 +1,37 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "SchematicsGeneratorHTML",
-    "title": "HTML Starter Options Schema",
-    "type": "object",
-    "properties": {
-        "project": {
-            "type": "string",
-            "description": "The name of the project.",
-            "$default": {
-                "$source": "projectName"
-            }
-        },
-        "lint": {
-            "type": "boolean",
-            "description": "Adds eslint to the project.",
-            "default": true,
-            "x-prompt": "Add eslint to your project?"
-        },
-        "baseApp": {
-            "type": "string",
-            "description": "The base app to use.",
-            "default": "MES",
-            "enum": [
-                "Core",
-                "MES"
-            ],
-            "x-prompt": {
-                "message": "What is the base app you want to use?",
-                "type": "list",
-                "items": [
-                    "Core",
-                    "MES"
-                ]
-            }
-        }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsGeneratorHTML",
+  "title": "HTML Starter Options Schema",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
     },
-    "required": []
+    "application": {
+      "type": "string",
+      "description": "The base app to use.",
+      "default": "MES",
+      "enum": ["Core", "MES"],
+      "x-prompt": {
+        "message": "What is the base app you want to use?",
+        "type": "list",
+        "items": ["Core", "MES"]
+      }
+    },
+    "version": {
+      "type": "string",
+      "description": "The base app version to use."
+    },
+    "eslint": {
+      "type": "boolean",
+      "description": "Add eslint to the project.",
+      "default": true,
+      "x-prompt": "Add eslint to your project?"
+    }
+  },
+  "required": []
 }
