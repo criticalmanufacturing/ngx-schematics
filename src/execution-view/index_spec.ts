@@ -109,7 +109,7 @@ describe('Generate Execution View', () => {
         const dasherizedExecutionViewName = strings.dasherize(executionViewOptions.name);
 
         const templateRegExp = new RegExp(
-            `<cmf-core-controls-execution-view \\[cmf-core-business-controls-transaction-execution-view\\]="instance!"\\s*` +
+            `<cmf-core-controls-execution-view \\[cmf-core-business-controls-transaction-execution-view\\]="instance"\\s*` +
                 `i18n-mainTitle="@@${strings.dasherize(executionViewOptions.project)}/wizard-${dasherizedExecutionViewName}#TITLE" mainTitle="${nameify(executionViewOptions.name)}"\\s*` +
                 `i18n-action-name="@@${strings.dasherize(executionViewOptions.project)}/wizard-${dasherizedExecutionViewName}#ACTION" action-name="Finish">\\s*` +
                     `<!-- Execution View steps -->\\s*` +
@@ -129,7 +129,9 @@ describe('Generate Execution View', () => {
 
         const executionViewContent = tree.readContent(`${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`);
         expect(executionViewContent).toMatch(/@Component\(/);
+        expect(executionViewContent).toContain(`standalone: true`);
         expect(executionViewContent).toContain(`selector: '${strings.dasherize(executionViewOptions.project)}-wizard-${strings.dasherize(executionViewOptions.name)}'`);
+        expect(executionViewContent).toMatch(/imports: \[\s*((CommonModule|ExecutionViewModule|TransactionExecutionViewModule)\s*,?\s*){3}\]/gm);
         expect(executionViewContent).toContain(`templateUrl: './wizard-${strings.dasherize(executionViewOptions.name)}.component.html'`);
         expect(executionViewContent).toContain(`styleUrls: ['./wizard-${strings.dasherize(executionViewOptions.name)}.component.less']`);
         expect(executionViewContent).toContain(`viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Wizard${strings.classify(executionViewOptions.name)}Component) }]`);
@@ -160,21 +162,5 @@ describe('Generate Execution View', () => {
         const executionViewContent = tree.readContent(`${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`);
         expect(executionViewContent).toMatch(/constructor\(\s*((viewContainerRef: ViewContainerRef|private pageBag: PageBag|private util: UtilService|private entityTypes: EntityTypeService)\s*,?\s*){4}\)/gm);
         expect(executionViewContent).toContain('super(viewContainerRef);');
-    });
-
-    it('should import CommonModule, ExecutionViewModule, and TransactionExecutionViewModule in NgModule', async () => {
-        const tree = await schematicRunner.runSchematic('execution-view', executionViewOptions, appTree);
-
-        const executionViewContent = tree.readContent(`${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`);
-        expect(executionViewContent).toMatch(/imports: \[\s*((CommonModule|ExecutionViewModule|TransactionExecutionViewModule)\s*,?\s*){3}\]/gm);
-    });
-
-    it('should be declared and exported in NgModule', async () => {
-        const tree = await schematicRunner.runSchematic('execution-view', executionViewOptions, appTree);
-
-        const executionViewContent = tree.readContent(`${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`);
-        expect(executionViewContent).toContain(`declarations: [Wizard${strings.classify(executionViewOptions.name)}Component]`);
-        expect(executionViewContent).toContain(`exports: [Wizard${strings.classify(executionViewOptions.name)}Component]`);
-        expect(executionViewContent).toContain(`export class Wizard${strings.classify(executionViewOptions.name)}Module { }`);
     });
 })

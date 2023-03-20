@@ -1,9 +1,12 @@
 import {
     Component,
     ElementRef,
-    NgModule,
     ViewContainerRef
 } from '@angular/core';
+
+import {
+    CommonModule
+} from '@angular/common';
 
 import {
     FeedbackService
@@ -81,11 +84,13 @@ import {
     }
 })
 @Component({
+    standalone: true,
     selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget',
+    imports: [CommonModule],
     templateUrl: './<%= dasherize(name) %>-widget.component.html',
     <% if (style !== 'none') { %>styleUrls: ['./<%= dasherize(name) %>-widget.component.<%= style %>']<% } %>
 })
-export class <%= classify(name) %>WidgetComponent extends WidgetGeneric implements WidgetRepresentation {
+export class <%= classify(name) %>Widget extends WidgetGeneric implements WidgetRepresentation {
 
     /**
      * Defines how the widget will be represented
@@ -103,10 +108,3 @@ export class <%= classify(name) %>WidgetComponent extends WidgetGeneric implemen
         super(viewContainerRef, elementRef, feedback);
     }
 }
-
-@NgModule({
-    imports: [],
-    declarations: [<%= classify(name) %>WidgetComponent],
-    exports: [<%= classify(name) %>WidgetComponent]
-})
-export class <%= classify(name) %>WidgetModule { }

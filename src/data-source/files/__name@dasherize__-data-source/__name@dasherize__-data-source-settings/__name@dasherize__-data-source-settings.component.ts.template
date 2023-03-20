@@ -1,7 +1,6 @@
 import {
     ViewContainerRef,
-    Component,
-    NgModule
+    Component
 } from '@angular/core';
 
 import {
@@ -43,7 +42,9 @@ import {
  *
  */
 @Component({
+    standalone: true,
     selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-data-source-settings',
+    imports: [CommonModule, DataSourceSettingsModule],
     templateUrl: './<%= dasherize(name) %>-data-source-settings.component.html',
     <% if (style !== 'none') { %>styleUrls: ['./<%= dasherize(name) %>-data-source-settings.component.<%= dasherize(style) %>']<% } %>
 })
@@ -69,13 +70,3 @@ export class <%= classify(name) %>DataSourceSettingsComponent extends Customizab
         this.settings = settings;
     }
 }
-
-@NgModule({
-    imports: [
-        CommonModule,
-        DataSourceSettingsModule
-    ],
-    declarations: [<%= classify(name) %>DataSourceSettingsComponent],
-    exports: [<%= classify(name) %>DataSourceSettingsComponent]
-})
-export class <%= classify(name) %>DataSourceSettingsModule { }

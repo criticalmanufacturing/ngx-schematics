@@ -27,7 +27,7 @@
                 "$source": "argv",
                 "index": 0
             },
-            "x-prompt": "What is the name of the widget?"
+            "x-prompt": "What name would you like to use for the widget?"
         },
         "style": {
             "description": "The file extension or preprocessor to use for style files, or 'none' to skip generating the style file.",

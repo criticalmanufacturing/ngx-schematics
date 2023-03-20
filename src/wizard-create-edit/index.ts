@@ -20,6 +20,7 @@ import { nameify } from '../utility/string';
 import { MetadataProperty } from '../utility/metadata';
 import { updatePublicAPI, updateMetadata } from '../utility/project';
 import { buildDefaultPath, parseName } from '../utility/workspace';
+import { Schema } from './schema';
 
 function getMetadataActions(project: string, entityTypeName: string) {
     return `\
@@ -45,7 +46,7 @@ function getMetadataActions(project: string, entityTypeName: string) {
 }`;
 }
 
-export default function (_options: any): Rule {
+export default function (_options: Schema): Rule {
     return async (tree: Tree, _context: SchematicContext) => {
         if (!_options.namespace) {
             const question: inquirer.ListQuestion = {
@@ -57,7 +58,7 @@ export default function (_options: any): Rule {
 
             _options.namespace = (await inquirer.prompt([question])).namespace;
 
-            if ((_options.namespace as string).startsWith('Other')) {
+            if (_options.namespace!.startsWith('Other')) {
                 const question: inquirer.InputQuestion = {
                     type: 'input',
                     name: 'namespace',
@@ -77,7 +78,7 @@ export default function (_options: any): Rule {
         }
 
         const workspace = await readWorkspace(tree);
-        const project = workspace.projects.get(_options.project as string);
+        const project = workspace.projects.get(_options.project);
 
         if (!project) {
             throw new SchematicsException(`Project "${_options.project}" does not exist.`);
@@ -87,8 +88,8 @@ export default function (_options: any): Rule {
             _options.path = buildDefaultPath(project);
         }
 
-        const parsedPath = parseName(_options.path as string, _options.name);
-        _options.name = parsedPath.name;
+        const parsedPath = parseName(_options.path, _options.name);
+        _options.name = parsedPath.name.replace(/^(wizard)?-?(create)?-?(edit)?-?/i, '');
         _options.path = parsedPath.path;
 
         const skipStyleFile = _options.style === 'none';
@@ -98,8 +99,7 @@ export default function (_options: any): Rule {
             applyTemplates({
                 ...strings,
                 ..._options,
-                nameify,
-                project: _options.project
+                nameify
             }),
             move(parsedPath.path),
         ]);

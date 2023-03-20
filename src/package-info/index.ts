@@ -2,7 +2,7 @@ import { join, normalize, dirname } from '@angular-devkit/core';
 import { chain, Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import { readWorkspace, ProjectDefinition } from '@schematics/angular/utility';
 
-import { updatePackageInfoMetadata, PackageInfo } from '../utility/metadata';
+import { setPackageInfoMetadata, PackageInfo } from '../utility/metadata';
 import { getMetadataFilePath } from '../utility/project';
 import { createSourceFile } from '../utility/ast';
 import { JSONFile } from '../utility/json';
@@ -57,7 +57,7 @@ function getAllFiles(host: Tree, rootPath: string): string[] {
     return filesFound;
 }
 
-function fillMetadataPackageInfo(project: ProjectDefinition, options: PackageInfo): Rule {
+function fillMetadataPackageInfo(project: ProjectDefinition, options: Required<PackageInfo>): Rule {
     return (tree: Tree) => {
         const metadataPath = getMetadataFilePath(tree, project);
 
@@ -70,7 +70,7 @@ function fillMetadataPackageInfo(project: ProjectDefinition, options: PackageInf
             return;
         }
 
-        updatePackageInfoMetadata(source, options);
+        setPackageInfoMetadata(source, options);
         tree.overwrite(metadataPath, source.getFullText());
     }
 }
@@ -90,7 +90,7 @@ export default function (_options: any): Rule {
             return;
         }
 
-        const packageInfo: PackageInfo = {
+        const packageInfo: Required<PackageInfo> = {
             package: _options.project,
             widgets: [],
             converters: [],

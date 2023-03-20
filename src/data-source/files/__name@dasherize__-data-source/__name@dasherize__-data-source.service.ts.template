@@ -5,14 +5,17 @@ import {
 } from 'cmf-core';
 
 import {
+    TreatTransactionOutput as DataSourceExecutionOutput
+} from 'cmf-core-business-controls';
+
+import {
     DataSource,
     DataSourceGeneric,
-    DataSourceSettingsDef,
-    DataSourceExecutionOutput
+    DataSourceSettingsDef
 } from 'cmf-core-dashboards';
 
 import {
-    <%= classify(name) %>DataSourceSettings
+    <%= classify(name) %>DataSourceSettingsComponent
 } from './<%= dasherize(name) %>-data-source-settings/<%= dasherize(name) %>-data-source-settings.component';
 
 /**
@@ -45,7 +48,7 @@ import {
 @DataSource({
     name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>-data-source#NAME:<%= nameify(name) %>`,
     settingsComponent: {
-        component: <%= classify(name) %>DataSourceSettings
+        component: <%= classify(name) %>DataSourceSettingsComponent
     }
 })
 export class <%= classify(name) %>DataSource extends DataSourceGeneric implements DataSourceSettingsDef {

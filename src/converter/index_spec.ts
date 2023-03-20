@@ -32,10 +32,12 @@ describe('Generate Converter', () => {
     };
 
     const converterOptions = {
-        name: 'test-converter',
+        name: 'test',
         path: `projects/${libraryOptions.name}/src/lib`,
         project: libraryOptions.name
     }
+
+    const defaultConverterFilePath = `projects/${libraryOptions.name}/src/lib/${converterOptions.name}-converter/${converterOptions.name}-converter.pipe.ts`;
 
     let appTree: UnitTestTree;
 
@@ -50,9 +52,9 @@ describe('Generate Converter', () => {
     it('should create the converter file', async () => {
         const tree = await schematicRunner.runSchematic('converter', converterOptions, appTree);
 
-        expect(tree.getDir(`${converterOptions.path}/${converterOptions.name}`).subfiles).toEqual(
+        expect(tree.getDir(`${converterOptions.path}/${converterOptions.name}-converter`).subfiles).toEqual(
             jasmine.arrayContaining([
-                `${converterOptions.name}.pipe.ts`,
+                `${converterOptions.name}-converter.pipe.ts`,
             ])
         );
     });
@@ -60,11 +62,12 @@ describe('Generate Converter', () => {
     it('should have the Pipe and Converter decorators', async () => {
         const tree = await schematicRunner.runSchematic('converter', converterOptions, appTree);
 
-        const pipeContent = tree.readContent(`${converterOptions.path}/${converterOptions.name}/${converterOptions.name}.pipe.ts`);
+        const pipeContent = tree.readContent(defaultConverterFilePath);
 
-        expect(pipeContent).toMatch(/import \{\s*((NgModule|PipeTransform|Pipe)\s*,?\s*){3}\} from '@angular\/core';/gm);
+        expect(pipeContent).toMatch(/import \{\s*((PipeTransform|Pipe)\s*,?\s*){2}\} from '@angular\/core';/gm);
         expect(pipeContent).toMatch(/import \{\s*Converter\s*\} from 'cmf-core-dashboards';/gm);
         expect(pipeContent).toMatch(/@Pipe\(/);
+        expect(pipeContent).toContain('standalone: true');
         expect(pipeContent).toMatch(/@Converter\(/g);
     });
 
@@ -73,7 +76,7 @@ describe('Generate Converter', () => {
 
         const converterName = `${nameify(converterOptions.name)} Converter`;
 
-        const pipeContent = tree.readContent(`${converterOptions.path}/${converterOptions.name}/${converterOptions.name}.pipe.ts`);
+        const pipeContent = tree.readContent(defaultConverterFilePath);
         expect(pipeContent).toContain(`name: $localize\`:@@${strings.dasherize(converterOptions.project)}/${converterOptions.name}#NAME:${converterName}\``);
     });
 
@@ -82,28 +85,17 @@ describe('Generate Converter', () => {
 
         const converterName = `${strings.camelize(converterOptions.name)}`;
 
-        const pipeContent = tree.readContent(`${converterOptions.path}/${converterOptions.name}/${converterOptions.name}.pipe.ts`);
+        const pipeContent = tree.readContent(defaultConverterFilePath);
         expect(pipeContent).toContain(`name: '${converterName}'`);
     });
 
     it('should implement PipeTransform', async () => {
         const tree = await schematicRunner.runSchematic('converter', converterOptions, appTree);
 
-        const converterClassName = `${strings.classify(converterOptions.name)}Pipe`;
+        const converterClassName = `${strings.classify(converterOptions.name)}`;
 
-        const pipeContent = tree.readContent(`${converterOptions.path}/${converterOptions.name}/${converterOptions.name}.pipe.ts`);
-        expect(pipeContent).toContain(`export class ${converterClassName} implements PipeTransform {`);
+        const pipeContent = tree.readContent(defaultConverterFilePath);
+        expect(pipeContent).toContain(`export class ${converterClassName}Converter implements PipeTransform {`);
         expect(pipeContent).toContain('transform(value: any, ...args: any[]): any');
-    });
-
-    it('should be declared and exported in NgModule', async () => {
-        const tree = await schematicRunner.runSchematic('converter', converterOptions, appTree);
-
-        const converterClassName = `${strings.classify(converterOptions.name)}Pipe`;
-
-        const pipeContent = tree.readContent(`${converterOptions.path}/${converterOptions.name}/${converterOptions.name}.pipe.ts`);
-        expect(pipeContent).toContain(`declarations: \[${converterClassName}\]`);
-        expect(pipeContent).toContain(`exports: \[${converterClassName}\]`);
-        expect(pipeContent).toContain(`export class ${converterClassName}Module { }`);
     });
 });

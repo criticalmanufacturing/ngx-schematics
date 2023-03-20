@@ -6,7 +6,7 @@ import { ProjectDefinition } from "@schematics/angular/utility";
 
 import { createSourceFile, insertExport } from "./ast";
 import { buildRelativePath, ProjectType } from "./workspace";
-import { insertMetadata, MetadataProperty } from "./metadata";
+import { insertMetadata, MetadataProperty, PackageInfo, updatePackageInfo } from "./metadata";
 import { JSONFile } from "./json";
 
 /**
@@ -81,6 +81,37 @@ export function updateMetadata(project: ProjectDefinition, options: UpdateMetada
             options.imports,
             options.identifier,
             options.toInsert
+        );
+
+        tree.overwrite(metadataPath, source.getFullText());
+    };
+}
+
+/**
+ * Updates the metadata package info properties
+ * @param project project definition from which the metadata will be updated
+ * @param options Update options with the information to insert in the metadata
+ * @returns 
+ */
+export function updateMetadataPackageInfo(project: ProjectDefinition, options: PackageInfo): Rule {
+    return async (tree: Tree) => {
+        const metadataPath = getMetadataFilePath(tree, project);
+
+        if (!metadataPath) {
+            return;
+        }
+
+        const metadataContent = tree.get(metadataPath)?.content.toString('utf-8');
+
+        if (!metadataContent) {
+            return;
+        }
+
+        const source = new Project().createSourceFile(metadataPath, metadataContent, { overwrite: true });
+
+        updatePackageInfo(
+            source,
+            options
         );
 
         tree.overwrite(metadataPath, source.getFullText());

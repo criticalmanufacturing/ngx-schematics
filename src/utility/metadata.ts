@@ -1,5 +1,5 @@
 import { indentBy } from '@angular-devkit/core/src/utils/literals';
-import { ClassDeclaration, SourceFile, SyntaxKind } from 'ts-morph';
+import { ClassDeclaration, SourceFile, SyntaxKind, StructureKind, ObjectLiteralExpression } from 'ts-morph';
 import { insertImport } from './ast';
 import { nameify } from './string';
 
@@ -45,10 +45,10 @@ const PROPERTY_REFERENCE = {
 
 export interface PackageInfo {
     package: string;
-    widgets: string[];
-    converters: string[];
-    dataSources: string[];
-    components: string[];
+    widgets?: string[];
+    converters?: string[];
+    dataSources?: string[];
+    components?: string[];
 }
 
 function getMetadataClassDeclaration(source: SourceFile): ClassDeclaration | undefined {
@@ -182,7 +182,7 @@ export function insertRoutesMetadata(
  * @param options Package info
  * @returns 
  */
-export function updatePackageInfoMetadata(source: SourceFile, options: PackageInfo): void {
+export function setPackageInfoMetadata(source: SourceFile, options: Required<PackageInfo>): void {
     const metadataClass = getMetadataClassDeclaration(source);
 
     if (!metadataClass) {
@@ -222,4 +222,98 @@ ${indentBy(12)`"${[
     } else {
         packageInfoAccessor.replaceWithText(toInsert).formatText();
     }
+}
+
+/**
+ * Updates the package info object property addding new elements
+ * @param objectExpression ObjectLiteralExpression
+ * @param elements elements to add
+ * @returns 
+ */
+function updateInfoObjectProperty(objectExpression: ObjectLiteralExpression, propertyName: string, elements: string[]) {
+    const property = objectExpression.getProperty(propertyName)?.asKind(SyntaxKind.PropertyAssignment);
+
+    if (!property) {
+        objectExpression.addProperty({
+            kind: StructureKind.PropertyAssignment,
+            name: propertyName,
+            initializer: elements.length > 0 ? `\n'${elements.join(`',\n'`)}'\n` : ''
+        });
+    } else {
+        const array = property.getInitializer()?.asKind(SyntaxKind.ArrayLiteralExpression);
+
+        if (array) {
+            const elementsToAdd = elements.filter(e => !array.getElements().map(node => node.getText()).includes(e));
+
+            if (elementsToAdd.length === 0) {
+                return;
+            }
+
+            array.addElements(elementsToAdd.map(e => "'" + e + "'"), { useNewLines: true });
+
+            const loader = objectExpression.getProperty('loader');
+
+            if (!loader) {
+                return;
+            }
+
+            const loaderText = loader.getText();
+            const exportsMatch = /webpackExports\s*:\s*\[([^\]]*?)(\s*\])/.exec(loaderText);
+
+            if (exportsMatch) {
+                const insertIndex = exportsMatch.index + exportsMatch[0].length - exportsMatch[2].length;
+                const baseIndentation = loader.getIndentationText().length / loader.getIndentationLevel();
+                const indentation = loader.getIndentationText() + ' '.repeat(baseIndentation * 2);
+                loader.replaceWithText(
+                    loaderText.slice(0, insertIndex) + // ... webpackExports: [...
+                    (exportsMatch[1].trim().length > 0 ? ',' : '') +
+                    `\n${indentation}"${elementsToAdd.join(`",\n${indentation}"`)}"` +
+                    (exportsMatch[2].length === 1 ? `\n${loader.getIndentationText() + ' '.repeat(baseIndentation)}` : '') +
+                    loaderText.slice(insertIndex, loaderText.length) // ] ...
+                );
+            }
+
+            loader.formatText();
+        }
+    }
+}
+
+/**
+ * Update the package info properties
+ * @param source source file
+ * @param options info to add
+ * @returns 
+ */
+export function updatePackageInfo(source: SourceFile, options: PackageInfo): void {
+    const metadataClass = getMetadataClassDeclaration(source);
+
+    if (!metadataClass) {
+        return;
+    }
+
+    const allAccessors = metadataClass.getGetAccessors();
+    const packageInfoAccessor = allAccessors.find((accessor) => accessor.getName() === 'packageInfo');
+
+    options.widgets ??= [];
+    options.components ??= [];
+    options.converters ??= [];
+    options.dataSources ??= [];
+
+    if (!packageInfoAccessor) {
+        return setPackageInfoMetadata(source, options as Required<typeof options>);
+    }
+
+    // Lets add the new element to the array of the metadata getter
+    const returnStatement = packageInfoAccessor.getFirstDescendantByKind(SyntaxKind.ReturnStatement);
+    const objectExpression = returnStatement?.getFirstChildByKind(SyntaxKind.ObjectLiteralExpression);
+
+    // just give up at this point
+    if (!objectExpression) {
+        return;
+    }
+
+    updateInfoObjectProperty(objectExpression, 'widgets', options.widgets);
+    updateInfoObjectProperty(objectExpression, 'converters', options.converters);
+    updateInfoObjectProperty(objectExpression, 'dataSources', options.dataSources);
+    updateInfoObjectProperty(objectExpression, 'components', options.components);
 }

@@ -33,6 +33,7 @@ describe('Generate Entity Page', () => {
 
     const entityPageOptions = {
         name: 'TestEntityType',
+        entityType: 'TestEntityType',
         project: libraryOptions.name,
         namespace: 'TestNamespace'
     }
@@ -70,7 +71,7 @@ describe('Generate Entity Page', () => {
         const tree = await schematicRunner.runSchematic('entity-page', entityPageOptions, appTree);
         const templateRegExp = new RegExp(
             `<cmf-core-business-controls-entityPage\\s*` +
-                `\\[mainTitle\\]="epEntity\\?.Name!"\\s*` +
+                `\\[mainTitle\\]="epEntity\\?.Name"\\s*` +
                 `\\entityType="${strings.classify(entityPageOptions.name)}"\\s*` +
                 `i18n-entityTypeName="@@${strings.dasherize(entityPageOptions.project)}/page-${strings.dasherize(entityPageOptions.name)}#ENTITY_TYPE"\\s*` +
                 `entityTypeName="${nameify(entityPageOptions.name)}">\\s*` +
@@ -104,8 +105,8 @@ describe('Generate Entity Page', () => {
 
         const entityPageContent = tree.readContent(`${pageEntityTypePath}/page-${strings.dasherize(entityPageOptions.name)}.component.ts`);
         expect(entityPageContent).toContain(`implements EntityPageInterface<Cmf.${entityPageOptions.namespace}.BusinessObjects.${strings.classify(entityPageOptions.name)}>, LevelsToLoad`);
-        expect(entityPageContent).toContain(`public epLevelsToLoad: number = 1;`);
-        expect(entityPageContent).toContain(`public epEntity!: Cmf.${entityPageOptions.namespace}.BusinessObjects.${strings.classify(entityPageOptions.name)};`);
+        expect(entityPageContent).toContain(`public epLevelsToLoad = 1;`);
+        expect(entityPageContent).toContain(`public epEntity: Cmf.${entityPageOptions.namespace}.BusinessObjects.${strings.classify(entityPageOptions.name)};`);
     });
 
     it('should have the constructor receiving the ViewContainerRef and providing it to the super', async () => {
@@ -194,7 +195,7 @@ describe('Generate Entity Page', () => {
     
             const entityPageDetailsViewContent = tree.readContent(`${pageEntityTypeDetailsViewPath}/page-${strings.dasherize(entityPageOptions.name)}-details-view.component.ts`);
             expect(entityPageDetailsViewContent).toContain(`private _epEntityLoadedSubscription: Subscription;`);
-            expect(entityPageDetailsViewContent).toContain(`public epEntity!: Cmf.${entityPageOptions.namespace}.BusinessObjects.${strings.classify(entityPageOptions.name)};`);
+            expect(entityPageDetailsViewContent).toContain(`public epEntity: Cmf.${entityPageOptions.namespace}.BusinessObjects.${strings.classify(entityPageOptions.name)};`);
         });
 
         it('should have the constructor receiving the ViewContainerRef and EntityPageService', async () => {
