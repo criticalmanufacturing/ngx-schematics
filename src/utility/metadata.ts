@@ -247,39 +247,41 @@ function updateInfoObjectProperty(objectExpression: ObjectLiteralExpression, pro
 
     const array = property.getInitializer()?.asKind(SyntaxKind.ArrayLiteralExpression);
 
-    if (array) {
-        const elementsToAdd = elements.filter(e => !array.getElements().map(node => node.getText()).includes(e));
-
-        if (elementsToAdd.length === 0) {
-            return;
-        }
-
-        array.addElements(elementsToAdd.map(e => "'" + e + "'"), { useNewLines: true });
-
-        const loader = objectExpression.getProperty('loader');
-
-        if (!loader) {
-            return;
-        }
-
-        const loaderText = loader.getText();
-        const exportsMatch = /webpackExports\s*:\s*\[([^\]]*?)(\s*\])/.exec(loaderText);
-
-        if (exportsMatch) {
-            const insertIndex = exportsMatch.index + exportsMatch[0].length - exportsMatch[2].length;
-            const baseIndentation = loader.getIndentationText().length / loader.getIndentationLevel();
-            const indentation = loader.getIndentationText() + ' '.repeat(baseIndentation * 2);
-            loader.replaceWithText(
-                loaderText.slice(0, insertIndex) + // ... webpackExports: [...
-                (exportsMatch[1].trim().length > 0 ? ',' : '') +
-                `\n${indentation}"${elementsToAdd.join(`",\n${indentation}"`)}"` +
-                (exportsMatch[2].length === 1 ? `\n${loader.getIndentationText() + ' '.repeat(baseIndentation)}` : '') +
-                loaderText.slice(insertIndex, loaderText.length) // ] ...
-            );
-        }
-
-        loader.formatText();
+    if (!array) {
+        return;
     }
+
+    const elementsToAdd = elements.filter(e => !array.getElements().map(node => node.getText()).includes(e));
+
+    if (elementsToAdd.length === 0) {
+        return;
+    }
+
+    array.addElements(elementsToAdd.map(e => "'" + e + "'"), { useNewLines: true });
+
+    const loader = objectExpression.getProperty('loader');
+
+    if (!loader) {
+        return;
+    }
+
+    const loaderText = loader.getText();
+    const exportsMatch = /webpackExports\s*:\s*\[([^\]]*?)(\s*\])/.exec(loaderText);
+
+    if (exportsMatch) {
+        const insertIndex = exportsMatch.index + exportsMatch[0].length - exportsMatch[2].length;
+        const baseIndentation = loader.getIndentationText().length / loader.getIndentationLevel();
+        const indentation = loader.getIndentationText() + ' '.repeat(baseIndentation * 2);
+        loader.replaceWithText(
+            loaderText.slice(0, insertIndex) + // ... webpackExports: [...
+            (exportsMatch[1].trim().length > 0 ? ',' : '') +
+            `\n${indentation}"${elementsToAdd.join(`",\n${indentation}"`)}"` +
+            (exportsMatch[2].length === 1 ? `\n${loader.getIndentationText() + ' '.repeat(baseIndentation)}` : '') +
+            loaderText.slice(insertIndex, loaderText.length) // ] ...
+        );
+    }
+
+    loader.formatText();
 }
 
 /**
