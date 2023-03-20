@@ -231,50 +231,54 @@ ${indentBy(12)`"${[
  * @returns 
  */
 function updateInfoObjectProperty(objectExpression: ObjectLiteralExpression, propertyName: string, elements: string[]) {
-    const property = objectExpression.getProperty(propertyName)?.asKind(SyntaxKind.PropertyAssignment);
-
-    if (!property) {
+    if (!objectExpression.getProperty(propertyName)) {
         objectExpression.addProperty({
             kind: StructureKind.PropertyAssignment,
             name: propertyName,
-            initializer: elements.length > 0 ? `\n'${elements.join(`',\n'`)}'\n` : ''
+            initializer: '[]'
         });
-    } else {
-        const array = property.getInitializer()?.asKind(SyntaxKind.ArrayLiteralExpression);
+    }
 
-        if (array) {
-            const elementsToAdd = elements.filter(e => !array.getElements().map(node => node.getText()).includes(e));
+    const property = objectExpression.getProperty(propertyName)?.asKind(SyntaxKind.PropertyAssignment);
 
-            if (elementsToAdd.length === 0) {
-                return;
-            }
+    if (!property) {
+        return;
+    }
 
-            array.addElements(elementsToAdd.map(e => "'" + e + "'"), { useNewLines: true });
+    const array = property.getInitializer()?.asKind(SyntaxKind.ArrayLiteralExpression);
 
-            const loader = objectExpression.getProperty('loader');
+    if (array) {
+        const elementsToAdd = elements.filter(e => !array.getElements().map(node => node.getText()).includes(e));
 
-            if (!loader) {
-                return;
-            }
-
-            const loaderText = loader.getText();
-            const exportsMatch = /webpackExports\s*:\s*\[([^\]]*?)(\s*\])/.exec(loaderText);
-
-            if (exportsMatch) {
-                const insertIndex = exportsMatch.index + exportsMatch[0].length - exportsMatch[2].length;
-                const baseIndentation = loader.getIndentationText().length / loader.getIndentationLevel();
-                const indentation = loader.getIndentationText() + ' '.repeat(baseIndentation * 2);
-                loader.replaceWithText(
-                    loaderText.slice(0, insertIndex) + // ... webpackExports: [...
-                    (exportsMatch[1].trim().length > 0 ? ',' : '') +
-                    `\n${indentation}"${elementsToAdd.join(`",\n${indentation}"`)}"` +
-                    (exportsMatch[2].length === 1 ? `\n${loader.getIndentationText() + ' '.repeat(baseIndentation)}` : '') +
-                    loaderText.slice(insertIndex, loaderText.length) // ] ...
-                );
-            }
-
-            loader.formatText();
+        if (elementsToAdd.length === 0) {
+            return;
         }
+
+        array.addElements(elementsToAdd.map(e => "'" + e + "'"), { useNewLines: true });
+
+        const loader = objectExpression.getProperty('loader');
+
+        if (!loader) {
+            return;
+        }
+
+        const loaderText = loader.getText();
+        const exportsMatch = /webpackExports\s*:\s*\[([^\]]*?)(\s*\])/.exec(loaderText);
+
+        if (exportsMatch) {
+            const insertIndex = exportsMatch.index + exportsMatch[0].length - exportsMatch[2].length;
+            const baseIndentation = loader.getIndentationText().length / loader.getIndentationLevel();
+            const indentation = loader.getIndentationText() + ' '.repeat(baseIndentation * 2);
+            loader.replaceWithText(
+                loaderText.slice(0, insertIndex) + // ... webpackExports: [...
+                (exportsMatch[1].trim().length > 0 ? ',' : '') +
+                `\n${indentation}"${elementsToAdd.join(`",\n${indentation}"`)}"` +
+                (exportsMatch[2].length === 1 ? `\n${loader.getIndentationText() + ' '.repeat(baseIndentation)}` : '') +
+                loaderText.slice(insertIndex, loaderText.length) // ] ...
+            );
+        }
+
+        loader.formatText();
     }
 }
 
