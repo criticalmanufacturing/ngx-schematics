@@ -562,7 +562,7 @@ export default function (_options: Schema): Rule {
                 choices: valideTags
             };
 
-            _options.version = (await inquirer.prompt([question])).namespace;
+            _options.version = (await inquirer.prompt([question])).distTag;
         }
 
         if (!_options.version) {
