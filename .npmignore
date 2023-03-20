@@ -1,4 +1,7 @@
 
 # Ignores TypeScript files, but keeps definitions.
 *.ts
+*.js.map
+tsconfig.json
+.github
 !*.d.ts
