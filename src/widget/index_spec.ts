@@ -32,7 +32,7 @@ describe('Generate Widget', () => {
     };
 
     const widgetOptions = {
-        name: 'test-widget',
+        name: 'test',
         project: libraryOptions.name,
         style: 'less'
     }
@@ -109,7 +109,7 @@ describe('Generate Widget', () => {
 
     it('should have the name, iconClass, and settingsComponent properties in the Widget decorator', async () => {
         const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
-        
+
         const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
         expect(widgetContent).toContain(`name: $localize\`:@@${strings.dasherize(widgetOptions.project)}/${strings.dasherize(widgetOptions.name)}-widget#NAME:${nameify(widgetOptions.name)} Widget\``);
         expect(widgetContent).toContain(`iconClass: 'icon-core-st-lg-generic'`);
@@ -138,7 +138,7 @@ describe('Generate Widget', () => {
 
     it('should have the selector, templateUrl, and styleUrls properties in the Component decorator', async () => {
         const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
-        
+
         const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
         expect(widgetContent).toContain(`selector: '${strings.dasherize(widgetOptions.project)}-${strings.dasherize(widgetOptions.name)}-widget'`);
         expect(widgetContent).toContain(`templateUrl: './${strings.dasherize(widgetOptions.name)}-widget.component.html'`);
@@ -148,7 +148,7 @@ describe('Generate Widget', () => {
     it('should extend WidgetGeneric and implement WidgetRepresentation', async () => {
         const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
 
-        const widgetClassName = `${strings.classify(widgetOptions.name)}WidgetComponent`;
+        const widgetClassName = `${strings.classify(widgetOptions.name)}Widget`;
 
         const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
         expect(widgetContent).toContain(`export class ${widgetClassName} extends WidgetGeneric implements WidgetRepresentation {`);
@@ -162,18 +162,9 @@ describe('Generate Widget', () => {
         expect(widgetContent).toContain('super(viewContainerRef, elementRef, feedback);');
     });
 
-    it('should be declared and exported in NgModule', async () => {
-        const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
-
-        const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
-        expect(widgetContent).toContain(`declarations: [${strings.classify(widgetOptions.name)}WidgetComponent]`);
-        expect(widgetContent).toContain(`exports: [${strings.classify(widgetOptions.name)}WidgetComponent]`);
-        expect(widgetContent).toContain(`export class ${strings.classify(widgetOptions.name)}WidgetModule { }`);
-    });
-
     describe('- Generate Widget Settings', () => {
 
-        it('should create the widget settings file', async () => { 
+        it('should create the widget settings file', async () => {
             const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
 
             const files = getAllFilesFromDir(`projects/${libraryOptions.name}/src/lib/${widgetOptions.name}-widget/${widgetOptions.name}-widget-settings`, tree);
@@ -210,7 +201,9 @@ describe('Generate Widget', () => {
 
             const widgetSettingsContent = tree.readContent(`${defaultWidgetSettingsComponentFilePath}.ts`);
             expect(widgetSettingsContent).toMatch(/@Component\(/);
+            expect(widgetSettingsContent).toContain('standalone: true');
             expect(widgetSettingsContent).toContain(`selector: '${strings.dasherize(widgetOptions.project)}-${strings.dasherize(widgetOptions.name)}-widget-settings'`);
+            expect(widgetSettingsContent).toContain('imports: [CommonModule, WidgetSettingsModule]');
             expect(widgetSettingsContent).toContain(`templateUrl: './${strings.dasherize(widgetOptions.name)}-widget-settings.component.html'`);
             expect(widgetSettingsContent).toContain(`styleUrls: ['./${strings.dasherize(widgetOptions.name)}-widget-settings.component.less']`);
         });
@@ -246,27 +239,9 @@ describe('Generate Widget', () => {
 
         it('should have the constructor receiving the ViewContainerRef and providing it to the super', async () => {
             const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
-    
+
             const widgetSettingsContent = tree.readContent(`${defaultWidgetSettingsComponentFilePath}.ts`);
             expect(widgetSettingsContent).toMatch(/constructor\(viewContainerRef: ViewContainerRef\) {\s*super\(viewContainerRef\);\s*}/gm)
-        });
-
-        it('should import WidgetSettingsModule in NgModule', async () => {
-            const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
-    
-            const widgetSettingsContent = tree.readContent(`${defaultWidgetSettingsComponentFilePath}.ts`);
-            expect(widgetSettingsContent).toContain('imports: [WidgetSettingsModule]');
-        });
-
-        it('should be declared and exported in NgModule', async () => {
-            const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
-    
-            const widgetSettingsClassName = `${strings.classify(widgetOptions.name)}WidgetSettings`;
-    
-            const widgetSettingsContent = tree.readContent(`${defaultWidgetSettingsComponentFilePath}.ts`);
-            expect(widgetSettingsContent).toContain(`declarations: [${widgetSettingsClassName}Component]`);
-            expect(widgetSettingsContent).toContain(`exports: [${widgetSettingsClassName}Component]`);
-            expect(widgetSettingsContent).toContain(`export class ${widgetSettingsClassName}Module { }`);
         });
     });
 });

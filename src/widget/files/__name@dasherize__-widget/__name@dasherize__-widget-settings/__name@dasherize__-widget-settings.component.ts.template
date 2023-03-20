@@ -1,8 +1,11 @@
 import {
     Component,
-    NgModule,
     ViewContainerRef
 } from '@angular/core';
+
+import {
+    CommonModule
+} from '@angular/common';
 
 import {
     CustomizableComponent
@@ -43,7 +46,9 @@ import {
  *
  */
 @Component({
+    standalone: true,
     selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget-settings',
+    imports: [CommonModule, WidgetSettingsModule],
     templateUrl: './<%= dasherize(name) %>-widget-settings.component.html',
     <% if (style !== 'none') { %>styleUrls: ['./<%= dasherize(name) %>-widget-settings.component.<%= style %>']<% } %>
 })
@@ -56,10 +61,3 @@ export class <%= classify(name) %>WidgetSettingsComponent extends CustomizableCo
         super(viewContainerRef);
     }
 }
-
-@NgModule({
-    imports: [WidgetSettingsModule],
-    declarations: [<%= classify(name) %>WidgetSettingsComponent],
-    exports: [<%= classify(name) %>WidgetSettingsComponent]
-})
-export class <%= classify(name) %>WidgetSettingsModule { }

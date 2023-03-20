@@ -85,17 +85,17 @@ import {
     viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Page<%= classify(name) %>Component) }]
 })
 export class Page<%= classify(name) %>Component extends CustomizableComponent
-    implements EntityPageInterface<Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>>, LevelsToLoad {
+    implements EntityPageInterface<Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>>, LevelsToLoad {
 
     /**
      * Levels to load of the entity
      */
-    public epLevelsToLoad: number = 1;
+    public epLevelsToLoad = 1;
 
     /**
      * The entity to be presented in this view
      */
-    public epEntity!: Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
+    public epEntity: Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>;
 
     /**
      * Constructor

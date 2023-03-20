@@ -23,8 +23,8 @@ describe('Test ng-add', () => {
 
     const ngAddOptions = {
         project: 'application',
-        registry: 'https://test.registry.npmjs.org',
-        baseApp: 'Core'
+        application: 'Core',
+        version: 'dev'
     }
 
     let appTree: UnitTestTree;
@@ -44,7 +44,6 @@ describe('Test ng-add', () => {
                 '/package.json',
                 '/tsconfig.json',
                 '/.eslintrc.json',
-                '/.npmrc',
                 '/application/tsconfig.app.json',
                 '/application/tsconfig.spec.json',
                 '/application/ngsw-config.json',
@@ -59,19 +58,6 @@ describe('Test ng-add', () => {
             ])
         );
     });
-
-    it('should set the registry in .npmrc', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const npmrcContent = tree.readContent('/.npmrc');
-        expect(npmrcContent).toEqual(`registry=${ngAddOptions.registry}`);
-    })
-
-    it('should not create the .npmrc file', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', { ...ngAddOptions, registry: undefined }, appTree);
-
-        expect(tree.files).not.toEqual(jasmine.arrayContaining(['/.npmrc']));
-    })
 
     describe('- Generate angular.json', () => {
 
@@ -138,7 +124,7 @@ describe('Test ng-add', () => {
 
             const ngAddMesOptions = {
                 ...ngAddOptions,
-                baseApp: 'MES'
+                application: 'MES'
             }
 
             const tree = await schematicRunner.runSchematic('ng-add', ngAddMesOptions, appTree);
@@ -153,11 +139,13 @@ describe('Test ng-add', () => {
     });
 
     describe('- Generate tsconfig.json', () => {
-        it('should have the skipLibCheck flags set to true', async() => {
+        it('should have new configs', async() => {
             const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
     
             const tsConfigJsonContent = parse(tree.readContent('/tsconfig.json'));
-            expect(tsConfigJsonContent.compilerOptions.skipLibCheck).toBeTrue();
+            expect(tsConfigJsonContent.compilerOptions.noImplicitAny).toBeFalse();
+            expect(tsConfigJsonContent.compilerOptions.strictFunctionTypes).toBeFalse();
+            expect(tsConfigJsonContent.compilerOptions.strictNullChecks).toBeFalse();
         })
     });
 
@@ -266,7 +254,7 @@ describe('Test ng-add', () => {
 
             const ngAddMesOptions = {
                 ...ngAddOptions,
-                baseApp: 'MES'
+                application: 'MES'
             }
 
             const tree = await schematicRunner.runSchematic('ng-add', ngAddMesOptions, appTree);

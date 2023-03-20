@@ -90,7 +90,7 @@ export class Page<%= classify(name) %>DetailsViewComponent extends CustomizableC
     /**
      * The entity to be presented in this view
      */
-    public epEntity!: Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
+    public epEntity: Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>;
 
     /**
      * Constructor

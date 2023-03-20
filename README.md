@@ -33,7 +33,8 @@ Update an application with HTML defaults.
 | `--project`       | The name of the project.         | `string`    |               |
 | `--registry`      | The npm registry to use.         | `string`    |               |
 | `--lint`          | Adds eslint to the project.      | `boolean`   | `true`        |
-| `--base-app`      | The base app to be used.         | `string`    | `Core`        |
+| `--application`   | The base application to be used. | `string`    | `MES`         |
+| `--version`       | The version to be used.          | `string`    |               |
 
 #### **Usage:**
 ```
@@ -93,13 +94,14 @@ Creates a new, generic Entity Page definition in the given or default project
 
 | Name          | Description                        | Value Type  |
 | ------------- | ---------------------------------- | ----------- |
-| `name`        | The name of the entity type.       | `string`    |
+| `name`        | The name of the entity page.       | `string`    |
 
 #### **Options:** 
 
 | Name            | Description                          | Value Type  |
 | -------------   | ------------------------------------ | ----------- |
 | `--project`     | The name of the project.             | `string`    |
+| `--entity-type` | The name of the entity type.         | `string`    |
 | `--namespace`   | The namespace of the entity type.    | `string`    |
 
 #### **Usage:**
@@ -229,15 +231,16 @@ Creates a new, generic Wizard Create Edit definition in the given or default pro
 
 #### **Arguments:** 
 
-| Name          | Description                  | Value Type  |
-| ------------- | ---------------------------- | ----------- |
-| `name`        | The name of the entity type. | `string`    |
+| Name          | Description                         | Value Type  |
+| ------------- | ------------------------------------| ----------- |
+| `name`        | The name of the wizard create edit. | `string`    |
 
 #### **Options:** 
 
 | Name            | Description                           | Value Type  | Default Value  |
 | --------------- | ------------------------------------- | ----------- | -------------- |
 | `--project`     | The name of the project.              | `string`    |                |
+| `--entity-type` | The name of the entity type.          | `string`    |                |
 | `--namespace`   | The namespace of the entity type.     | `string`    |                |
 | `--style`       | The processor to use for style files. | `string`    | `less`         |
 

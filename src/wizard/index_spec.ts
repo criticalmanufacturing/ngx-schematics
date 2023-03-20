@@ -109,7 +109,7 @@ describe('Generate Wizard', () => {
         const dasherizedWizardName = strings.dasherize(wizardOptions.name);
 
         const templateRegExp = new RegExp(
-            `<cmf-core-controls-wizard \\[cmf-core-business-controls-transaction-wizard\\]="instance!"\\s*` +
+            `<cmf-core-controls-wizard \\[cmf-core-business-controls-transaction-wizard\\]="instance"\\s*` +
                 `i18n-mainTitle="@@${strings.dasherize(wizardOptions.project)}/wizard-${dasherizedWizardName}#TITLE"\\s*` +
                 `mainTitle="${nameify(wizardOptions.name)}"\\s*`+
                 `i18n-action-name="@@${strings.dasherize(wizardOptions.project)}/wizard-${dasherizedWizardName}#ACTION"\\s*` +
@@ -133,7 +133,9 @@ describe('Generate Wizard', () => {
 
         const wizardContent = tree.readContent(`${wizardPath}/wizard-${strings.dasherize(wizardOptions.name)}.component.ts`);
         expect(wizardContent).toMatch(/@Component\(/);
-        expect(wizardContent).toContain(`selector: '${strings.dasherize(wizardOptions.project)}-wizard-${strings.dasherize(wizardOptions.name)}'`);
+        expect(wizardContent).toContain(`standalone: true`);
+        expect(wizardContent).toContain(`selector: '${strings.dasherize(wizardOptions.project)}-wizard-${strings.dasherize(wizardOptions.name)}'`);        
+        expect(wizardContent).toMatch(/imports: \[\s*((CommonModule|TransactionWizardModule)\s*,?\s*){2}\]/gm);
         expect(wizardContent).toContain(`templateUrl: './wizard-${strings.dasherize(wizardOptions.name)}.component.html'`);
         expect(wizardContent).toContain(`styleUrls: ['./wizard-${strings.dasherize(wizardOptions.name)}.component.less']`);
         expect(wizardContent).toContain(`viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Wizard${strings.classify(wizardOptions.name)}Component) }]`);
@@ -150,7 +152,7 @@ describe('Generate Wizard', () => {
         const tree = await schematicRunner.runSchematic('wizard', wizardOptions, appTree);
 
         const wizardContent = tree.readContent(`${wizardPath}/wizard-${strings.dasherize(wizardOptions.name)}.component.ts`);
-        expect(wizardContent).toContain(`implements TransactionWizard, OnInit`);
+        expect(wizardContent).toContain(`implements OnInit, TransactionWizard`);
         expect(wizardContent).toContain(`public async prepareDataInput(): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput[]> {`);
         expect(wizardContent).toContain(`public async handleDataOutput(outputs: Cmf.Foundation.BusinessOrchestration.BaseOutput[], wizardArgs?: WizardEventArgs): Promise<void> {`);
         expect(wizardContent).toContain(`public async prepareTransactionInput(args: TransactionEventArgs): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput> {`);
@@ -165,20 +167,4 @@ describe('Generate Wizard', () => {
         expect(wizardContent).toMatch(/constructor\(\s*((viewContainerRef: ViewContainerRef|private pageBag: PageBag|private util: UtilService|private entityTypes: EntityTypeService)\s*,?\s*){4}\)/gm);
         expect(wizardContent).toContain('super(viewContainerRef);');
     });
-
-    it('should import CommonModule and TransactionWizardModule in NgModule', async () => {
-        const tree = await schematicRunner.runSchematic('wizard', wizardOptions, appTree);
-
-        const wizardContent = tree.readContent(`${wizardPath}/wizard-${strings.dasherize(wizardOptions.name)}.component.ts`);
-        expect(wizardContent).toMatch(/imports: \[\s*((CommonModule|TransactionWizardModule)\s*,?\s*){2}\]/gm);
-    });
-
-    it('should be declared and exported in NgModule', async () => {
-        const tree = await schematicRunner.runSchematic('wizard', wizardOptions, appTree);
-
-        const wizardContent = tree.readContent(`${wizardPath}/wizard-${strings.dasherize(wizardOptions.name)}.component.ts`);
-        expect(wizardContent).toContain(`declarations: [Wizard${strings.classify(wizardOptions.name)}Component]`);
-        expect(wizardContent).toContain(`exports: [Wizard${strings.classify(wizardOptions.name)}Component]`);
-        expect(wizardContent).toContain(`export class Wizard${strings.classify(wizardOptions.name)}Module { }`);
-    });
-})
+});

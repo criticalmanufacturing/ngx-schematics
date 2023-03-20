@@ -1,6 +1,5 @@
 import {
     Component,
-    NgModule,
     OnInit,
     ViewContainerRef
 } from '@angular/core';
@@ -85,7 +84,9 @@ import {
  *
  */
 @Component({
+    standalone: true,
     selector: '<%= dasherize(project) %>-wizard-create-edit-<%= dasherize(name) %>',
+    imports: [CommonModule, CreateEditEntityModule, CreateEditStepGeneralDataModule],
     templateUrl: './wizard-create-edit-<%= dasherize(name) %>.component.html',
     <% if (style !== 'none') { %>styleUrls: ['./wizard-create-edit-<%= dasherize(name) %>.component.<%= style %>']<% } %>
 })
@@ -99,17 +100,17 @@ export class WizardCreateEdit<%= classify(name) %>Component extends Customizable
     /**
      * Wizard title
      */
-    public title!: string;
+    public title: string;
 
     /**
      * Wizard action name
      */
-    public action!: string;
+    public action: string;
 
     /**
      * The instance of the wizard
      */
-    public instance: Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %> | null = null;
+    public instance: Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
 
     /**
      * Constructor
@@ -121,6 +122,35 @@ export class WizardCreateEdit<%= classify(name) %>Component extends Customizable
         private entityTypes: EntityTypeService
     ) {
         super(viewContainerRef);
+    }
+
+    /**
+     * NgOnInit
+     * Sets the basic wizard content according to the pageBag context
+     */
+    public ngOnInit(): void {
+        if (this._pageBag != null && this._pageBag.context != null) {
+            if (this._pageBag.context.editMode != null) {
+                this.editMode = this._pageBag.context.editMode;
+            }
+
+            // edit mode
+            if (this._pageBag.context.editMode === EditMode.Edit) {
+                if (this._pageBag.context.instance == null
+                || !this.util.instanceof(this._pageBag.context.instance, Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>)) {
+                    throw new Error($localize`:@<%= dasherize(project) %>/<%= dasherize(name) %>#NO_INSTANCE_FOUND:No Instance Found`);
+                }
+
+                this.title = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#TITLE_EDIT:Edit <%= nameify(name) %>`;
+                this.action = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#SAVE:Save`;
+            } else {
+                this.title = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#TITLE_CREATE:Create <%= nameify(name) %>`;
+                this.action = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#CREATE:Create`;
+                this.instance = new Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>();
+            }
+        } else {
+            throw new Error($localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#MISSING_CONTEXT:Missing context`);
+        }
     }
 
     /**
@@ -162,47 +192,7 @@ export class WizardCreateEdit<%= classify(name) %>Component extends Customizable
      * On Before Service Call from the createEditEntity
      */
     public onBeforeServiceCall = (): Cmf.Foundation.BusinessOrchestration.BaseInput => {
-        const input: Cmf.Foundation.BusinessOrchestration.BaseInput | undefined;
+        const input = new Cmf.Foundation.BusinessOrchestration.BaseInput();
         return input;
     };
-
-    /**
-     * NgOnInit
-     * Sets the basic wizard content according to the pageBag context
-     */
-    public ngOnInit(): void {
-        if (this._pageBag != null && this._pageBag.context != null) {
-            if (this._pageBag.context.editMode != null) {
-                this.editMode = this._pageBag.context.editMode;
-            }
-
-            // edit mode
-            if (this._pageBag.context.editMode === EditMode.Edit) {
-                if (this._pageBag.context.instance == null
-                || !this.util.instanceof(this._pageBag.context.instance, Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>)) {
-                    throw new Error($localize`:@<%= dasherize(project) %>/<%= dasherize(name) %>#NO_INSTANCE_FOUND:No Instance Found`);
-                }
-
-                this.title = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#TITLE_EDIT:Edit <%= nameify(name) %>`;
-                this.action = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#SAVE:Save`;
-            } else {
-                this.title = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#TITLE_CREATE:Create <%= nameify(name) %>`;
-                this.action = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#CREATE:Create`;
-                this.instance = new Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>();
-            }
-        } else {
-            throw new Error($localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#MISSING_CONTEXT:Missing context`);
-        }
-    }
 }
-
-@NgModule({
-    imports: [
-        CommonModule,
-        CreateEditEntityModule,
-        CreateEditStepGeneralDataModule
-    ],
-    declarations: [WizardCreateEdit<%= classify(name) %>Component],
-    exports: [WizardCreateEdit<%= classify(name) %>Component]
-})
-export class WizardCreateEdit<%= classify(name) %>Module { }

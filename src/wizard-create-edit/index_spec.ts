@@ -137,7 +137,9 @@ describe('Generate Wizard Create Edit', () => {
 
         const wizardContent = tree.readContent(`${wizardPath}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.ts`);
         expect(wizardContent).toMatch(/@Component\(/);
+        expect(wizardContent).toContain(`standalone: true`);
         expect(wizardContent).toContain(`selector: '${strings.dasherize(wizardOptions.project)}-wizard-create-edit-${strings.dasherize(wizardOptions.name)}'`);
+        expect(wizardContent).toMatch(/imports: \[\s*((CommonModule|CreateEditEntityModule|CreateEditStepGeneralDataModule)\s*,?\s*){3}\]/gm);
         expect(wizardContent).toContain(`templateUrl: './wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.html'`);
         expect(wizardContent).toContain(`styleUrls: ['./wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.less']`);
     });
@@ -173,20 +175,4 @@ describe('Generate Wizard Create Edit', () => {
         expect(wizardContent).toContain('public onInitialSetupFinish = (instance: any, outputs: Cmf.Foundation.BusinessOrchestration.BaseOutput[]): void => {');
         expect(wizardContent).toContain('public onBeforeServiceCall = (): Cmf.Foundation.BusinessOrchestration.BaseInput => {');
     });
-
-    it('should import CommonModule, CreateEditEntityModule, and CreateEditStepGeneralDataModule in NgModule', async () => {
-        const tree = await schematicRunner.runSchematic('wizard-create-edit', wizardOptions, appTree);
-
-        const wizardContent = tree.readContent(`${wizardPath}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.ts`);
-        expect(wizardContent).toMatch(/imports: \[\s*((CommonModule|CreateEditEntityModule|CreateEditStepGeneralDataModule)\s*,?\s*){3}\]/gm);
-    });
-
-    it('should be declared and exported in NgModule', async () => {
-        const tree = await schematicRunner.runSchematic('wizard-create-edit', wizardOptions, appTree);
-
-        const wizardContent = tree.readContent(`${wizardPath}/wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.ts`);
-        expect(wizardContent).toContain(`declarations: [WizardCreateEdit${strings.classify(wizardOptions.name)}Component]`);
-        expect(wizardContent).toContain(`exports: [WizardCreateEdit${strings.classify(wizardOptions.name)}Component]`);
-        expect(wizardContent).toContain(`export class WizardCreateEdit${strings.classify(wizardOptions.name)}Module { }`);
-    });
-})
+});

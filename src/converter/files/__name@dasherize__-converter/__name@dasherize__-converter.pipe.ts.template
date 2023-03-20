@@ -1,5 +1,4 @@
 import {
-    NgModule,
     Pipe,
     PipeTransform
 } from '@angular/core';
@@ -25,17 +24,11 @@ import {
     output: null
 })
 @Pipe({
+    standalone: true,
     name: '<%= camelize(name) %>'
 })
-export class <%= classify(name) %>Pipe implements PipeTransform {
+export class <%= classify(name) %>Converter implements PipeTransform {
     transform(value: any, ...args: any[]): any {
         return value;
     }
 }
-
-@NgModule({
-    imports: [],
-    declarations: [<%= classify(name) %>Pipe],
-    exports: [<%= classify(name) %>Pipe]
-})
-export class <%= classify(name) %>PipeModule { }

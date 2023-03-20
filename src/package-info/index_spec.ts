@@ -47,7 +47,7 @@ describe('Generate Package Info', () => {
 
     it('should generate the package-info having a Widget', async () => {
 
-        const widgetName = 'test-widget';
+        const widgetName = 'test';
 
         let tree = await schematicRunner.runSchematic(
                 'widget',
@@ -60,17 +60,17 @@ describe('Generate Package Info', () => {
 
         tree = await schematicRunner.runSchematic('package-info', packageInfoOptions, tree);
 
-        const widgetComponentName = `${strings.classify(widgetName)}WidgetComponent`;
+        const widgetComponentName = `${strings.classify(widgetName)}Widget`;
 
         const metadataContent = tree.readContent(defaultMetadataFilePath);
-        const packageInfoWidgets = metadataContent.match(/widgets: \[(\r*\n*\s*)(\W|\w)+\]/gm)?.[0];
+        const packageInfoWidgets = metadataContent.match(/widgets: \[(\r*\n*\s*)(\W|\w)+?\]/gm)?.[0];
         expect(packageInfoWidgets).not.toBeNull();
         expect(packageInfoWidgets).toContain(`'${widgetComponentName}'`);
     });
 
     it('should generate the package-info having a Data Source', async () => {
 
-        const dataSourceName = 'test-data-source';
+        const dataSourceName = 'test';
 
         let tree = await schematicRunner.runSchematic(
                 'data-source',
@@ -86,14 +86,14 @@ describe('Generate Package Info', () => {
         const dataSourceComponentName = `${strings.classify(dataSourceName)}DataSource`;
 
         const metadataContent = tree.readContent(defaultMetadataFilePath);
-        const packageInfoDataSources = metadataContent.match(/dataSources: \[(\r*\n*\s*)(\W|\w)+\]/gm)?.[0];
+        const packageInfoDataSources = metadataContent.match(/dataSources: \[(\r*\n*\s*)(\W|\w)+?\]/gm)?.[0];
         expect(packageInfoDataSources).not.toBeNull();
         expect(packageInfoDataSources).toContain(`'${dataSourceComponentName}'`);
     });
 
     it('should generate the package-info having a Converter', async () => {
 
-        const converterName = 'test-converter';
+        const converterName = 'test';
 
         let tree = await schematicRunner.runSchematic(
                 'converter',
@@ -107,10 +107,10 @@ describe('Generate Package Info', () => {
 
         tree = await schematicRunner.runSchematic('package-info', packageInfoOptions, tree);
 
-        const converterComponentName = `${strings.classify(converterName)}Pipe`;
+        const converterComponentName = `${strings.classify(converterName)}Converter`;
 
         const metadataContent = tree.readContent(defaultMetadataFilePath);
-        const packageInfoConverters = metadataContent.match(/converters: \[(\r*\n*\s*)(\W|\w)+\]/gm)?.[0];
+        const packageInfoConverters = metadataContent.match(/converters: \[(\r*\n*\s*)(\W|\w)+?\]/gm)?.[0];
         expect(packageInfoConverters).not.toBeNull();
         expect(packageInfoConverters).toContain(`'${converterComponentName}'`);
     });
@@ -124,6 +124,7 @@ describe('Generate Package Info', () => {
                 {
                     name: entityPageName,
                     project: libraryOptions.name,
+                    entityType: 'TestEntityType',
                     namespace: 'TestNamespace'
                 },
                 appTree

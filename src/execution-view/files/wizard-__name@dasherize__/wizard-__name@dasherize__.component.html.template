@@ -1,4 +1,4 @@
-<cmf-core-controls-execution-view [cmf-core-business-controls-transaction-execution-view]="instance!"
+<cmf-core-controls-execution-view [cmf-core-business-controls-transaction-execution-view]="instance"
     i18n-mainTitle="@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#TITLE" mainTitle="<%= nameify(name) %>"
     i18n-action-name="@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#ACTION" action-name="Finish">
 

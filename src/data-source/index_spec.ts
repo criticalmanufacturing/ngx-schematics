@@ -32,12 +32,12 @@ describe('Generate Data Source', () => {
     };
 
     const dataSourceOptions = {
-        name: 'test-data-source',
+        name: 'test',
         project: libraryOptions.name,
         style: 'less'
     }
 
-    const defaultDataSourceFilePath = `projects/${libraryOptions.name}/src/lib/${dataSourceOptions.name}-data-source/${dataSourceOptions.name}-data-source.ts`;
+    const defaultDataSourceFilePath = `projects/${libraryOptions.name}/src/lib/${dataSourceOptions.name}-data-source/${dataSourceOptions.name}-data-source.service.ts`;
     const defaultDataSourceSettingsComponentFilePath = `projects/${libraryOptions.name}/src/lib/${dataSourceOptions.name}-data-source/${dataSourceOptions.name}-data-source-settings/${dataSourceOptions.name}-data-source-settings.component`;
 
     let appTree: UnitTestTree;
@@ -106,7 +106,7 @@ describe('Generate Data Source', () => {
     it('should have the name and settingsComponent properties in the DataSource decorator', async () => {
         const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
 
-        const dataSourceSettingsName = `${strings.classify(dataSourceOptions.name)}DataSourceSettings`;
+        const dataSourceSettingsName = `${strings.classify(dataSourceOptions.name)}DataSourceSettingsComponent`;
         
         const dataSourceContent = tree.readContent(defaultDataSourceFilePath);
         expect(dataSourceContent).toContain(`name: $localize\`:@@${strings.dasherize(dataSourceOptions.project)}/${dataSourceOptions.name}-data-source#NAME:${nameify(dataSourceOptions.name)}\``);
@@ -179,7 +179,9 @@ describe('Generate Data Source', () => {
 
             const dataSourceSettingsContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.ts`);
             expect(dataSourceSettingsContent).toMatch(/@Component\(/);
+            expect(dataSourceSettingsContent).toContain(`standalone: true`);
             expect(dataSourceSettingsContent).toContain(`selector: '${strings.dasherize(dataSourceOptions.project)}-${strings.dasherize(dataSourceOptions.name)}-data-source-settings'`);
+            expect(dataSourceSettingsContent).toMatch(/imports: \[\s*((CommonModule|DataSourceSettingsModule)\s*,?\s*){2}\]/gm);
             expect(dataSourceSettingsContent).toContain(`templateUrl: './${strings.dasherize(dataSourceOptions.name)}-data-source-settings.component.html'`);
             expect(dataSourceSettingsContent).toContain(`styleUrls: ['./${strings.dasherize(dataSourceOptions.name)}-data-source-settings.component.less']`);
         });
@@ -218,24 +220,6 @@ describe('Generate Data Source', () => {
     
             const dataSourceSettingsContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.ts`);
             expect(dataSourceSettingsContent).toMatch(/constructor\(viewContainerRef: ViewContainerRef\) {\s*super\(viewContainerRef\);\s*}/gm)
-        });
-
-        it('should import CommonModule and DataSourceSettingsModule in NgModule', async () => {
-            const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
-    
-            const dataSourceSettingsContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.ts`);
-            expect(dataSourceSettingsContent).toMatch(/imports: \[\s*((CommonModule|DataSourceSettingsModule)\s*,?\s*){2}\]/gm);
-        });
-
-        it('should be declared and exported in NgModule', async () => {
-            const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
-    
-            const dataSourceSettingsClassName = `${strings.classify(dataSourceOptions.name)}DataSourceSettings`;
-    
-            const dataSourceSettingsContent = tree.readContent(`${defaultDataSourceSettingsComponentFilePath}.ts`);
-            expect(dataSourceSettingsContent).toContain(`declarations: [${dataSourceSettingsClassName}Component]`);
-            expect(dataSourceSettingsContent).toContain(`exports: [${dataSourceSettingsClassName}Component]`);
-            expect(dataSourceSettingsContent).toContain(`export class ${dataSourceSettingsClassName}Module { }`);
         });
     });
 });

@@ -16,7 +16,7 @@ import {
     Page<%= classify(name) %>Module
 } from './page-<%= dasherize(name) %>.component';
 
-const routes: Routes = EntityTypeMetadataService.getRoutes('<%= classify(name) %>', Page<%= classify(name) %>Component);
+const routes: Routes = EntityTypeMetadataService.getRoutes('<%= classify(entityType) %>', Page<%= classify(name) %>Component);
 
 @NgModule({
     imports: [

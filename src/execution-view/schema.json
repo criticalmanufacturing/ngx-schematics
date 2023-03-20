@@ -22,12 +22,12 @@
         },
         "name": {
             "type": "string",
-            "description": "The name of the action that the execution view will perform.",
+            "description": "The name of the execution-view.",
             "$default": {
                 "$source": "argv",
                 "index": 0
             },
-            "x-prompt": "What is the name of the action?"
+            "x-prompt": "What name would you like to use for the execution-view?"
         },
         "entityType": {
             "type": "string",
