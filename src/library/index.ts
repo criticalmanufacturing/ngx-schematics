@@ -62,7 +62,6 @@ function createMetadataSubEntry(options: any) {
         const packageName = `${options.name}/metadata`;
         const folderName = basename(normalize(project!.root));
         const distRoot = `dist/${folderName}/metadata`;
-        const pathImportLib = `${distRoot}/${packageName.replace('/', '-')}`;
         const namePrefix = addedProject.replace(/^cmf-/, '');
 
         const templateSource = apply(url('./files'), [
@@ -80,7 +79,7 @@ function createMetadataSubEntry(options: any) {
 
         return chain([
             mergeWith(templateSource),
-            options.skipTsConfig ? noop() : updateTsConfig({ [`compilerOptions.paths.${packageName}`]: [pathImportLib, distRoot] }),
+            options.skipTsConfig ? noop() : updateTsConfig([[['compilerOptions', 'paths', packageName], [distRoot]]]),
             updateAppModule({ packageName, namePrefix })
         ]);
     }

@@ -155,7 +155,7 @@ export function getMetadataFilePath(tree: Tree, project: ProjectDefinition): str
     return;
 }
 
-export function updateTsConfig(rules: Record<string, any>) {
+export function updateTsConfig(rules: [string[], any][]) {
     return async (tree: Tree) => {
         if (!tree.exists('tsconfig.json')) {
             return;
@@ -163,12 +163,11 @@ export function updateTsConfig(rules: Record<string, any>) {
 
         const file = new JSONFile(tree, 'tsconfig.json');
 
-        Object.keys(rules).forEach((rule) => {
-            const jsonPath = rule.split('.');
-            const newValue = rules[rule];
-            const oldValue = file.get(jsonPath);
+        rules.forEach(([path, value]) => {
+            const newValue = value;
+            const oldValue = file.get(path);
 
-            file.modify(jsonPath, Array.isArray(oldValue) ? [...oldValue, ...newValue] : newValue);
+            file.modify(path, Array.isArray(oldValue) ? [...oldValue, ...newValue] : newValue);
         });
     };
 }

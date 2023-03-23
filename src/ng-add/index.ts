@@ -299,12 +299,12 @@ function installSchematics(_options: Required<Schema>) {
             overrideComponentTemplate(),
             updateAppModule(_options.application),
             updateMain(),
-            updateTsConfig({
-                "compilerOptions.strictFunctionTypes": false,
-                "compilerOptions.noImplicitAny": false,
-                "compilerOptions.strictNullChecks": false,
-                "compilerOptions.allowSyntheticDefaultImports": true
-            })
+            updateTsConfig([
+                [['compilerOptions', 'strictFunctionTypes'], false],
+                [['compilerOptions', 'noImplicitAny'], false],
+                [['compilerOptions', 'strictNullChecks'], false],
+                [['compilerOptions', 'allowSyntheticDefaultImports'], true],
+            ])
         ]);
     };
 }
