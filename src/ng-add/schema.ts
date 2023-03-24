@@ -1,21 +1,21 @@
 export interface Schema {
-    /**
-     * The name of the project.
-     */
-    project?: string;
+  /**
+   * The name of the project.
+   */
+  project?: string;
 
-    /**
-     * The base app to use.
-     */
-    application: 'MES' | 'Core';
+  /**
+   * The base app to use.
+   */
+  application: 'MES' | 'Core';
 
-    /**
-     * The base app version to use.
-     */
-    version?: string;
+  /**
+   * The base app version to use.
+   */
+  version?: string;
 
-    /**
-     * Add eslint to the project.
-     */
-    eslint?: string,
+  /**
+   * Add eslint to the project.
+   */
+  eslint?: string;
 }
