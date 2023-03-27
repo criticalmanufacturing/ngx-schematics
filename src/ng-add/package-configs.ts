@@ -123,12 +123,7 @@ export const PROJECT_ASSETS = [
  * Project Core Assets
  */
 export const PROJECT_CORE_ASSETS = [
-  ...PROJECT_ASSETS,
-  {
-    glob: '*.svg',
-    input: 'node_modules/cmf-core/assets/img/logos',
-    output: 'assets/img/logos',
-  },
+  ...PROJECT_ASSETS
 ];
 
 /**
@@ -140,12 +135,7 @@ export const PROJECT_MES_ASSETS = [
     glob: '**/*.svg',
     input: 'node_modules/cmf-mes-business-controls/assets/product/img',
     output: 'assets/business-controls/product',
-  },
-  {
-    glob: '*.svg',
-    input: 'node_modules/cmf-mes/assets/img/logos',
-    output: 'assets/img/logos',
-  },
+  }
 ];
 
 /**
