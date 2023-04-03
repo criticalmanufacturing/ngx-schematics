@@ -19,4 +19,29 @@ export interface Schema {
    * The file extension or preprocessor to use for style files, or 'none' to skip generating the style file.
    */
   style: string;
+
+  /**
+   * The title of the task.
+   */
+  title: string;
+
+  /**
+   * The icon name of the task.
+   */
+  icon: string;
+
+  /**
+   * Do not generate dynamic inputs for this task.
+   */
+  hasInputs: boolean;
+
+  /**
+   * Do not generate dynamic outputs for this task.
+   */
+  hasOutputs: boolean;
+
+  /**
+   * Do not generate task protocol for this task.
+   */
+  isForProtocol: boolean;
 }

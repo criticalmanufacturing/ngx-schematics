@@ -2,24 +2,23 @@ import {
   apply,
   applyTemplates,
   chain,
+  filter,
   mergeWith,
   move,
+  noop,
   Rule,
-  SchematicContext,
   SchematicsException,
+  strings,
   Tree,
   url
 } from '@angular-devkit/schematics';
-import { strings } from '@angular-devkit/core';
 import { readWorkspace } from '@schematics/angular/utility';
-
-import { updateMetadataPackageInfo, updatePublicAPI } from '../utility/project';
 import { nameify } from '../utility/string';
 import { buildDefaultPath, parseName } from '../utility/workspace';
 import { Schema } from './schema';
 
 export default function (_options: Schema): Rule {
-  return async (tree: Tree, _context: SchematicContext) => {
+  return async (tree: Tree) => {
     const workspace = await readWorkspace(tree);
     const project = workspace.projects.get(_options.project);
 
@@ -30,7 +29,7 @@ export default function (_options: Schema): Rule {
     }
 
     if (!_options.name) {
-      throw new SchematicsException(`Converter name is required`);
+      throw new SchematicsException(`Task name is required`);
     }
 
     if (_options.path === undefined) {
@@ -41,23 +40,20 @@ export default function (_options: Schema): Rule {
     _options.name = parsedPath.name;
     _options.path = parsedPath.path;
 
+    const skipStyleFile = _options.style === 'none';
+
     const templateSource = apply(url('./files'), [
+      skipStyleFile
+        ? filter((path) => !path.endsWith('.__style__.template'))
+        : noop(),
       applyTemplates({
         ...strings,
         ..._options,
-        nameify,
-        project: _options.project
+        nameify
       }),
       move(parsedPath.path)
     ]);
 
-    return chain([
-      mergeWith(templateSource),
-      updatePublicAPI(project),
-      updateMetadataPackageInfo(project, {
-        converters: [strings.classify(_options.name) + 'Converter'],
-        package: _options.project
-      })
-    ]);
+    return chain([mergeWith(templateSource)]);
   };
 }

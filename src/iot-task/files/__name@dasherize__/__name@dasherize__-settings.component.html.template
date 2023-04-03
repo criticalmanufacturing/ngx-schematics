@@ -1,0 +1,10 @@
+<% if (hasInputs && hasOutputs) { %><cmf-core-connect-iot-taskSettings [showInputsTab]="true" [showOutputsTab]="true">
+<% } else if (hasInputs) { %> <cmf-core-connect-iot-taskSettings [showInputsTab]="true">
+<% } else if (hasOutputs) { %> <cmf-core-connect-iot-taskSettings [showOutputsTab]="true">
+<% } else { %> <cmf-core-connect-iot-taskSettings><% } %>
+
+    <cmf-core-controls-baseWidget i18n-mainTitle="@@<%= dasherize(project) %>/<%= dasherize(name) %>#SETTINGS" mainTitle="Settings">
+        <!-- Add settings here -->
+    </cmf-core-controls-baseWidget>
+
+</cmf-core-connect-iot-taskSettings>

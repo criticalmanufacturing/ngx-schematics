@@ -10,7 +10,6 @@ on:
         required: false
         description: 'Tag to publish'
 jobs:
-
   build-and-publish:
     runs-on: ubuntu-latest
     steps:

@@ -5,13 +5,13 @@ import {
   normalize,
   Path,
   relative,
-  split,
+  split
 } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
 import {
   ProjectDefinition,
   readWorkspace,
-  TargetDefinition,
+  TargetDefinition
 } from '@schematics/angular/utility';
 import { ts } from 'ts-morph';
 import { findBootstrapModulePath } from './ast';
@@ -29,7 +29,7 @@ export interface NameLocation {
  */
 export enum ProjectType {
   Application = 'application',
-  Library = 'library',
+  Library = 'library'
 }
 
 /**
@@ -74,7 +74,7 @@ export function parseName(path: string, name: string): NameLocation {
 
   return {
     name: nameWithoutPath,
-    path: normalize('/' + namePath),
+    path: normalize('/' + namePath)
   };
 }
 

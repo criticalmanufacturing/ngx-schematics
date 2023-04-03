@@ -1,5 +1,5 @@
 **Critical Manufacturing Schematics Repository**
-========= 
+=========
 
 **Critical Manufacturing Schematics** is the base of any CMF MES HTML Graphical User Interface customization project. This repository is meant to be a quick and easy way of getting started with CMF MES GUI customization, by providing a basic structure for the project and all the recommended tooling.
 
@@ -22,21 +22,22 @@
 
 Update an application with HTML defaults.
 
-#### **Arguments:** 
+#### **Arguments:**
 
-*No arguments available.*
+_No arguments available._
 
-#### **Options:** 
+#### **Options:**
 
-| Name              | Description                      | Value Type  | Default Value |
-| ----------------- | -------------------------------- | ----------- | ------------- |
-| `--project`       | The name of the project.         | `string`    |               |
-| `--registry`      | The npm registry to use.         | `string`    |               |
-| `--lint`          | Adds eslint to the project.      | `boolean`   | `true`        |
-| `--application`   | The base application to be used. | `string`    | `MES`         |
-| `--version`       | The version to be used.          | `string`    |               |
+| Name            | Description                      | Value Type | Default Value |
+| --------------- | -------------------------------- | ---------- | ------------- |
+| `--project`     | The name of the project.         | `string`   |               |
+| `--registry`    | The npm registry to use.         | `string`   |               |
+| `--lint`        | Adds eslint to the project.      | `boolean`  | `true`        |
+| `--application` | The base application to be used. | `string`   | `MES`         |
+| `--version`     | The version to be used.          | `string`   |               |
 
 #### **Usage:**
+
 ```
 ng add
 ```
@@ -47,19 +48,20 @@ ng add
 
 Creates a new, generic Converter definition in the given or default project
 
-#### **Arguments:** 
+#### **Arguments:**
 
-| Name          | Description                      | Value Type  |
-| ------------- | -------------------------------- | ----------- |
-| `name`        | The name of the converter.       | `string`    |
+| Name   | Description                | Value Type |
+| ------ | -------------------------- | ---------- |
+| `name` | The name of the converter. | `string`   |
 
-#### **Options:** 
+#### **Options:**
 
-| Name            | Description                      | Value Type  |
-| --------------- | -------------------------------- | ----------- |
-| `--project`     | The name of the project.         | `string`    |
+| Name        | Description              | Value Type |
+| ----------- | ------------------------ | ---------- |
+| `--project` | The name of the project. | `string`   |
 
 #### **Usage:**
+
 ```
 ng generate converter [name]
 ```
@@ -68,20 +70,21 @@ ng generate converter [name]
 
 Creates a new, generic Data Source definition in the given or default project
 
-#### **Arguments:** 
+#### **Arguments:**
 
-| Name          | Description                        | Value Type  |
-| ------------- | ---------------------------------- | ----------- |
-| `name`        | The name of the data source.       | `string`    |
+| Name   | Description                  | Value Type |
+| ------ | ---------------------------- | ---------- |
+| `name` | The name of the data source. | `string`   |
 
-#### **Options:** 
+#### **Options:**
 
-| Name            | Description                           | Value Type  | Default Value  |
-| --------------- | ------------------------------------- | ----------- | -------------- |
-| `--project`     | The name of the project.              | `string`    |                |
-| `--style`       | The processor to use for style files. | `string`    | `less`         |
+| Name        | Description                           | Value Type | Default Value |
+| ----------- | ------------------------------------- | ---------- | ------------- |
+| `--project` | The name of the project.              | `string`   |               |
+| `--style`   | The processor to use for style files. | `string`   | `less`        |
 
 #### **Usage:**
+
 ```
 ng generate data-source [name]
 ```
@@ -90,21 +93,22 @@ ng generate data-source [name]
 
 Creates a new, generic Entity Page definition in the given or default project
 
-#### **Arguments:** 
+#### **Arguments:**
 
-| Name          | Description                        | Value Type  |
-| ------------- | ---------------------------------- | ----------- |
-| `name`        | The name of the entity page.       | `string`    |
+| Name   | Description                  | Value Type |
+| ------ | ---------------------------- | ---------- |
+| `name` | The name of the entity page. | `string`   |
 
-#### **Options:** 
+#### **Options:**
 
-| Name            | Description                          | Value Type  |
-| -------------   | ------------------------------------ | ----------- |
-| `--project`     | The name of the project.             | `string`    |
-| `--entity-type` | The name of the entity type.         | `string`    |
-| `--namespace`   | The namespace of the entity type.    | `string`    |
+| Name            | Description                       | Value Type |
+| --------------- | --------------------------------- | ---------- |
+| `--project`     | The name of the project.          | `string`   |
+| `--entity-type` | The name of the entity type.      | `string`   |
+| `--namespace`   | The namespace of the entity type. | `string`   |
 
 #### **Usage:**
+
 ```
 ng generate entity-page [name]
 ```
@@ -113,22 +117,23 @@ ng generate entity-page [name]
 
 Creates a new, generic Execution View definition in the given or default project
 
-#### **Arguments:** 
+#### **Arguments:**
 
-| Name           | Description                                                        | Value Type  |
-| -------------- | ------------------------------------------------------------------ | ----------- |
-| `name`         | The name of the action that the execution view will perform.       | `string`    |
-| `entity-type`  | The name of the entity type to be performed.                       | `string`    |
+| Name          | Description                                                  | Value Type |
+| ------------- | ------------------------------------------------------------ | ---------- |
+| `name`        | The name of the action that the execution view will perform. | `string`   |
+| `entity-type` | The name of the entity type to be performed.                 | `string`   |
 
-#### **Options:** 
+#### **Options:**
 
-| Name            | Description                           | Value Type  | Default Value  |
-| --------------- | ------------------------------------- | ----------- | -------------- |
-| `--project`     | The name of the project.              | `string`    |                |
-| `--namespace`   | The namespace of the entity type.     | `string`    |                |
-| `--style`       | The processor to use for style files. | `string`    | `less`         |
+| Name          | Description                           | Value Type | Default Value |
+| ------------- | ------------------------------------- | ---------- | ------------- |
+| `--project`   | The name of the project.              | `string`   |               |
+| `--namespace` | The namespace of the entity type.     | `string`   |               |
+| `--style`     | The processor to use for style files. | `string`   | `less`        |
 
 #### **Usage:**
+
 ```
 ng generate execution-view [name] --entity-type [entityType]
 ```
@@ -137,25 +142,26 @@ ng generate execution-view [name] --entity-type [entityType]
 
 Creates a new, generic Library project in the current workspace
 
-#### **Arguments:** 
+#### **Arguments:**
 
-| Name          | Description               | Value Type  |
-| ------------- | ------------------------- | ----------- |
-| `name`        | The name of the library.  | `string`    |
+| Name   | Description              | Value Type |
+| ------ | ------------------------ | ---------- |
+| `name` | The name of the library. | `string`   |
 
-#### **Options:** 
+#### **Options:**
 
-| Name                  | Description                                                                                | Value Type  | Default Value  |
-| --------------------- | ------------------------------------------------------------------------------------------ | ----------- | -------------- |
-| `--entry-file`        | The path at which to create the library's public API file, relative to the workspace root. | `string`    | `public-api`   |
-| `--prefix`            | A prefix to apply to generated selectors.                                                  | `string`    | `lib`          |
-| `--skip-package-json` | Do not add dependencies to the "package.json" file.                                        | `boolean`   | `false`        |
-| `--skip-install`      | Do not install dependency packages.                                                        | `boolean`   | `false`        |
-| `--skip-ts-config`    | Do not update "tsconfig.json" to add a path mapping for the new library.                   | `boolean`   | `false`        |
-| `--skip-metadata`     | Do not generate metadata for the new library.                                              | `boolean`   | `false`        |
-| `--lint`              | Adds eslint to the library.                                                                | `boolean`   |                |
+| Name                  | Description                                                                                | Value Type | Default Value |
+| --------------------- | ------------------------------------------------------------------------------------------ | ---------- | ------------- |
+| `--entry-file`        | The path at which to create the library's public API file, relative to the workspace root. | `string`   | `public-api`  |
+| `--prefix`            | A prefix to apply to generated selectors.                                                  | `string`   | `lib`         |
+| `--skip-package-json` | Do not add dependencies to the "package.json" file.                                        | `boolean`  | `false`       |
+| `--skip-install`      | Do not install dependency packages.                                                        | `boolean`  | `false`       |
+| `--skip-ts-config`    | Do not update "tsconfig.json" to add a path mapping for the new library.                   | `boolean`  | `false`       |
+| `--skip-metadata`     | Do not generate metadata for the new library.                                              | `boolean`  | `false`       |
+| `--lint`              | Adds eslint to the library.                                                                | `boolean`  |               |
 
 #### **Usage:**
+
 ```
 ng generate library [name]
 ```
@@ -164,17 +170,18 @@ ng generate library [name]
 
 Generate the package information in the given or default project
 
-#### **Arguments:** 
+#### **Arguments:**
 
-| Name          | Description               | Value Type  |
-| ------------- | ------------------------- | ----------- |
-| `project`     | The name of the project.  | `string`    |
+| Name      | Description              | Value Type |
+| --------- | ------------------------ | ---------- |
+| `project` | The name of the project. | `string`   |
 
-#### **Options:** 
+#### **Options:**
 
-*No options available.*
+_No options available._
 
 #### **Usage:**
+
 ```
 ng generate package-info [project]
 ```
@@ -183,20 +190,21 @@ ng generate package-info [project]
 
 Creates a new, generic Widget definition in the given or default project
 
-#### **Arguments:** 
+#### **Arguments:**
 
-| Name          | Description                   | Value Type  |
-| ------------- | ----------------------------- | ----------- |
-| `name`        | The name of the widget.       | `string`    |
+| Name   | Description             | Value Type |
+| ------ | ----------------------- | ---------- |
+| `name` | The name of the widget. | `string`   |
 
-#### **Options:** 
+#### **Options:**
 
-| Name            | Description                           | Value Type  | Default Value  |
-| --------------- | ------------------------------------- | ----------- | -------------- |
-| `--project`     | The name of the project.              | `string`    |                |
-| `--style`       | The processor to use for style files. | `string`    | `less`         |
+| Name        | Description                           | Value Type | Default Value |
+| ----------- | ------------------------------------- | ---------- | ------------- |
+| `--project` | The name of the project.              | `string`   |               |
+| `--style`   | The processor to use for style files. | `string`   | `less`        |
 
 #### **Usage:**
+
 ```
 ng generate widget [name]
 ```
@@ -205,22 +213,23 @@ ng generate widget [name]
 
 Creates a new, generic Wizard definition in the given or default project
 
-#### **Arguments:** 
+#### **Arguments:**
 
-| Name           | Description                                          | Value Type  |
-| -------------- | ---------------------------------------------------- | ----------- |
-| `name`         | The name of the action that the wizard will perform. | `string`    |
-| `entity-type`  | The name of the entity type to be performed.         | `string`    |
+| Name          | Description                                          | Value Type |
+| ------------- | ---------------------------------------------------- | ---------- |
+| `name`        | The name of the action that the wizard will perform. | `string`   |
+| `entity-type` | The name of the entity type to be performed.         | `string`   |
 
-#### **Options:** 
+#### **Options:**
 
-| Name            | Description                           | Value Type  | Default Value  |
-| --------------- | ------------------------------------- | ----------- | -------------- |
-| `--project`     | The name of the project.              | `string`    |                |
-| `--namespace`   | The namespace of the entity type.     | `string`    |                |
-| `--style`       | The processor to use for style files. | `string`    | `less`         |
+| Name          | Description                           | Value Type | Default Value |
+| ------------- | ------------------------------------- | ---------- | ------------- |
+| `--project`   | The name of the project.              | `string`   |               |
+| `--namespace` | The namespace of the entity type.     | `string`   |               |
+| `--style`     | The processor to use for style files. | `string`   | `less`        |
 
 #### **Usage:**
+
 ```
 ng generate wizard [name] --entity-type [entityType]
 ```
@@ -229,22 +238,23 @@ ng generate wizard [name] --entity-type [entityType]
 
 Creates a new, generic Wizard Create Edit definition in the given or default project
 
-#### **Arguments:** 
+#### **Arguments:**
 
-| Name          | Description                         | Value Type  |
-| ------------- | ------------------------------------| ----------- |
-| `name`        | The name of the wizard create edit. | `string`    |
+| Name   | Description                         | Value Type |
+| ------ | ----------------------------------- | ---------- |
+| `name` | The name of the wizard create edit. | `string`   |
 
-#### **Options:** 
+#### **Options:**
 
-| Name            | Description                           | Value Type  | Default Value  |
-| --------------- | ------------------------------------- | ----------- | -------------- |
-| `--project`     | The name of the project.              | `string`    |                |
-| `--entity-type` | The name of the entity type.          | `string`    |                |
-| `--namespace`   | The namespace of the entity type.     | `string`    |                |
-| `--style`       | The processor to use for style files. | `string`    | `less`         |
+| Name            | Description                           | Value Type | Default Value |
+| --------------- | ------------------------------------- | ---------- | ------------- |
+| `--project`     | The name of the project.              | `string`   |               |
+| `--entity-type` | The name of the entity type.          | `string`   |               |
+| `--namespace`   | The namespace of the entity type.     | `string`   |               |
+| `--style`       | The processor to use for style files. | `string`   | `less`        |
 
 #### **Usage:**
+
 ```
 ng generate wizard-create-edit [name]
 ```

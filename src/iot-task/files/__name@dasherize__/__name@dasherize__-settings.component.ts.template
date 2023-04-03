@@ -1,0 +1,114 @@
+import {
+    Component,
+    OnInit,
+    OnChanges,
+    ViewContainerRef,
+    SimpleChanges
+} from '@angular/core';
+
+import {
+    UtilService
+} from 'cmf-core';
+
+import {
+    PropertyContainerModule,
+    PropertyEditorModule
+} from 'cmf-core-business-controls';
+
+import {
+    BaseWidgetModule,
+    EnumComboBoxModule
+ } from 'cmf-core-controls';
+
+import {
+    TaskDefinitionSettings, 
+    TaskSettingsBase,
+    TaskSettingsModule, 
+    TaskSettingsService
+} from 'cmf-core-connect-iot';
+
+import * as <%= classify(name) %>Task from './<%= dasherize(name) %>.task';
+
+/** Constants */
+export interface <%= classify(name) %>TaskSettings extends <%= classify(name) %>Task.<%= classify(name) %>Settings, TaskDefinitionSettings { }
+
+/**
+ *
+ */
+
+@Component({
+    standalone: true,
+    selector: 'connect-iot-controller-engine-core-tasks-<%= name %>-settings',
+    imports: [
+        TaskSettingsModule,
+        PropertyEditorModule,
+        EnumComboBoxModule,
+        BaseWidgetModule,
+        PropertyContainerModule
+    ],
+    templateUrl: '<%= name %>-settings.component.html',
+    <% if (style !== 'none') { %>styleUrls: ['./<%= name %>-settings.component.<%= style %>'],<% } %>
+})
+export class <%= classify(name) %>Settings extends TaskSettingsBase implements OnInit, OnChanges {
+
+    /**
+     * Task settings
+     */
+    public override settings: <%= classify(name) %>TaskSettings;
+    private _taskInstance: <%= classify(name) %>Task.<%= classify(name) %>Task;
+
+    /**
+     * Constructor
+     */
+    constructor(
+        viewContainerRef: ViewContainerRef,
+        service: TaskSettingsService,
+        private util: UtilService
+    ) {
+        super(viewContainerRef, service);
+
+        service.onBeforeSave = this.onBeforeSave.bind(this);
+    }
+
+    /** Triggered when the task is created and define the default values */
+    public ngOnInit(): void {
+        const currentSettings = Object.assign({}, this.settings);
+        Object.assign(this.settings, <%= classify(name) %>Task.SETTINGS_DEFAULTS, currentSettings);
+
+        if (this.container != null) {
+            this._taskInstance = this.container.task as <%= classify(name) %>Task.<%= classify(name) %>Task;
+        }
+
+        // Initialize default values for settings page
+        if (this.settings != null) {
+            // ...
+            // Example with defaults in the .task itself
+            // this.settings.message = this.settings.message != null ? this.settings.message : this._taskInstance.message;
+        }
+    }
+
+    /** Triggered when an element from the html page is changed */
+    public override ngOnChanges(changes: SimpleChanges): void {
+        super.ngOnChanges(changes);
+
+    }
+
+    /**
+     * Handles a change in the settings.
+     * Update the settings property with given value and path
+     * @param value New value
+     * @param destPath Destination property
+     */
+    public _onSettingsValueChange(value: any, destPath: string): void {
+        // Set the settings with new value
+        this.util.setNestedPropertyByPath(this.settings, destPath, value, true);
+    }
+
+    /**
+     * Process all nodes (default and outputs)
+     * @param settings Settings
+     */
+    public onBeforeSave(settings: <%= classify(name) %>Task.<%= classify(name) %>Settings): <%= classify(name) %>Task.<%= classify(name) %>Settings {
+        return settings;
+    }
+}

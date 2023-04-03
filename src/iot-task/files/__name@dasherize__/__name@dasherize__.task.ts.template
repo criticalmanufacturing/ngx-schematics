@@ -1,0 +1,108 @@
+import {
+    Task,
+    Dependencies,
+    System,
+    DI,
+    TYPES
+} from "@criticalmanufacturing/connect-iot-controller-engine";
+
+/** Default values for settings */
+export const SETTINGS_DEFAULTS: <%= classify(name) %>Settings = {
+    inputs: [],
+    outputs: [],
+    message: ""
+}
+
+/**
+ * @whatItDoes
+ *
+ * This task does something ... describe here
+ *
+ * @howToUse
+ *
+ * yada yada yada
+ *
+ * ### Inputs
+ * * `any` : **activate** - Activate the task
+ *
+ * ### Outputs
+ * * `bool`  : ** success ** - Triggered when the the task is executed with success
+ * * `Error` : ** error ** - Triggered when the task failed for some reason
+ *
+ * ### Settings
+ * See {@see <%= classify(name) %>Settings}
+ */
+@Task.Task()
+export class <%= classify(name) %>Task implements Task.TaskInstance, <%= classify(name) %>Settings {
+
+    /** Accessor helper for untyped properties and output emitters. */
+    [key: string]: any;
+
+    /** **Inputs** */
+    /** Activate task execution */
+    @Task.InputProperty(Task.INPUT_ACTIVATE)
+    public activate: any = undefined;
+    // ... more inputs
+
+
+    /** **Outputs** */
+    /** To output a success notification */
+    @Task.OutputProperty(Task.OUTPUT_SUCCESS)
+    public success: Task.Output<boolean> = new Task.Output<boolean>();
+    /** To output an error notification */
+    @Task.OutputProperty(Task.OUTPUT_ERROR)
+    public error: Task.Output<Error> = new Task.Output<Error>();
+
+
+    /** Settings */
+    inputs: Task.TaskInput[];
+    outputs: Task.TaskOutput[];
+    /** Properties Settings */
+    message: string;
+
+    @DI.Inject(TYPES.Dependencies.Logger)
+    private _logger: Dependencies.Logger;
+<% if(isForProtocol === true) { %>
+    @DI.Inject(TYPES.System.Driver)
+    private _driverProxy: System.DriverProxy;<% } %>
+
+    /**
+     * When one or more input values is changed this will be triggered,
+     * @param changes Task changes
+     */
+    async onChanges(changes: Task.Changes): Promise<void> {
+        if (changes["activate"]) {
+            // It is advised to reset the activate to allow being reactivated without the value being different
+            this.activate = undefined;
+
+            // ... code here
+            this.success.emit(true);
+
+            // or
+            this._logger.error(`Something very wrong just happened! Log it!`);
+            throw new Error ("Will stop processing, but Error output will be triggered with this value");
+        }
+    }
+
+    /** Right after settings are loaded, create the needed dynamic outputs. */
+    async onBeforeInit(): Promise<void> {
+    }
+
+    /** Initialize this task, register any event handler, etc */
+    async onInit(): Promise<void> {
+    }
+
+    /** Cleanup internal data, unregister any event handler, etc */
+    async onDestroy(): Promise<void> {
+    }
+
+    // On every tick (use instead of onChanges if necessary)
+    // async onCheck(): Promise<void> {
+    // }
+}
+
+// Add settings here
+/** <%= classify(name) %> Settings object */
+export interface <%= classify(name) %>Settings extends System.TaskDefaultSettings {
+    message: string;
+}

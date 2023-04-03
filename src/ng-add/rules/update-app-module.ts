@@ -1,13 +1,13 @@
 import { Rule, Tree } from '@angular-devkit/schematics';
 import {
   addSymbolToNgModuleMetadata,
-  createSourceFile,
+  createSourceFile
 } from '../../utility/ast';
 import { getAppModulePath } from '../../utility/workspace';
 import {
   CORE_BASE_MODULE,
   MES_BASE_MODULE,
-  METADATA_ROUTING_MODULE,
+  METADATA_ROUTING_MODULE
 } from '../package-configs';
 import { Schema } from '../schema';
 

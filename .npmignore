@@ -1,4 +1,3 @@
-
 # Ignores TypeScript files, but keeps definitions.
 *.ts
 *.js.map

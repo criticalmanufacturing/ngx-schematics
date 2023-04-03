@@ -5,7 +5,7 @@ import {
   Rule,
   SchematicContext,
   SchematicsException,
-  Tree,
+  Tree
 } from '@angular-devkit/schematics';
 
 import { readWorkspace } from '@schematics/angular/utility';
@@ -23,7 +23,7 @@ import { updateTsConfig } from '../utility/project';
 import {
   addPackageJsonDependency,
   NodeDependency,
-  NodeDependencyType,
+  NodeDependencyType
 } from '../utility/dependency';
 
 import { version as pkgVersion, name as pkgName } from '../../package.json';
@@ -100,7 +100,7 @@ function installSchematics(options: Schema) {
             ? MES_BASE_MODULE[0]
             : CORE_BASE_MODULE[0]
         ),
-        listNpmReleaseTags(`${pkgName}@${pkgVersion}`),
+        listNpmReleaseTags(`${pkgName}@${pkgVersion}`)
       ]);
 
       const valideTags = pkgTags.filter((t) => appTags.includes(t)); // only include matching app package tags
@@ -115,7 +115,7 @@ function installSchematics(options: Schema) {
         type: 'list',
         name: 'distTag',
         message: 'What is the distribution to utilize?',
-        choices: valideTags,
+        choices: valideTags
       };
 
       options.version = (await inquirer.prompt([question])).distTag;
@@ -130,13 +130,13 @@ function installSchematics(options: Schema) {
       dependencies.push({
         type: NodeDependencyType.Default,
         name: MES_BASE_MODULE[0],
-        version: options.version,
+        version: options.version
       });
     } else {
       dependencies.push({
         type: NodeDependencyType.Default,
         name: CORE_BASE_MODULE[0],
-        version: options.version,
+        version: options.version
       });
     }
 
@@ -145,19 +145,19 @@ function installSchematics(options: Schema) {
         ? [
             addConfigJson(options as Required<Schema>),
             updateIndexFiles(options as Required<Schema>),
-            updateWorkspace(options as Required<Schema>),
             updateBootstrapComponent(),
             updateAppModule(options),
-            updateMain(),
+            updateMain()
           ]
         : [noop()]),
+      updateWorkspace(options),
       installDependencies(dependencies),
       updateTsConfig([
         [['compilerOptions', 'strictFunctionTypes'], false],
         [['compilerOptions', 'noImplicitAny'], false],
         [['compilerOptions', 'strictNullChecks'], false],
-        [['compilerOptions', 'allowSyntheticDefaultImports'], true],
-      ]),
+        [['compilerOptions', 'allowSyntheticDefaultImports'], true]
+      ])
     ]);
   };
 }
@@ -169,23 +169,23 @@ export default function (_options: Schema): Rule {
     const packjson = tree.readJson('package.json') as JsonObject;
     const allDeps = [
       ...Object.keys(packjson.dependencies as JsonObject),
-      ...Object.keys(packjson.devDependencies as JsonObject),
+      ...Object.keys(packjson.devDependencies as JsonObject)
     ];
 
     return chain([
       _options.project && !allDeps.includes('@angular/service-worker')
         ? externalSchematic('@angular/pwa', 'pwa', {
-            project: _options.project,
+            project: _options.project
           })
         : noop(),
       externalSchematic('@angular/localize', 'ng-add', {
         project: _options.project,
-        useAtRuntime: true,
+        useAtRuntime: true
       }),
       _options.eslint
         ? externalSchematic('@angular-eslint/schematics', 'ng-add', {})
         : noop(),
-      installSchematics(_options),
+      installSchematics(_options)
     ]);
   };
 }

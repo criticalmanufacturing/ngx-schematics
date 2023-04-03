@@ -3,7 +3,7 @@
  */
 export const CORE_BASE_MODULE: [string, string] = [
   'cmf-core-ui',
-  'CoreUIModule',
+  'CoreUIModule'
 ];
 
 /**
@@ -16,7 +16,7 @@ export const MES_BASE_MODULE: [string, string] = ['cmf-mes-ui', 'MesUIModule'];
  */
 export const METADATA_ROUTING_MODULE: [string, string] = [
   'cmf-core',
-  'MetadataRoutingModule',
+  'MetadataRoutingModule'
 ];
 
 /**
@@ -30,7 +30,7 @@ export const THEMES = [
   'cmf.style.dark',
   'cmf.style.dark.accessibility',
   'cmf.style.gray',
-  'cmf.style.gray.accessibility',
+  'cmf.style.gray.accessibility'
 ];
 
 /**
@@ -60,7 +60,7 @@ export const PROJECT_ALLOWED_COMMONJS_DEPENDENCIES = [
   'javascript-natural-sort',
   'seedrandom',
   'typed-function',
-  'buffer',
+  'buffer'
 ];
 
 /**
@@ -70,61 +70,59 @@ export const PROJECT_ASSETS = [
   {
     glob: 'favicon.ico',
     input: 'node_modules/cmf-core/src/assets/img',
-    output: '',
+    output: ''
   },
   {
     glob: '**/icon-*.png',
     input: 'node_modules/cmf-core/assets/img/icons',
-    output: 'assets/icons',
+    output: 'assets/icons'
   },
   {
     glob: '**/*',
     input: 'node_modules/cmf-core/assets/img/flags',
-    output: 'assets/flags',
+    output: 'assets/flags'
   },
   {
     glob: '**/*',
     input: 'node_modules/cmf-core/assets/img/themes',
-    output: 'assets/themes',
+    output: 'assets/themes'
   },
   {
     glob: '**/*',
     input: 'node_modules/monaco-editor/min/vs',
-    output: 'monaco-editor/vs',
+    output: 'monaco-editor/vs'
   },
   {
     glob: '**/*',
     input: 'node_modules/cmf-core-fablive/assets',
-    output: 'assets/fablive',
+    output: 'assets/fablive'
   },
   {
     glob: '**/*',
     input: 'node_modules/cmf-core-augmentedreality/assets',
-    output: 'assets/augmentedreality',
+    output: 'assets/augmentedreality'
   },
   {
     glob: '**/*',
     input: 'node_modules/cmf-core-shell/assets',
-    output: 'assets/shell',
+    output: 'assets/shell'
   },
   {
     glob: 'artoolkit_wasm.wasm',
     input: 'node_modules/cmf-artoolkit',
-    output: 'cmf-artoolkit',
+    output: 'cmf-artoolkit'
   },
   {
     glob: 'camera_para.dat',
     input: 'node_modules/cmf-artoolkit',
-    output: 'cmf-artoolkit',
-  },
+    output: 'cmf-artoolkit'
+  }
 ];
 
 /**
  * Project Core Assets
  */
-export const PROJECT_CORE_ASSETS = [
-  ...PROJECT_ASSETS
-];
+export const PROJECT_CORE_ASSETS = [...PROJECT_ASSETS];
 
 /**
  * Project MES Assets
@@ -134,7 +132,7 @@ export const PROJECT_MES_ASSETS = [
   {
     glob: '**/*.svg',
     input: 'node_modules/cmf-mes-business-controls/assets/product/img',
-    output: 'assets/business-controls/product',
+    output: 'assets/business-controls/product'
   }
 ];
 
@@ -146,7 +144,7 @@ const GENERIC_STYLES = [
   'node_modules/bootstrap/dist/css/bootstrap.css',
   'node_modules/cmf.kendoui/styles/kendo.common.min.css',
   'node_modules/jquery-ui/themes/base/dialog.css',
-  'node_modules/jquery-ui/themes/base/core.css',
+  'node_modules/jquery-ui/themes/base/core.css'
 ];
 
 /**
@@ -158,8 +156,8 @@ export const PROJECT_CORE_STYLES = [
   ...THEMES.map((theme) => ({
     inject: false,
     bundleName: theme,
-    input: `node_modules/cmf-core/assets/style/themes/${theme}/${theme}.less`,
-  })),
+    input: `node_modules/cmf-core/assets/style/themes/${theme}/${theme}.less`
+  }))
 ];
 
 /**
@@ -171,8 +169,8 @@ export const PROJECT_MES_STYLES = [
   ...THEMES.map((theme) => ({
     inject: false,
     bundleName: theme,
-    input: `node_modules/cmf-mes/assets/style/themes/${theme}/${theme}.less`,
-  })),
+    input: `node_modules/cmf-mes/assets/style/themes/${theme}/${theme}.less`
+  }))
 ];
 
 /**
@@ -241,11 +239,11 @@ export const PROJECT_SCRIPTS = [
   {
     bundleName: 'jszip',
     inject: false,
-    input: 'node_modules/cmf.kendoui/js/jszip.min.js',
+    input: 'node_modules/cmf.kendoui/js/jszip.min.js'
   },
   {
     bundleName: 'fullcalendar',
     inject: false,
-    input: 'node_modules/fullcalendar/dist/fullcalendar.min.js',
-  },
+    input: 'node_modules/fullcalendar/dist/fullcalendar.min.js'
+  }
 ];

@@ -4,7 +4,7 @@ import {
   ObjectLiteralExpression,
   PropertyAssignment,
   SourceFile,
-  SyntaxKind,
+  SyntaxKind
 } from 'ts-morph';
 import { createSourceFile } from '../../utility/ast';
 import { getAppModulePath } from '../../utility/workspace';

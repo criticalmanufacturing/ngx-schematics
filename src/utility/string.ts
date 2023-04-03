@@ -1,4 +1,4 @@
-import { strings } from "@angular-devkit/core";
+import { strings } from '@angular-devkit/core';
 
 /**
  * Nameify RegExp
@@ -10,5 +10,5 @@ const STRING_NAMEIFY_REGEXP_1 = /([a-z\d])([A-Z]+)/g;
  * @param str string to nameify.
  */
 export function nameify(str: string): string {
-    return strings.classify(str).replace(STRING_NAMEIFY_REGEXP_1, '$1 $2');
+  return strings.classify(str).replace(STRING_NAMEIFY_REGEXP_1, '$1 $2');
 }

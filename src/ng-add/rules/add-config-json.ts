@@ -8,7 +8,7 @@ import {
   Rule,
   SchematicsException,
   Tree,
-  url,
+  url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
 import { emptyDir } from './empty-dir';
@@ -53,14 +53,14 @@ export function addConfigJson(options: { project: string }): Rule {
       "cmf.style.gray.accessibility",
       "cmf.style.contrast",
       "cmf.style.contrast.accessibility"
-    ]`,
+    ]`
       }),
-      move(join(normalize(sourcePath), 'assets')),
+      move(join(normalize(sourcePath), 'assets'))
     ]);
 
     return chain([
       emptyDir(join(normalize(sourcePath), 'assets', 'icons')),
-      mergeWith(templateSource),
+      mergeWith(templateSource)
     ]);
   };
 }
