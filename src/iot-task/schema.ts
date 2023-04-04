@@ -21,16 +21,6 @@ export interface Schema {
   style: string;
 
   /**
-   * The title of the task.
-   */
-  title: string;
-
-  /**
-   * The icon name of the task.
-   */
-  icon: string;
-
-  /**
    * Do not generate dynamic inputs for this task.
    */
   hasInputs: boolean;

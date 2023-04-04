@@ -35,18 +35,6 @@
       "default": "less",
       "enum": ["css", "scss", "sass", "less", "none"]
     },
-    "title": {
-      "type": "string",
-      "description": "The title of the task.",
-      "default": "Black Box",
-      "x-prompt": "What title would you like to use for the task?"
-    },
-    "icon": {
-      "type": "string",
-      "description": "The icon name of the task.",
-      "default": "icon-core-connect-iot-lg-logmessage",
-      "x-prompt": "What icon would you like to use for the task?"
-    },
     "hasInputs": {
       "type": "boolean",
       "description": "Do not generate dynamic inputs for this task.",

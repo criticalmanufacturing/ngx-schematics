@@ -5,8 +5,8 @@ import { <%= classify(name) %>Settings } from './<%= name %>.task';
 
 @Injectable()
 @TaskDesigner({
-    name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>#TITLE:<%= title %>`,
-    iconClass: '<%= icon %>',
+    name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>#TITLE:<%= nameify(name) %>`,
+    iconClass: 'icon-core-connect-iot-lg-logmessage',
     inputs: {
         activate: Task.INPUT_ACTIVATE,
 

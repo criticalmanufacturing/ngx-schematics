@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsWidget",
+  "title": "Widget Options Schema",
+  "type": "object",
+  "properties": {
+    "path": {
+      "type": "string",
+      "format": "path",
+      "$default": {
+        "$source": "workingDirectory"
+      },
+      "description": "The path at which to create the component file, relative to the current workspace. Default is a folder with the same name as the component in the project root.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the converter.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the converter?"
+    },
+    "input": {
+      "type": "string",
+      "description": "The input type of the converter.",
+      "default": "any",
+      "x-prompt": "what is the input type of the converter?"
+    },
+    "output": {
+      "type": "string",
+      "description": "The output type of the converter.",
+      "default": "any",
+      "x-prompt": "what is the output type of the converter?"
+    }
+  },
+  "required": ["name"]
+}
