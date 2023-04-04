@@ -6,6 +6,8 @@ import { ConverterDesigner } from 'cmf-core-connect-iot';
     input: <%= converterInputType %>,
     output: <%= converterOutputType %>,
     parameters: {
+        // Add parameters here
+        // example: parameterId: System.PropertyValueType.String,
     }
 })
 export class <%= classify(name) %>ConverterDesigner { }

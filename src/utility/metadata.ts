@@ -280,7 +280,7 @@ ${indentBy(12)`"${[
  * @param elements elements to add
  * @returns
  */
-function updateInfoObjectProperty(
+export function updateObjectArrayProperty(
   objectExpression: ObjectLiteralExpression,
   propertyName: string,
   elements: string[]
@@ -401,12 +401,12 @@ export function updatePackageInfo(
     return;
   }
 
-  updateInfoObjectProperty(objectExpression, 'widgets', options.widgets);
-  updateInfoObjectProperty(objectExpression, 'converters', options.converters);
-  updateInfoObjectProperty(
+  updateObjectArrayProperty(objectExpression, 'widgets', options.widgets);
+  updateObjectArrayProperty(objectExpression, 'converters', options.converters);
+  updateObjectArrayProperty(
     objectExpression,
     'dataSources',
     options.dataSources
   );
-  updateInfoObjectProperty(objectExpression, 'components', options.components);
+  updateObjectArrayProperty(objectExpression, 'components', options.components);
 }

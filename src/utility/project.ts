@@ -156,23 +156,25 @@ export function updateMetadataPackageInfo(
 }
 
 /**
- * Finds the metadata file path in the root given the public api
+ * Finds the file path in the public api given the entry point name
  * @param content File content to search the metadata on
  * @param fileName Metadata File Name
  */
-export function getMetadataFilePath(
+export function getFilePathFromEntryPoint(
   tree: Tree,
-  project: ProjectDefinition
+  project: ProjectDefinition,
+  entryPoint: string,
+  filterFn: (module: string) => boolean
 ): string | undefined {
   if (
-    !tree.exists(join(normalize(project.root), 'metadata', 'ng-package.json'))
+    !tree.exists(join(normalize(project.root), entryPoint, 'ng-package.json'))
   ) {
     return;
   }
 
   const json = new JSONFile(
     tree,
-    join(normalize(project.root), 'metadata', 'ng-package.json')
+    join(normalize(project.root), entryPoint, 'ng-package.json')
   );
   const entryFile = json.get(['lib', 'entryFile']) as string | null;
 
@@ -181,7 +183,7 @@ export function getMetadataFilePath(
   }
 
   const content = tree
-    .get(join(normalize(project.root), 'metadata', entryFile))
+    .get(join(normalize(project.root), entryPoint, entryFile))
     ?.content.toString('utf-8');
 
   if (!content) {
@@ -196,10 +198,10 @@ export function getMetadataFilePath(
   for (const node of exportNodes) {
     const module = node.getModuleSpecifierValue();
 
-    if (module?.endsWith('metadata.service')) {
+    if (module && filterFn(module)) {
       return (
         join(
-          dirname(join(normalize(project.root), 'metadata', entryFile)),
+          dirname(join(normalize(project.root), entryPoint, entryFile)),
           module
         ) + '.ts'
       );
@@ -207,6 +209,20 @@ export function getMetadataFilePath(
   }
 
   return;
+}
+
+/**
+ * Finds the metadata file path in the root given the public api
+ * @param content File content to search the metadata on
+ * @param fileName Metadata File Name
+ */
+export function getMetadataFilePath(
+  tree: Tree,
+  project: ProjectDefinition
+): string | undefined {
+  return getFilePathFromEntryPoint(tree, project, 'metadata', (m) =>
+    m.endsWith('metadata.service')
+  );
 }
 
 export function updateTsConfig(rules: [string[], any][]) {

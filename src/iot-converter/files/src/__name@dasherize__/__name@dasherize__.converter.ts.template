@@ -1,4 +1,4 @@
-import { Converter, DI, Dependencies, TYPES } from "@criticalmanufacturing/connect-iot-controller-engine";
+import { Converter, DI, Dependencies, TYPES } from '@criticalmanufacturing/connect-iot-controller-engine';
 
 /**
  * @whatItDoes
@@ -19,6 +19,6 @@ export class <%= classify(name) %>Converter implements Converter.ConverterInstan
      */
     transform(value: <%= inputType %>, parameters: { [key: string]: any; }): <%= outputType %> {
         // >>TODO: Add converter code
-        throw new Error(">>TODO: Not implemented yet");
+        throw new Error('>>TODO: Not implemented yet');
     }
 }

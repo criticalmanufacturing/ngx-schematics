@@ -1,3 +1,4 @@
+import { join, normalize } from '@angular-devkit/core';
 import {
   apply,
   applyTemplates,
@@ -13,6 +14,7 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
+import { updatePackageMetadata } from '../utility/iot';
 import { nameify } from '../utility/string';
 import { buildDefaultPath, parseName } from '../utility/workspace';
 import { Schema } from './schema';
@@ -42,7 +44,7 @@ export default function (_options: Schema): Rule {
 
     const skipStyleFile = _options.style === 'none';
 
-    const templateSource = apply(url('./files'), [
+    const templateSource = apply(url('./files/src'), [
       skipStyleFile
         ? filter((path) => !path.endsWith('.__style__.template'))
         : noop(),
@@ -54,6 +56,23 @@ export default function (_options: Schema): Rule {
       move(parsedPath.path)
     ]);
 
-    return chain([mergeWith(templateSource)]);
+    const testsPath = join(normalize(project.root), 'test', 'unit', 'tasks');
+
+    const templateTest = apply(url('./files/test'), [
+      applyTemplates({
+        ...strings,
+        ..._options,
+        nameify
+      }),
+      move(testsPath)
+    ]);
+
+    return chain([
+      mergeWith(templateSource),
+      mergeWith(templateTest),
+      updatePackageMetadata(project, {
+        tasks: [strings.camelize(_options.name)]
+      })
+    ]);
   };
 }

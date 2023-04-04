@@ -1,3 +1,4 @@
+import { join, normalize } from '@angular-devkit/core';
 import {
   apply,
   applyTemplates,
@@ -11,7 +12,11 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
-import { toConverterType, toValueType } from '../utility/iot';
+import {
+  toConverterType,
+  toValueType,
+  updatePackageMetadata
+} from '../utility/iot';
 import { nameify } from '../utility/string';
 import { buildDefaultPath, parseName } from '../utility/workspace';
 import { Schema } from './schema';
@@ -39,7 +44,7 @@ export default function (_options: Schema): Rule {
     _options.name = parsedPath.name;
     _options.path = parsedPath.path;
 
-    const templateSource = apply(url('./files'), [
+    const templateSource = apply(url('./files/src'), [
       applyTemplates({
         ...strings,
         ..._options,
@@ -52,6 +57,32 @@ export default function (_options: Schema): Rule {
       move(parsedPath.path)
     ]);
 
-    return chain([mergeWith(templateSource)]);
+    const testsPath = join(
+      normalize(project.root),
+      'test',
+      'unit',
+      'converters'
+    );
+
+    const templateTest = apply(url('./files/test'), [
+      applyTemplates({
+        ...strings,
+        ..._options,
+        inputType: toValueType(_options.input),
+        outputType: toValueType(_options.output),
+        converterInputType: toConverterType(_options.input),
+        converterOutputType: toConverterType(_options.output),
+        nameify
+      }),
+      move(testsPath)
+    ]);
+
+    return chain([
+      mergeWith(templateSource),
+      mergeWith(templateTest),
+      updatePackageMetadata(project, {
+        converters: [strings.camelize(_options.name)]
+      })
+    ]);
   };
 }
