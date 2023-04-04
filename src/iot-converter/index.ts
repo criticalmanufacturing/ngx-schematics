@@ -11,6 +11,7 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
+import { toConverterType, toValueType } from '../utility/iot';
 import { nameify } from '../utility/string';
 import { buildDefaultPath, parseName } from '../utility/workspace';
 import { Schema } from './schema';
@@ -42,6 +43,10 @@ export default function (_options: Schema): Rule {
       applyTemplates({
         ...strings,
         ..._options,
+        inputType: toValueType(_options.input),
+        outputType: toValueType(_options.output),
+        converterInputType: toConverterType(_options.input),
+        converterOutputType: toConverterType(_options.output),
         nameify
       }),
       move(parsedPath.path)

@@ -1,3 +1,5 @@
+import { IoTValueType } from '../utility/iot';
+
 export interface Schema {
   /**
    * The path at which to create the component file, relative to the current workspace.
@@ -18,10 +20,10 @@ export interface Schema {
   /**
    * The input type of the converter.
    */
-  input: string;
+  input: IoTValueType;
 
   /**
    * The output type of the converter.
    */
-  output: string;
+  output: IoTValueType;
 }

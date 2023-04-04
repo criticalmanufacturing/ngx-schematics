@@ -33,12 +33,36 @@
       "type": "string",
       "description": "The input type of the converter.",
       "default": "any",
+      "enum": [
+        "Any",
+        "String",
+        "Integer",
+        "Long",
+        "Decimal",
+        "Boolean",
+        "Date",
+        "Object",
+        "Buffer",
+        "Enum"
+      ],
       "x-prompt": "what is the input type of the converter?"
     },
     "output": {
       "type": "string",
       "description": "The output type of the converter.",
       "default": "any",
+      "enum": [
+        "Any",
+        "String",
+        "Integer",
+        "Long",
+        "Decimal",
+        "Boolean",
+        "Date",
+        "Object",
+        "Buffer",
+        "Enum"
+      ],
       "x-prompt": "what is the output type of the converter?"
     }
   },

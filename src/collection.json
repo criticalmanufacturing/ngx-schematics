@@ -59,6 +59,11 @@
       "description": "Generates a new IoT task.",
       "factory": "./iot-task",
       "schema": "./iot-task/schema.json"
+    },
+    "iot-converter": {
+      "description": "Generates a new IoT converter.",
+      "factory": "./iot-converter",
+      "schema": "./iot-converter/schema.json"
     }
   }
 }

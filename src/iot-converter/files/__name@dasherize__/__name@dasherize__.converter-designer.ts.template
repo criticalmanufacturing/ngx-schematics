@@ -1,11 +1,11 @@
+import { Converter } from '@criticalmanufacturing/connect-iot-controller-engine';
 import { ConverterDesigner } from 'cmf-core-connect-iot';
 
 @ConverterDesigner({
     name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>#TITLE:<%= nameify(name) %>`,
-    input: <%= inputAsIoT %>,
-    output: <%= outputAsIoT %>,
+    input: <%= converterInputType %>,
+    output: <%= converterOutputType %>,
     parameters: {
-<%- parametersAsJS %>
     }
 })
 export class <%= classify(name) %>ConverterDesigner { }
