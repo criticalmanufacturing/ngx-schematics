@@ -21,7 +21,8 @@ export function insertExport(
   source: SourceFile,
   symbolName: string,
   module: string,
-  isDefault = false
+  isDefault = false,
+  leadingTrivia?: string
 ): void {
   const allExports = source.getExportDeclarations();
   const exportNode = allExports.find(
@@ -33,7 +34,7 @@ export function insertExport(
       return;
     }
 
-    source.addExportDeclaration({ moduleSpecifier: module });
+    source.addExportDeclaration({ moduleSpecifier: module, leadingTrivia });
   } else if (exportNode) {
     const namedExports = exportNode.getNamedExports();
 
@@ -45,7 +46,8 @@ export function insertExport(
   } else {
     source.addExportDeclaration({
       namedExports: [symbolName],
-      moduleSpecifier: module
+      moduleSpecifier: module,
+      leadingTrivia
     });
   }
 }
@@ -217,10 +219,10 @@ export function findBootstrapModulePath(
  * Gets the a ts source file
  */
 export function createSourceFile(
-  host: Tree,
+  tree: Tree,
   path: string
 ): SourceFile | undefined {
-  const content = host.get(path)?.content.toString('utf-8');
+  const content = tree.get(path)?.content.toString('utf-8');
 
   if (!content) {
     return;

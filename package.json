@@ -12,16 +12,6 @@
     "schematics"
   ],
   "author": "Critical Manufacturing",
-  "contributors": [
-    {
-      "name": "Carlos Samouco",
-      "url": "https://github.com/Carlosamouco"
-    },
-    {
-      "name": "Nelson Faria",
-      "url": "https://github.com/NelsonFaria14"
-    }
-  ],
   "license": "BSD-3-Clause",
   "schematics": "./src/collection.json",
   "dependencies": {

@@ -7,7 +7,7 @@ import {
   relative,
   split
 } from '@angular-devkit/core';
-import { Tree } from '@angular-devkit/schematics';
+import { Rule, Tree } from '@angular-devkit/schematics';
 import {
   ProjectDefinition,
   readWorkspace,
@@ -136,4 +136,12 @@ export function getProjectBuildTargets(
   }
 
   return targets;
+}
+
+export function removeDir(sourcePath: string): Rule {
+  return (tree: Tree) => {
+    tree.getDir(sourcePath).subfiles.forEach((path) => {
+      tree.delete(join(normalize(sourcePath), path));
+    });
+  };
 }

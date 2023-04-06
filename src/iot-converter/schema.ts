@@ -20,10 +20,10 @@ export interface Schema {
   /**
    * The input type of the converter.
    */
-  input: IoTValueType;
+  inputType: IoTValueType;
 
   /**
    * The output type of the converter.
    */
-  output: IoTValueType;
+  outputType: IoTValueType;
 }

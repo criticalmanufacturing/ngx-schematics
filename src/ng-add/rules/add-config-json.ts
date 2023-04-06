@@ -11,7 +11,7 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
-import { emptyDir } from './empty-dir';
+import { removeDir } from '../../utility/workspace';
 
 export function addConfigJson(options: { project: string }): Rule {
   return async (tree: Tree) => {
@@ -59,7 +59,7 @@ export function addConfigJson(options: { project: string }): Rule {
     ]);
 
     return chain([
-      emptyDir(join(normalize(sourcePath), 'assets', 'icons')),
+      removeDir(join(normalize(sourcePath), 'assets', 'icons')),
       mergeWith(templateSource)
     ]);
   };

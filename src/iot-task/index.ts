@@ -14,7 +14,7 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
-import { updatePackageMetadata } from '../utility/iot';
+import { updatePackageMetadata, updatePublicAPI } from '../utility/iot';
 import { nameify } from '../utility/string';
 import { buildDefaultPath, parseName } from '../utility/workspace';
 import { Schema } from './schema';
@@ -72,6 +72,11 @@ export default function (_options: Schema): Rule {
       mergeWith(templateTest),
       updatePackageMetadata(project, {
         tasks: [strings.camelize(_options.name)]
+      }),
+      updatePublicAPI({
+        project: _options.project,
+        tasks: [{ path: _options.path, name: _options.name }],
+        converters: []
       })
     ]);
   };

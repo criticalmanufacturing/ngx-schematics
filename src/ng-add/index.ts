@@ -178,10 +178,12 @@ export default function (_options: Schema): Rule {
             project: _options.project
           })
         : noop(),
-      externalSchematic('@angular/localize', 'ng-add', {
-        project: _options.project,
-        useAtRuntime: true
-      }),
+      _options.project
+        ? externalSchematic('@angular/localize', 'ng-add', {
+            project: _options.project,
+            useAtRuntime: true
+          })
+        : noop(),
       _options.eslint
         ? externalSchematic('@angular-eslint/schematics', 'ng-add', {})
         : noop(),

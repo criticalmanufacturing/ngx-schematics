@@ -20,6 +20,7 @@ import {
 import { nameify } from '../utility/string';
 import { buildDefaultPath, parseName } from '../utility/workspace';
 import { Schema } from './schema';
+import { updatePublicAPI } from '../utility/iot';
 
 export default function (_options: Schema): Rule {
   return async (tree: Tree) => {
@@ -44,16 +45,18 @@ export default function (_options: Schema): Rule {
     _options.name = parsedPath.name;
     _options.path = parsedPath.path;
 
+    const context = {
+      ...strings,
+      ..._options,
+      inputType: toValueType(_options.inputType),
+      outputType: toValueType(_options.outputType),
+      converterInputType: toConverterType(_options.inputType),
+      converterOutputType: toConverterType(_options.outputType),
+      nameify
+    };
+
     const templateSource = apply(url('./files/src'), [
-      applyTemplates({
-        ...strings,
-        ..._options,
-        inputType: toValueType(_options.input),
-        outputType: toValueType(_options.output),
-        converterInputType: toConverterType(_options.input),
-        converterOutputType: toConverterType(_options.output),
-        nameify
-      }),
+      applyTemplates(context),
       move(parsedPath.path)
     ]);
 
@@ -65,15 +68,7 @@ export default function (_options: Schema): Rule {
     );
 
     const templateTest = apply(url('./files/test'), [
-      applyTemplates({
-        ...strings,
-        ..._options,
-        inputType: toValueType(_options.input),
-        outputType: toValueType(_options.output),
-        converterInputType: toConverterType(_options.input),
-        converterOutputType: toConverterType(_options.output),
-        nameify
-      }),
+      applyTemplates(context),
       move(testsPath)
     ]);
 
@@ -82,6 +77,11 @@ export default function (_options: Schema): Rule {
       mergeWith(templateTest),
       updatePackageMetadata(project, {
         converters: [strings.camelize(_options.name)]
+      }),
+      updatePublicAPI({
+        project: _options.project,
+        tasks: [],
+        converters: [{ path: _options.path, name: _options.name }]
       })
     ]);
   };

@@ -1,4 +1,3 @@
-import { Converter } from '@criticalmanufacturing/connect-iot-controller-engine';
 import { ConverterDesigner } from 'cmf-core-connect-iot';
 
 @ConverterDesigner({
@@ -10,4 +9,4 @@ import { ConverterDesigner } from 'cmf-core-connect-iot';
         // example: parameterId: System.PropertyValueType.String,
     }
 })
-export class <%= classify(name) %>ConverterDesigner { }
+export class <%= classify(name) %>Designer { }

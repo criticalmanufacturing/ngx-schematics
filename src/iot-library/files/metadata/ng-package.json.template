@@ -1,0 +1,7 @@
+{
+  "$schema": "<%= relativePathToWorkspaceRoot %>/node_modules/ng-packagr/ng-package.schema.json",
+  "dest": "<%= relativePathToWorkspaceRoot %>/<%= metadatatDistRoot %>",
+  "lib": {
+    "entryFile": "src/<%= entryFile %>.ts"
+  }
+}

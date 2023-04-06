@@ -1,0 +1,5 @@
+/*
+ * Public API Surface of <%= dasherize(name) %>/metadata
+ */
+
+export * from './lib/metadata';

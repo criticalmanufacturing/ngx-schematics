@@ -55,6 +55,11 @@
       "factory": "./wizard-create-edit",
       "schema": "./wizard-create-edit/schema.json"
     },
+    "iot-library": {
+      "description": "Generates a new IoT library.",
+      "factory": "./iot-library",
+      "schema": "./iot-library/schema.json"
+    },
     "iot-task": {
       "description": "Generates a new IoT task.",
       "factory": "./iot-task",

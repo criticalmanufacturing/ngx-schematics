@@ -29,7 +29,7 @@
       },
       "x-prompt": "What name would you like to use for the converter?"
     },
-    "input": {
+    "inputType": {
       "type": "string",
       "description": "The input type of the converter.",
       "default": "any",
@@ -47,7 +47,7 @@
       ],
       "x-prompt": "what is the input type of the converter?"
     },
-    "output": {
+    "outputType": {
       "type": "string",
       "description": "The output type of the converter.",
       "default": "any",
