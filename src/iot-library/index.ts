@@ -9,6 +9,7 @@ import {
   externalSchematic,
   mergeWith,
   move,
+  noop,
   schematic,
   url
 } from '@angular-devkit/schematics';
@@ -22,6 +23,7 @@ import {
   strings
 } from '@angular-devkit/core';
 import { readWorkspace } from '@schematics/angular/utility';
+import * as inquirer from 'inquirer';
 import { relativePathToWorkspaceRoot, removeDir } from '../utility/workspace';
 import { nameify } from '../utility/string';
 import { JSONFile } from '../utility/json';
@@ -45,7 +47,47 @@ function installDependencies(dependencies: NodeDependency[]) {
   };
 }
 
-function updatePackagejson(options: { project: string }) {
+/**
+ * Edits .vscode/settings.json file to ignore compiled output
+ */
+function editVsCodeSettings(): Rule {
+  return async (tree: Tree) => {
+    const workspace = await readWorkspace(tree);
+
+    const root = workspace.extensions['newProjectRoot'] ?? 'projects';
+    const vscodeSettingsPath = join(normalize('.vscode'), 'settings.json');
+    const fileExclude = `{
+    "${root}/**/*.js": { "when": "$(basename).ts" },
+    "${root}/**/*.d.ts": { "when": "$(basename).ts" },
+    "${root}/**/*.js.map": true
+  }`;
+
+    if (!tree.exists(vscodeSettingsPath)) {
+      tree.create(
+        vscodeSettingsPath,
+        `\
+{
+  "files.exclude": ${fileExclude}
+}`
+      );
+
+      return;
+    }
+
+    new JSONFile(tree, vscodeSettingsPath).modify(
+      ['files.exclude'],
+      JSON.parse(fileExclude)
+    );
+  };
+}
+
+/**
+ * Updates the package.json adding the necessary properties
+ */
+function updatePackagejson(options: {
+  project: string;
+  namespace?: string;
+}): Rule {
   return async (tree: Tree) => {
     const workspace = await readWorkspace(tree);
     const project = workspace.projects.get(options.project);
@@ -60,6 +102,30 @@ function updatePackagejson(options: { project: string }) {
       tree,
       join(normalize(project.root), 'package.json')
     );
+
+    if (
+      options.namespace != null &&
+      !(packJson.get(['name']) as string)?.startsWith(options.namespace)
+    ) {
+      packJson.modify(
+        ['name'],
+        options.namespace + '/' + packJson.get(['name'])
+      );
+    }
+
+    const rootPack = new JSONFile(tree, 'package.json');
+    const version =
+      rootPack.get(['dependencies', 'cmf-core-ui']) ??
+      rootPack.get(['dependencies', 'cmf-mes-ui']);
+
+    packJson.modify(['peerDependencies'], {
+      ...(packJson.get(['peerDependencies']) ?? {}),
+      '@criticalmanufacturing/connect-iot-controller-engine': version,
+      'cmf-core': version,
+      'cmf-core-business-controls': version,
+      'cmf-core-connect-iot': version,
+      'cmf-core-controls': version
+    });
 
     packJson.modify(['scripts'], {
       ...(packJson.get(['scripts']) ?? {}),
@@ -79,7 +145,15 @@ function updatePackagejson(options: { project: string }) {
   };
 }
 
-function addIoTLibrary(options: { name: string; project: string }) {
+/**
+ * IoT Library generator
+ */
+function addIoTLibrary(options: {
+  name: string;
+  project: string;
+  skipInstall: boolean;
+  namespace?: string;
+}) {
   return async (tree: Tree) => {
     const workspace = await readWorkspace(tree);
     const project = workspace.projects.get(options.project);
@@ -126,7 +200,11 @@ function addIoTLibrary(options: { name: string; project: string }) {
     return chain([
       mergeWith(templateSource),
       removeDir(sourceDir),
-      updatePackagejson({ project: options.project }),
+      updatePackagejson({
+        project: options.project,
+        namespace: options.namespace
+      }),
+      editVsCodeSettings(),
       schematic('iot-task', {
         path: `${sourceDir}/tasks`,
         project: options.project,
@@ -135,36 +213,55 @@ function addIoTLibrary(options: { name: string; project: string }) {
         hasOutputs: false,
         isForProtocol: false
       }),
-      installDependencies(
-        Object.entries(devDeps).map(([key, value]) => ({
-          type: NodeDependencyType.Dev,
-          name: key,
-          version: value
-        }))
-      )
+      options.skipInstall
+        ? noop()
+        : installDependencies(
+            Object.entries(devDeps).map(([key, value]) => ({
+              type: NodeDependencyType.Dev,
+              name: key,
+              version: value
+            }))
+          )
     ]);
   };
 }
 
 export default function (_options: Schema): Rule {
   return async (tree: Tree) => {
-    if (!_options.prefix) {
-      const folderName = _options.name.startsWith('@')
-        ? _options.name.substring(1)
-        : _options.name;
-
-      if (/[A-Z]/.test(folderName)) {
-        _options.prefix = strings.dasherize(folderName);
-      }
-    }
-
     const entryFile = 'public-api-designer';
     const workspace = await readWorkspace(tree);
+
+    let namespace = /^@.*\/.*/.test(_options.name)
+      ? _options.name.split('/')[0]
+      : _options.namespace;
+
+    if (!namespace) {
+      const question: inquirer.InputQuestion = {
+        type: 'input',
+        name: 'namespace',
+        message: 'What is your package namespace?',
+        default: '@criticalmanufacturing'
+      };
+
+      namespace = (await inquirer.prompt([question])).namespace;
+    }
+
+    if (
+      namespace != null &&
+      !/^(?:@[a-zA-Z0-9-*~][a-zA-Z0-9-*._~]*)$/.test(namespace)
+    ) {
+      throw new SchematicsException(
+        'Data path "/namespace" must match pattern "^(?:@[a-zA-Z0-9-*~][a-zA-Z0-9-*._~])$"'
+      );
+    }
 
     const lint = (
       (workspace.extensions.cli as JsonObject)
         ?.schematicCollections as JsonArray
     )?.includes('@angular-eslint/schematics');
+
+    // delete extra options
+    delete _options.namespace;
 
     return chain([
       externalSchematic(
@@ -176,7 +273,9 @@ export default function (_options: Schema): Rule {
         name: /^@.*\/.*/.test(_options.name)
           ? _options.name.split('/')[1]
           : _options.name,
-        project: _options.name
+        project: _options.name,
+        skipInstall: _options.skipInstall ?? false,
+        namespace: namespace
       })
     ]);
   };

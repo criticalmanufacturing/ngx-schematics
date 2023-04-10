@@ -1,0 +1,11 @@
+# Compiled Output
+*.d.ts
+*.js
+*.js.map
+
+# Tests
+/.nyc_output
+/coverage
+
+# Node
+/node_modules
