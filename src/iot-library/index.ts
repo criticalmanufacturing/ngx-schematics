@@ -69,10 +69,9 @@ function updatePackagejson(options: { project: string }) {
       'build:runtime': 'tsc -p tsconfig.lib.runtime.json',
       'build:tests': 'tsc -p test/unit',
       test: 'mocha test/**/*.test.js --timeout 5000 --exit',
-      cover: 'node istanbul cover mocha test/**/*.test.js',
       'vs:buildAndTest': 'npm run build && npm run vs:test',
       'vs:test':
-        'node istanbul cover mocha --report cobertura --report lcov test/**/*.test.js -- --timeout 5000 --exit --reporter mocha-junit-reporter --reporter-options mochaFile=./test/test-results.xml',
+        'nyc -r cobertura -r lcov -r text-summary mocha test/**/*.test.js -- --timeout 5000 --exit -r mocha-multi-reporters -r mocha-junit-reporter --reporter-options mochaFile=./test/test-results.xml',
       pretest: 'npm run build',
       watch:
         'npm run build:runtime -- -w | mocha --timeout 5000 --exit --reporter min -w test/**/*.test.js'
