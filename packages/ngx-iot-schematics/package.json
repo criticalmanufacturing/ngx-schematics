@@ -1,0 +1,24 @@
+{
+  "name": "@criticalmanufacturing/ngx-iot-schematics",
+  "version": "0.0.0",
+  "description": "Critical Manufacturing angular iot schematics",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "watch": "tsc -w -p tsconfig.json"
+  },
+  "keywords": [
+    "schematics"
+  ],
+  "author": "Critical Manufacturing",
+  "license": "BSD-3-Clause",
+  "schematics": "./src/collection.json",
+  "dependencies": {
+    "@angular-devkit/core": "",
+    "@angular-devkit/schematics": "",
+    "@angular-eslint/schematics": "",
+    "@criticalmanufacturing/schematics-devkit": "",
+    "@schematics/angular": "",
+    "inquirer": "",
+    "ts-morph": ""
+  }
+}

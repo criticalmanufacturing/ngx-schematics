@@ -1,0 +1,29 @@
+{
+  "name": "@criticalmanufacturing/ngx-schematics",
+  "version": "0.0.0",
+  "description": "Critical Manufacturing angular schematics",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "watch": "tsc -w -p tsconfig.json",
+    "test": "jasmine src/**/*_spec.js",
+    "build-test": "npm run build && npm run test"
+  },
+  "keywords": [
+    "schematics"
+  ],
+  "author": "Critical Manufacturing",
+  "license": "BSD-3-Clause",
+  "schematics": "./src/collection.json",
+  "dependencies": {
+    "@angular-devkit/core": "",
+    "@angular-devkit/schematics": "",
+    "@angular-eslint/schematics": "",
+    "@angular/localize": "",
+    "@angular/pwa": "",
+    "@criticalmanufacturing/schematics-devkit": "",
+    "@schematics/angular": "",
+    "inquirer": "",
+    "node-html-parser": "",
+    "ts-morph": ""
+  }
+}

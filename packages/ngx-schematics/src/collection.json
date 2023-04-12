@@ -1,0 +1,59 @@
+{
+  "$schema": "../../../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "extends": ["@angular-eslint/schematics"],
+  "schematics": {
+    "ng-add": {
+      "description": "Update an application with HTML defaults.",
+      "factory": "./ng-add/index",
+      "schema": "./ng-add/schema.json",
+      "save": "devDependencies",
+      "private": true,
+      "hidden": true
+    },
+    "converter": {
+      "description": "Generate a new converter.",
+      "factory": "./converter",
+      "schema": "./converter/schema.json"
+    },
+    "data-source": {
+      "description": "Generate a new data source.",
+      "factory": "./data-source",
+      "schema": "./data-source/schema.json"
+    },
+    "entity-page": {
+      "description": "Generate a new entity page.",
+      "factory": "./entity-page",
+      "schema": "./entity-page/schema.json"
+    },
+    "execution-view": {
+      "description": "Generate a customization library project for Angular.",
+      "factory": "./execution-view",
+      "schema": "./execution-view/schema.json"
+    },
+    "library": {
+      "description": "Generate a new library.",
+      "factory": "./library",
+      "schema": "./library/schema.json"
+    },
+    "package-info": {
+      "description": "Generate the package information.",
+      "factory": "./package-info",
+      "schema": "./package-info/schema.json"
+    },
+    "widget": {
+      "description": "Generate a new widget.",
+      "factory": "./widget",
+      "schema": "./widget/schema.json"
+    },
+    "wizard": {
+      "description": "Generate a new wizard.",
+      "factory": "./wizard",
+      "schema": "./wizard/schema.json"
+    },
+    "wizard-create-edit": {
+      "description": "Generates a new create edit wizard.",
+      "factory": "./wizard-create-edit",
+      "schema": "./wizard-create-edit/schema.json"
+    }
+  }
+}

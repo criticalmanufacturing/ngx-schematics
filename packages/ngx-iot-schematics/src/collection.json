@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "extends": ["@angular-eslint/schematics"],
+  "schematics": {
+    "ng-add": {
+      "description": "Update an application with HTML defaults.",
+      "factory": "./ng-add/index",
+      "schema": "./ng-add/schema.json",
+      "save": "devDependencies",
+      "private": true,
+      "hidden": true
+    },
+    "library": {
+      "description": "Generates a new IoT library.",
+      "factory": "./library",
+      "schema": "./library/schema.json"
+    },
+    "task": {
+      "description": "Generates a new IoT task.",
+      "factory": "./task",
+      "schema": "./task/schema.json"
+    },
+    "converter": {
+      "description": "Generates a new IoT converter.",
+      "factory": "./converter",
+      "schema": "./converter/schema.json"
+    }
+  }
+}
