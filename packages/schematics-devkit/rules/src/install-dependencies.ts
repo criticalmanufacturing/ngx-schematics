@@ -18,18 +18,56 @@ export interface NodeDependency {
   overwrite?: boolean;
 }
 
-function addPackageJsonDependency(
+/**
+ * Returns the information about an dependency searching by name
+ * @param tree Tree
+ * @param name the name of the dependency
+ * @param pkgJsonPath the path to the package.json file
+ */
+export function getInstalledDependency(
+  tree: Tree,
+  name: string,
+  pkgJsonPath = PKG_JSON_PATH
+): NodeDependency | undefined {
+  const json = new JSONFile(tree, pkgJsonPath);
+  for (const type of Object.values(NodeDependencyType)) {
+    if (json.get([type, name])) {
+      return {
+        name: name,
+        type: type,
+        version: json.get([type, name])
+      };
+    }
+  }
+}
+
+function removeDependency(
   tree: Tree,
   dependency: NodeDependency,
   pkgJsonPath = PKG_JSON_PATH
 ): void {
   const json = new JSONFile(tree, pkgJsonPath);
 
+  if (json.get([dependency.type, dependency.name])) {
+    const deps = json.get([dependency.type]);
+    delete deps[dependency.name];
+
+    json.modify([dependency.type], deps);
+  }
+}
+
+function addDependency(tree: Tree, dependency: NodeDependency, pkgJsonPath = PKG_JSON_PATH): void {
   const { overwrite, type, name, version } = dependency;
   const path = [type, name];
-  if (overwrite || !json.get(path)) {
-    json.modify(path, version);
+
+  const installedDep = getInstalledDependency(tree, name, pkgJsonPath);
+
+  if (installedDep && overwrite) {
+    removeDependency(tree, installedDep, pkgJsonPath);
   }
+
+  const json = new JSONFile(tree, pkgJsonPath);
+  json.modify(path, version);
 }
 
 /**
@@ -37,7 +75,7 @@ function addPackageJsonDependency(
  */
 export function installDependencies(dependencies: NodeDependency[]): Rule {
   return (tree: Tree, _context: SchematicContext) => {
-    dependencies.forEach((dependency) => addPackageJsonDependency(tree, dependency));
+    dependencies.forEach((dependency) => addDependency(tree, dependency));
     _context.addTask(new NodePackageInstallTask());
 
     return tree;

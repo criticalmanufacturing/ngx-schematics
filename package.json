@@ -1,7 +1,7 @@
 {
-  "name": "@crticalmanufacturing/angular-schematics",
+  "name": "@crticalmanufacturing/schematics",
   "version": "10.0.0",
-  "description": "Critical Manufacturing Schematics Repository",
+  "description": "Critical Manufacturing Angular Schematics",
   "private": true,
   "dependencies": {
     "@angular-devkit/core": "^15.2.1",
@@ -34,4 +34,3 @@
     "packages/*"
   ]
 }
-

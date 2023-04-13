@@ -1,7 +1,7 @@
 {
   "name": "@criticalmanufacturing/ngx-schematics",
   "version": "0.0.0",
-  "description": "Critical Manufacturing angular schematics",
+  "description": "Critical Manufacturing Angular Schematics",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "watch": "tsc -w -p tsconfig.json",

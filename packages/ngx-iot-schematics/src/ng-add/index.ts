@@ -17,7 +17,8 @@ import {
   updateTsConfig,
   NodeDependency,
   NodeDependencyType,
-  installDependencies
+  installDependencies,
+  getInstalledDependency
 } from '@criticalmanufacturing/schematics-devkit/rules';
 
 import { version as pkgVersion, name as pkgName } from '../../package.json';
@@ -114,6 +115,13 @@ function installSchematics(options: Schema) {
         type: NodeDependencyType.Default,
         version: options.version!
       }));
+
+      dependencies.push({
+        name: pkgName,
+        version: getInstalledDependency(tree, pkgName)?.version ?? pkgVersion,
+        type: NodeDependencyType.Dev,
+        overwrite: true
+      });
 
       return chain([
         updateWorkspace(),

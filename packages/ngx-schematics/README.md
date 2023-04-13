@@ -1,4 +1,5 @@
-**Critical Manufacturing Schematics Repository**
+# **Critical Manufacturing Schematics Repository**
+
 =========
 
 **Critical Manufacturing Schematics** is the base of any CMF MES HTML Graphical User Interface customization project. This repository is meant to be a quick and easy way of getting started with CMF MES GUI customization, by providing a basic structure for the project and all the recommended tooling.
@@ -158,7 +159,6 @@ Creates a new, generic Library project in the current workspace
 | `--skip-install`      | Do not install dependency packages.                                                        | `boolean`  | `false`       |
 | `--skip-ts-config`    | Do not update "tsconfig.json" to add a path mapping for the new library.                   | `boolean`  | `false`       |
 | `--skip-metadata`     | Do not generate metadata for the new library.                                              | `boolean`  | `false`       |
-| `--lint`              | Adds eslint to the library.                                                                | `boolean`  |               |
 
 #### **Usage:**
 

@@ -18,7 +18,9 @@ import * as inquirer from 'inquirer';
 import { CORE_BASE_MODULE, MES_BASE_MODULE } from './package-configs';
 
 import {
+  NodeDependency,
   NodeDependencyType,
+  getInstalledDependency,
   installDependencies,
   updateTsConfig
 } from '@criticalmanufacturing/schematics-devkit/rules';
@@ -101,7 +103,15 @@ function installSchematics(options: Schema) {
       throw new SchematicsException('Option "version" is required.');
     }
 
-    const dependencies = [];
+    const dependencies: NodeDependency[] = [
+      {
+        name: pkgName,
+        version: getInstalledDependency(tree, pkgName)?.version ?? pkgVersion,
+        type: NodeDependencyType.Dev,
+        overwrite: true
+      }
+    ];
+
     if (options.application === 'MES') {
       dependencies.push({
         type: NodeDependencyType.Default,
