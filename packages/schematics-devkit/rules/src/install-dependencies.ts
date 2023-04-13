@@ -62,7 +62,11 @@ function addDependency(tree: Tree, dependency: NodeDependency, pkgJsonPath = PKG
 
   const installedDep = getInstalledDependency(tree, name, pkgJsonPath);
 
-  if (installedDep && overwrite) {
+  if (!overwrite && installedDep) {
+    return;
+  }
+
+  if (overwrite && installedDep) {
     removeDependency(tree, installedDep, pkgJsonPath);
   }
 
