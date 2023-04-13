@@ -1,8 +1,6 @@
-# **Critical Manufacturing Schematics Repository**
+# **Critical Manufacturing UI Schematics Package**
 
-=========
-
-**Critical Manufacturing Schematics** is the base of any CMF MES HTML Graphical User Interface customization project. This repository is meant to be a quick and easy way of getting started with CMF MES GUI customization, by providing a basic structure for the project and all the recommended tooling.
+**Critical Manufacturing UI Schematics** is the base of any CMF MES HTML Graphical User Interface customization project. This repository is meant to be a quick and easy way of getting started with CMF MES GUI customization, by providing a basic structure for the project and all the recommended tooling.
 
 ## **Schematics**
 
@@ -257,37 +255,4 @@ Creates a new, generic Wizard Create Edit definition in the given or default pro
 
 ```
 ng generate wizard-create-edit [name]
-```
-
-## **Getting Started**
-
-1. Clone this repository into your repository root.
-
-2. Run:
-
-```
-npm install
-```
-
-## **Testing**
-
-To test locally, install `@criticalmanufacturing/ngx-schematics` globally and use the `schematics` command line tool. That tool acts the same as the `generate` command of the Angular CLI, but also has a debug mode.
-
-Check the documentation with
-
-```bash
-schematics --help
-```
-
-## **Unit Testing**
-
-`npm run test` will run the unit tests, using Jasmine as a runner and test framework.
-
-## **Publishing**
-
-To publish, simply do:
-
-```bash
-npm run build
-npm publish
 ```

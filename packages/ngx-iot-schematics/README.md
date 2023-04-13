@@ -1,6 +1,4 @@
-# **Critical Manufacturing IoT Schematics Repository**
-
-=========
+# **Critical Manufacturing IoT Schematics Package**
 
 **Critical Manufacturing IoT Schematics** is the base of any CMF MES HTML IoMT Tasks project. This repository is meant to be a quick and easy way of getting started with IoT Tasks, by providing a basic structure for the project and all the recommended tooling.
 
@@ -9,6 +7,7 @@
 - [ng-add](#ng-add)
 - [converter](#converter)
 - [task](#task)
+- [library](#library)
 
 ## **Project Startup Commands**
 
@@ -112,37 +111,4 @@ Creates a new, generic IoT Tasks Library project in the current workspace
 
 ```
 ng generate library [name]
-```
-
-## **Getting Started**
-
-1. Clone this repository into your repository root.
-
-2. Run:
-
-```
-npm install
-```
-
-## **Testing**
-
-To test locally, install `@criticalmanufacturing/ngx-iot-schematics` globally and use the `schematics` command line tool. That tool acts the same as the `generate` command of the Angular CLI, but also has a debug mode.
-
-Check the documentation with
-
-```bash
-schematics --help
-```
-
-## **Unit Testing**
-
-`npm run test` will run the unit tests, using Jasmine as a runner and test framework.
-
-## **Publishing**
-
-To publish, simply do:
-
-```bash
-npm run build
-npm publish
 ```
