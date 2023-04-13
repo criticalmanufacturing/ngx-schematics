@@ -12,12 +12,9 @@
     "noImplicitThis": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
-    "rootDir": ".",
     "sourceMap": true,
     "strict": true,
     "resolveJsonModule": true,
     "types": ["jasmine", "node"]
-  },
-  "include": ["src/**/*"],
-  "exclude": ["src/**/files/**/*"]
+  }
 }

@@ -25,7 +25,7 @@ jobs:
         name: Build
       - run: npm run test
         name: Run unit tests
-      - run: npm publish --tag ${{ github.event.inputs.tag }}
+      - run: node ./scripts/publish ${{ github.event.inputs.tag }}
         name: Publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

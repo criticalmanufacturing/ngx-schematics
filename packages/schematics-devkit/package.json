@@ -1,0 +1,27 @@
+{
+  "name": "@criticalmanufacturing/schematics-devkit",
+  "version": "0.0.0",
+  "description": "Critical Manufacturing Angular Schematics Devkit",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "watch": "tsc -w -p tsconfig.json"
+  },
+  "keywords": [
+    "schematics"
+  ],
+  "author": "Critical Manufacturing",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "@angular-devkit/core": "",
+    "@angular-devkit/schematics": "",
+    "@schematics/angular": "",
+    "ts-morph": ""
+  },
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json",
+    "./utility": "./utility/index.js",
+    "./rules": "./rules/index.js",
+    "./testing": "./testing/index.js"
+  }
+}
