@@ -32,7 +32,7 @@ export function updateLibraryAPI(options: {
       return;
     }
 
-    const entryDir = dirname(normalize(entryFile));
+    const entryDir = join(normalize('/'), dirname(normalize(entryFile)));
     const designerEntryFile = createSourceFile(tree, entryFile);
     const runtimeEntryFile = createSourceFile(tree, join(entryDir, 'public-api-runtime.ts'));
 
@@ -133,14 +133,11 @@ export function updateLibraryAPI(options: {
     });
 
     if (designerEntryFile) {
-      tree.overwrite(join(normalize(project.root), entryFile), designerEntryFile.getFullText());
+      tree.overwrite(designerEntryFile.getFilePath(), designerEntryFile.getFullText());
     }
 
     if (runtimeEntryFile) {
-      tree.overwrite(
-        join(normalize(project.root), dirname(normalize(entryFile)), 'public-api-runtime.ts'),
-        runtimeEntryFile.getFullText()
-      );
+      tree.overwrite(runtimeEntryFile.getFilePath(), runtimeEntryFile.getFullText());
     }
   };
 }
