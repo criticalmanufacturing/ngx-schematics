@@ -3,7 +3,7 @@
   "extends": ["@angular-eslint/schematics"],
   "schematics": {
     "ng-add": {
-      "description": "Update an application with HTML defaults.",
+      "description": "Installs the IoT Schematics.",
       "factory": "./ng-add/index",
       "schema": "./ng-add/schema.json",
       "save": "devDependencies",

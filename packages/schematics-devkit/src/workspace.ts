@@ -1,5 +1,6 @@
 import { ProjectDefinition, TargetDefinition, readWorkspace } from '@schematics/angular/utility';
 import { Tree } from '@angular-devkit/schematics';
+import { exec } from 'child_process';
 
 /**
  * Project Type
@@ -51,4 +52,19 @@ export async function getMainPath(tree: Tree, project: string): Promise<string |
   }
 
   return appProject.targets.get('build')?.options?.main as string;
+}
+
+/**
+ * List ngx-schematics release tags of the current version
+ */
+export function listNpmReleaseTags(pkg: string): Promise<string[]> {
+  return new Promise<string[]>((resolve, reject) => {
+    exec(`npm dist-tag ls ${pkg}`, (error, stdout, stderr) => {
+      if (error) {
+        return reject(new Error(stderr));
+      }
+
+      return resolve(stdout.match(/^[^:]+/gm)?.reverse() ?? []);
+    });
+  });
 }

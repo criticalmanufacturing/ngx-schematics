@@ -10,7 +10,6 @@ import {
 
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 
-import { exec } from 'child_process';
 import * as inquirer from 'inquirer';
 
 import {
@@ -23,22 +22,9 @@ import {
 
 import { version as pkgVersion, name as pkgName } from '../../package.json';
 import { Schema } from './schema';
-import { CORE_IOT_PACKAGE, IOT_DEPENDENCIES } from './defenition';
+import { CORE_IOT_PACKAGE, IOT_DEPENDENCIES } from './definition';
 import { JsonArray, JsonObject } from '@angular-devkit/core';
-/**
- * List ngx-schematics release tags of the current version
- */
-function listNpmReleaseTags(pkg: string) {
-  return new Promise<string[]>((resolve, reject) => {
-    exec(`npm dist-tag ls ${pkg}`, (error, stdout, stderr) => {
-      if (error) {
-        return reject(new Error(stderr));
-      }
-
-      return resolve(stdout.match(/^[^:]+/gm)?.reverse() ?? []);
-    });
-  });
-}
+import { listNpmReleaseTags } from '@criticalmanufacturing/schematics-devkit';
 
 /**
  * Updates the angular.json file with all the relevant configuration
@@ -83,45 +69,22 @@ function installSchematics(options: Schema) {
       }
 
       if (!options.version) {
-        const [appTags, pkgTags] = await Promise.all([
-          listNpmReleaseTags(CORE_IOT_PACKAGE),
-          listNpmReleaseTags(`${pkgName}@${pkgVersion}`)
-        ]);
-
-        const valideTags = pkgTags.filter((t) => appTags.includes(t)); // only include matching app package tags
-
-        if (valideTags.length === 0) {
-          throw new SchematicsException(
-            'There are no matching npm dist-tags for the current application'
-          );
-        }
-
-        const question: inquirer.ListQuestion = {
-          type: 'list',
-          name: 'distTag',
-          message: 'What is the distribution to utilize?',
-          choices: valideTags
-        };
-
-        options.version = (await inquirer.prompt([question])).distTag;
-      }
-
-      if (!options.version) {
         throw new SchematicsException('Option "version" is required.');
       }
 
-      const dependencies: NodeDependency[] = IOT_DEPENDENCIES.map((name) => ({
-        name,
-        type: NodeDependencyType.Default,
-        version: options.version!
-      }));
-
-      dependencies.push({
-        name: pkgName,
-        version: getInstalledDependency(tree, pkgName)?.version ?? pkgVersion,
-        type: NodeDependencyType.Dev,
-        overwrite: true
-      });
+      const dependencies: NodeDependency[] = [
+        {
+          name: pkgName,
+          version: getInstalledDependency(tree, pkgName)?.version ?? pkgVersion,
+          type: NodeDependencyType.Dev,
+          overwrite: true
+        },
+        ...IOT_DEPENDENCIES.map((name) => ({
+          name,
+          type: NodeDependencyType.Default,
+          version: options.version!
+        }))
+      ];
 
       return chain([
         updateWorkspace(),
@@ -141,6 +104,30 @@ function installSchematics(options: Schema) {
 // per file.
 export default function (_options: Schema): Rule {
   return async (_: Tree, _context: SchematicContext) => {
+    if (!_options.version) {
+      const [appTags, pkgTags] = await Promise.all([
+        listNpmReleaseTags(CORE_IOT_PACKAGE),
+        listNpmReleaseTags(`${pkgName}@${pkgVersion}`)
+      ]);
+
+      const valideTags = pkgTags.filter((t) => appTags.includes(t)); // only include matching app package tags
+
+      if (valideTags.length === 0) {
+        throw new SchematicsException(
+          'There are no matching npm dist-tags for the current application'
+        );
+      }
+
+      const question: inquirer.ListQuestion = {
+        type: 'list',
+        name: 'distTag',
+        message: 'What is the distribution to utilize?',
+        choices: valideTags
+      };
+
+      _options.version = (await inquirer.prompt([question])).distTag;
+    }
+
     return chain([
       _options.eslint ? externalSchematic('@angular-eslint/schematics', 'ng-add', {}) : noop(),
       installSchematics(_options)

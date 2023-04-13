@@ -2,4 +2,10 @@
 *.ts
 !*.d.ts
 *.js.map
+
+# Ignore Test Files
+*_spec.js
+*_spec.d.ts
+
+# Ignore Config Files
 tsconfig.json

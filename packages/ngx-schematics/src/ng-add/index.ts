@@ -12,7 +12,6 @@ import { readWorkspace } from '@schematics/angular/utility';
 
 import { JsonObject } from '@angular-devkit/core';
 
-import { exec } from 'child_process';
 import * as inquirer from 'inquirer';
 
 import { CORE_BASE_MODULE, MES_BASE_MODULE } from './package-configs';
@@ -33,21 +32,7 @@ import { updateAppModule } from './rules/update-app-module';
 import { updateMain } from './rules/update-main';
 import { addConfigJson } from './rules/add-config-json';
 import { updateWorkspace } from './rules/update-workspace';
-
-/**
- * List ngx-schematics release tags of the current version
- */
-function listNpmReleaseTags(pkg: string) {
-  return new Promise<string[]>((resolve, reject) => {
-    exec(`npm dist-tag ls ${pkg}`, (error, stdout, stderr) => {
-      if (error) {
-        return reject(new Error(stderr));
-      }
-
-      return resolve(stdout.match(/^[^:]+/gm)?.reverse() ?? []);
-    });
-  });
-}
+import { listNpmReleaseTags } from '@criticalmanufacturing/schematics-devkit';
 
 /**
  * Updates main.ts file adding the load config method
@@ -56,47 +41,23 @@ function installSchematics(options: Schema) {
   return async (tree: Tree, _context: SchematicContext) => {
     const workspace = await readWorkspace(tree);
 
-    if (options.project) {
-      const project = workspace.projects.get(options.project);
-
-      if (!project) {
-        throw new SchematicsException(`Project is not defined in this workspace.`);
-      }
-
-      if (project.extensions['projectType'] !== 'application') {
-        throw new SchematicsException(`HTMLStarter requires a project type of "application".`);
-      }
-
-      // Find all the relevant targets for the project
-      if (project.targets.size === 0) {
-        throw new SchematicsException(`Targets are not defined for this project.`);
-      }
+    if (!options.project) {
+      return;
     }
 
-    if (!options.version) {
-      const [appTags, pkgTags] = await Promise.all([
-        listNpmReleaseTags(
-          options.application === 'MES' ? MES_BASE_MODULE[0] : CORE_BASE_MODULE[0]
-        ),
-        listNpmReleaseTags(`${pkgName}@${pkgVersion}`)
-      ]);
+    const project = workspace.projects.get(options.project);
 
-      const valideTags = pkgTags.filter((t) => appTags.includes(t)); // only include matching app package tags
+    if (!project) {
+      throw new SchematicsException(`Project is not defined in this workspace.`);
+    }
 
-      if (valideTags.length === 0) {
-        throw new SchematicsException(
-          'There are no matching npm dist-tags for the current application'
-        );
-      }
+    if (project.extensions['projectType'] !== 'application') {
+      throw new SchematicsException(`HTMLStarter requires a project type of "application".`);
+    }
 
-      const question: inquirer.ListQuestion = {
-        type: 'list',
-        name: 'distTag',
-        message: 'What is the distribution to utilize?',
-        choices: valideTags
-      };
-
-      options.version = (await inquirer.prompt([question])).distTag;
+    // Find all the relevant targets for the project
+    if (project.targets.size === 0) {
+      throw new SchematicsException(`Targets are not defined for this project.`);
     }
 
     if (!options.version) {
@@ -109,22 +70,13 @@ function installSchematics(options: Schema) {
         version: getInstalledDependency(tree, pkgName)?.version ?? pkgVersion,
         type: NodeDependencyType.Dev,
         overwrite: true
+      },
+      {
+        name: options.application === 'MES' ? MES_BASE_MODULE[0] : CORE_BASE_MODULE[0],
+        version: options.version,
+        type: NodeDependencyType.Default
       }
     ];
-
-    if (options.application === 'MES') {
-      dependencies.push({
-        type: NodeDependencyType.Default,
-        name: MES_BASE_MODULE[0],
-        version: options.version
-      });
-    } else {
-      dependencies.push({
-        type: NodeDependencyType.Default,
-        name: CORE_BASE_MODULE[0],
-        version: options.version
-      });
-    }
 
     return chain([
       ...(options.project
@@ -152,6 +104,32 @@ function installSchematics(options: Schema) {
 // per file.
 export default function (_options: Schema): Rule {
   return async (tree: Tree, _context: SchematicContext) => {
+    if (!_options.version) {
+      const [appTags, pkgTags] = await Promise.all([
+        listNpmReleaseTags(
+          _options.application === 'MES' ? MES_BASE_MODULE[0] : CORE_BASE_MODULE[0]
+        ),
+        listNpmReleaseTags(`${pkgName}@${pkgVersion}`)
+      ]);
+
+      const valideTags = pkgTags.filter((t) => appTags.includes(t)); // only include matching app package tags
+
+      if (valideTags.length === 0) {
+        throw new SchematicsException(
+          'There are no matching npm dist-tags for the current application'
+        );
+      }
+
+      const question: inquirer.ListQuestion = {
+        type: 'list',
+        name: 'distTag',
+        message: 'What is the distribution to utilize?',
+        choices: valideTags
+      };
+
+      _options.version = (await inquirer.prompt([question])).distTag;
+    }
+
     const packjson = tree.readJson('package.json') as JsonObject;
     const allDeps = [
       ...Object.keys(packjson.dependencies as JsonObject),
