@@ -57,7 +57,7 @@ function editVsCodeSettings(): Rule {
 /**
  * Updates the package.json adding the necessary properties
  */
-function updatePackagejson(options: { project: string; namespace?: string }): Rule {
+function updatePackagejson(options: { project: string; name: string }): Rule {
   return async (tree: Tree) => {
     const workspace = await readWorkspace(tree);
     const project = workspace.projects.get(options.project);
@@ -68,11 +68,8 @@ function updatePackagejson(options: { project: string; namespace?: string }): Ru
 
     const packJson = new JSONFile(tree, join(normalize(project.root), 'package.json'));
 
-    if (
-      options.namespace != null &&
-      !(packJson.get(['name']) as string)?.startsWith(options.namespace)
-    ) {
-      packJson.modify(['name'], options.namespace + '/' + packJson.get(['name']));
+    if ((packJson.get(['name']) as string) !== options.name) {
+      packJson.modify(['name'], options.name);
     }
 
     const rootPack = new JSONFile(tree, 'package.json');
@@ -109,12 +106,7 @@ function updatePackagejson(options: { project: string; namespace?: string }): Ru
 /**
  * IoT Library generator
  */
-function addIoTLibrary(options: {
-  name: string;
-  project: string;
-  skipInstall: boolean;
-  namespace?: string;
-}) {
+function addIoTLibrary(options: { project: string; skipInstall: boolean; fullname: string }) {
   return async (tree: Tree) => {
     const workspace = await readWorkspace(tree);
     const project = workspace.projects.get(options.project);
@@ -158,13 +150,13 @@ function addIoTLibrary(options: {
       removeDirectory(sourceDir),
       updatePackagejson({
         project: options.project,
-        namespace: options.namespace
+        name: options.fullname
       }),
       editVsCodeSettings(),
       schematic('task', {
         path: `${sourceDir}/tasks`,
         project: options.project,
-        name: options.name,
+        name: options.project,
         hasInputs: false,
         hasOutputs: false,
         isForProtocol: false
@@ -212,6 +204,13 @@ export default function (_options: Schema): Rule {
       (workspace.extensions.cli as JsonObject)?.schematicCollections as JsonArray
     )?.includes('@angular-eslint/schematics');
 
+    const fullname =
+      !/^@.*\/.*/.test(_options.name) && namespace
+        ? strings.dasherize(namespace + '/' + _options.name)
+        : strings.dasherize(_options.name);
+
+    _options.name = /^@.*\/.*/.test(_options.name) ? _options.name.split('/')[1] : _options.name;
+
     // delete extra options
     delete _options.namespace;
 
@@ -221,10 +220,9 @@ export default function (_options: Schema): Rule {
         entryFile
       }),
       addIoTLibrary({
-        name: /^@.*\/.*/.test(_options.name) ? _options.name.split('/')[1] : _options.name,
         project: _options.name,
         skipInstall: _options.skipInstall ?? false,
-        namespace: namespace
+        fullname: fullname
       })
     ]);
   };

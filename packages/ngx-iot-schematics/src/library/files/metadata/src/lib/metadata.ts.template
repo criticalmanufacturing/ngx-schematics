@@ -1,10 +1,10 @@
 import { ConnectIoTPackageMetadata } from 'cmf-core-connect-iot/extensions';
 
 export const Metadata: ConnectIoTPackageMetadata = {
-    name: '<%= name %>',
+    name: '<%= fullname %>',
     friendlyName: '',
     version: '',
-    load: () => import('<%= name %>'),
+    load: () => import('<%= fullname %>'),
     tasks: [],
     converters: [],
     fonts: []
