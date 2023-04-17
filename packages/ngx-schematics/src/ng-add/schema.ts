@@ -17,5 +17,5 @@ export interface Schema {
   /**
    * Add eslint to the project.
    */
-  eslint?: string;
+  eslint?: boolean;
 }

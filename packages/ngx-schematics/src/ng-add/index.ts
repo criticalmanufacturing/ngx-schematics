@@ -10,7 +10,7 @@ import {
 
 import { readWorkspace } from '@schematics/angular/utility';
 
-import { JsonObject } from '@angular-devkit/core';
+import { JsonArray, JsonObject } from '@angular-devkit/core';
 
 import * as inquirer from 'inquirer';
 
@@ -132,6 +132,13 @@ export default function (_options: Schema): Rule {
       ...Object.keys(packjson.dependencies as JsonObject),
       ...Object.keys(packjson.devDependencies as JsonObject)
     ];
+
+    const workspace = await readWorkspace(tree);
+    _options.eslint =
+      _options.eslint &&
+      !((workspace.extensions.cli as JsonObject)?.schematicCollections as JsonArray)?.includes(
+        '@angular-eslint/schematics'
+      );
 
     return chain([
       _options.project && !allDeps.includes('@angular/service-worker')
