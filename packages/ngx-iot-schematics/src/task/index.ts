@@ -13,7 +13,12 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
-import { getDefaultPath, parseName, strings } from '@criticalmanufacturing/schematics-devkit';
+import {
+  getDefaultPath,
+  parseName,
+  relative,
+  strings
+} from '@criticalmanufacturing/schematics-devkit';
 import { updateLibraryMetadata } from '../utility/update-library-metadata';
 import { Schema } from './schema';
 import { updateLibraryAPI } from '../utility/update-library-api';
@@ -50,12 +55,16 @@ export default function (_options: Schema): Rule {
       move(parsedPath.path)
     ]);
 
-    const testsPath = join(normalize(project.root), 'test', 'unit', 'tasks');
+    const testsPath = join(normalize('/'), project.root, 'test', 'unit', 'tasks');
 
     const templateTest = apply(url('./files/test'), [
       applyTemplates({
         ...strings,
-        ..._options
+        ..._options,
+        relativeTo: relative(
+          join(testsPath, strings.dasherize(_options.name)),
+          normalize(_options.path)
+        )
       }),
       move(testsPath)
     ]);

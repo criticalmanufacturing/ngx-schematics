@@ -1,14 +1,14 @@
-import "reflect-metadata";
-import * as chai from "chai";
-import { Task } from "@criticalmanufacturing/connect-iot-controller-engine";
-import EngineTestSuite from "@criticalmanufacturing/connect-iot-controller-engine/test";
-<% if(isForProtocol === true) { %>import { DriverProxyMock } from "@criticalmanufacturing/connect-iot-controller-engine/test/mocks/driverProxy.mock";<% } %>
-// import { DataStoreMock } from "@criticalmanufacturing/connect-iot-controller-engine/test/mocks/dataStore.mock";
+import 'reflect-metadata';
+import * as chai from 'chai';
+import { Task } from '@criticalmanufacturing/connect-iot-controller-engine';
+import EngineTestSuite from '@criticalmanufacturing/connect-iot-controller-engine/test';
+<% if(isForProtocol === true) { %>import { DriverProxyMock } from '@criticalmanufacturing/connect-iot-controller-engine/test/mocks/driverProxy.mock';<% } %>
+// import { DataStoreMock } from '@criticalmanufacturing/connect-iot-controller-engine/test/mocks/dataStore.mock';
 
-import { <%= classify(name) %>Settings } from "../../../../src/lib/tasks/<%= dasherize(name) %>/<%= dasherize(name) %>.task";
-import { <%= classify(name) %>Module } from "../../../../src/lib/tasks/<%= dasherize(name) %>/<%= dasherize(name) %>.task-module";
+import { <%= classify(name) %>Settings } from '<%= relativeTo %>/<%= dasherize(name) %>/<%= dasherize(name) %>.task';
+import { <%= classify(name) %>Module } from '<%= relativeTo %>/<%= dasherize(name) %>/<%= dasherize(name) %>.task-module';
 
-describe("<%= classify(name) %> Task tests", () => {
+describe('<%= classify(name) %> Task tests', () => {
 
 <% if(isForProtocol === true) { %>    let driverMock: DriverProxyMock;
     beforeEach(() => {
@@ -27,25 +27,25 @@ describe("<%= classify(name) %> Task tests", () => {
 
         const taskDefinition = {
             class: <%= classify(name) %>Module,
-            id: "0",
+            id: '0',
             settings: settings || <<%= classify(name) %>Settings>{
-                message: ""
+                message: ''
             }
         };
 
         EngineTestSuite.createTasks([
             taskDefinition,
             {
-                id: "1",
+                id: '1',
                 class: Task.Task({
-                    name: "mockTask"
+                    name: 'mockTask'
                 })(class MockTask implements Task.TaskInstance {
                     [key: string]: any;
                     _outputs: Map<string, Task.Output<any>> = new Map<string, Task.Output<any>>();
 
                     async onBeforeInit(): Promise<void> {
-                        this["activate"] = new Task.Output<any>();
-                        this._outputs.set("activate", this["activate"]);
+                        this['activate'] = new Task.Output<any>();
+                        this._outputs.set('activate', this['activate']);
                         // Create other custom outputs (for the Mock task) here
                     }
 
@@ -61,9 +61,9 @@ describe("<%= classify(name) %> Task tests", () => {
                 })
             }
         ], [
-            { sourceId: "1", outputName: `activate`, targetId: "0", inputName: "activate", },
-            { sourceId: "0", outputName: `success`, targetId: "1", inputName: "success", },
-            { sourceId: "0", outputName: `error`, targetId: "1", inputName: "error", },
+            { sourceId: '1', outputName: `activate`, targetId: '0', inputName: 'activate', },
+            { sourceId: '0', outputName: `success`, targetId: '1', inputName: 'success', },
+            { sourceId: '0', outputName: `error`, targetId: '1', inputName: 'error', },
             // Add more links needed here...
         ],
         <% if(isForProtocol === true) { %>driverMock<% } %><% if(isForProtocol === false) { %>undefined<% } %>,
@@ -90,14 +90,14 @@ describe("<%= classify(name) %> Task tests", () => {
      * Note: This is just an example about how to unit test the task. Not mandatory to use this method!
      */
 
-    it("should get success when activated", (done) => {
+    it('should get success when activated', (done) => {
         <%= camelize(name) %>TestFactory(undefined,
             (outputs: Map<string, Task.Output<any>>) => {
                 // Trigger an output
-                outputs.get("activate").emit(true);
+                outputs.get('activate').emit(true);
             }, (changes: Task.Changes) => {
                 // Validate the input
-                chai.expect(changes["success"].currentValue).to.equal(true);
+                chai.expect(changes['success'].currentValue).to.equal(true);
                 // Report the test as a success
                 done();
             });

@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { Converter } from '@criticalmanufacturing/connect-iot-controller-engine';
 import EngineTestSuite from '@criticalmanufacturing/connect-iot-controller-engine/test';
-import { <%= classify(name) %>Converter } from '../../../../src/lib/converters/<%= dasherize(name) %>/<%= dasherize(name) %>.converter';
+import { <%= classify(name) %>Converter } from '<%= relativeTo %>/<%= dasherize(name) %>/<%= dasherize(name) %>.converter';
 
 describe('<%= nameify(name) %> converter', () => {
     let converter: Converter.ConverterContainer;

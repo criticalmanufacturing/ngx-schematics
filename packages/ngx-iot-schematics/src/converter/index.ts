@@ -12,7 +12,12 @@ import {
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
 import { toConverterType, toValueType } from '../utility/iot-value-types';
-import { getDefaultPath, parseName, strings } from '@criticalmanufacturing/schematics-devkit';
+import {
+  getDefaultPath,
+  parseName,
+  relative,
+  strings
+} from '@criticalmanufacturing/schematics-devkit';
 import { Schema } from './schema';
 import { updateLibraryAPI } from '../utility/update-library-api';
 import { updateLibraryMetadata } from '../utility/update-library-metadata';
@@ -38,21 +43,25 @@ export default function (_options: Schema): Rule {
     _options.name = parsedPath.name;
     _options.path = parsedPath.path;
 
+    const testsPath = join(normalize('/'), project.root, 'test', 'unit', 'converters');
+
     const context = {
       ...strings,
       ..._options,
       inputType: toValueType(_options.inputType),
       outputType: toValueType(_options.outputType),
       converterInputType: toConverterType(_options.inputType),
-      converterOutputType: toConverterType(_options.outputType)
+      converterOutputType: toConverterType(_options.outputType),
+      relativeTo: relative(
+        join(testsPath, strings.dasherize(_options.name)),
+        normalize(_options.path)
+      )
     };
 
     const templateSource = apply(url('./files/src'), [
       applyTemplates(context),
       move(parsedPath.path)
     ]);
-
-    const testsPath = join(normalize(project.root), 'test', 'unit', 'converters');
 
     const templateTest = apply(url('./files/test'), [applyTemplates(context), move(testsPath)]);
 
