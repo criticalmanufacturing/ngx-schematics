@@ -39,25 +39,22 @@ import { listNpmReleaseTags } from '@criticalmanufacturing/schematics-devkit';
  */
 function installSchematics(options: Schema) {
   return async (tree: Tree, _context: SchematicContext) => {
-    const workspace = await readWorkspace(tree);
+    if (options.project) {
+      const workspace = await readWorkspace(tree);
+      const project = workspace.projects.get(options.project);
 
-    if (!options.project) {
-      return;
-    }
+      if (!project) {
+        throw new SchematicsException(`Project is not defined in this workspace.`);
+      }
 
-    const project = workspace.projects.get(options.project);
+      if (project.extensions['projectType'] !== 'application') {
+        throw new SchematicsException(`HTMLStarter requires a project type of "application".`);
+      }
 
-    if (!project) {
-      throw new SchematicsException(`Project is not defined in this workspace.`);
-    }
-
-    if (project.extensions['projectType'] !== 'application') {
-      throw new SchematicsException(`HTMLStarter requires a project type of "application".`);
-    }
-
-    // Find all the relevant targets for the project
-    if (project.targets.size === 0) {
-      throw new SchematicsException(`Targets are not defined for this project.`);
+      // Find all the relevant targets for the project
+      if (project.targets.size === 0) {
+        throw new SchematicsException(`Targets are not defined for this project.`);
+      }
     }
 
     if (!options.version) {

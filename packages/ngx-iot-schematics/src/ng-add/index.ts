@@ -59,44 +59,34 @@ export function updateWorkspace(): Rule {
  */
 function installSchematics(options: Schema) {
   return async (tree: Tree, _context: SchematicContext) => {
-    const workspace = await readWorkspace(tree);
-
-    if (options.project) {
-      const project = workspace.projects.get(options.project);
-
-      if (!project) {
-        throw new SchematicsException(`Project is not defined in this workspace.`);
-      }
-
-      if (!options.version) {
-        throw new SchematicsException('Option "version" is required.');
-      }
-
-      const dependencies: NodeDependency[] = [
-        {
-          name: pkgName,
-          version: getInstalledDependency(tree, pkgName)?.version ?? pkgVersion,
-          type: NodeDependencyType.Dev,
-          overwrite: true
-        },
-        ...IOT_DEPENDENCIES.map((name) => ({
-          name,
-          type: NodeDependencyType.Default,
-          version: options.version!
-        }))
-      ];
-
-      return chain([
-        updateWorkspace(),
-        installDependencies(dependencies),
-        updateTsConfig([
-          [['compilerOptions', 'strictFunctionTypes'], false],
-          [['compilerOptions', 'noImplicitAny'], false],
-          [['compilerOptions', 'strictNullChecks'], false],
-          [['compilerOptions', 'allowSyntheticDefaultImports'], true]
-        ])
-      ]);
+    if (!options.version) {
+      throw new SchematicsException('Option "version" is required.');
     }
+
+    const dependencies: NodeDependency[] = [
+      {
+        name: pkgName,
+        version: getInstalledDependency(tree, pkgName)?.version ?? pkgVersion,
+        type: NodeDependencyType.Dev,
+        overwrite: true
+      },
+      ...IOT_DEPENDENCIES.map((name) => ({
+        name,
+        type: NodeDependencyType.Default,
+        version: options.version!
+      }))
+    ];
+
+    return chain([
+      updateWorkspace(),
+      installDependencies(dependencies),
+      updateTsConfig([
+        [['compilerOptions', 'strictFunctionTypes'], false],
+        [['compilerOptions', 'noImplicitAny'], false],
+        [['compilerOptions', 'strictNullChecks'], false],
+        [['compilerOptions', 'allowSyntheticDefaultImports'], true]
+      ])
+    ]);
   };
 }
 
