@@ -1,23 +1,17 @@
 /**
  * Project Core Base Module
  */
-export const CORE_BASE_MODULE: [string, string] = [
-  'cmf-core-ui',
-  'CoreUIModule'
-];
+export const CORE_BASE_MODULE: [string, string] = ['cmf-core-ui', 'CoreUIModule.forRoot()'];
 
 /**
  * Project MES Base Module
  */
-export const MES_BASE_MODULE: [string, string] = ['cmf-mes-ui', 'MesUIModule'];
+export const MES_BASE_MODULE: [string, string] = ['cmf-mes-ui', 'MesUIModule.forRoot()'];
 
 /**
  * Project Metadata Routing Module
  */
-export const METADATA_ROUTING_MODULE: [string, string] = [
-  'cmf-core',
-  'MetadataRoutingModule'
-];
+export const METADATA_ROUTING_MODULE: [string, string] = ['cmf-core', 'MetadataRoutingModule'];
 
 /**
  * THEMES
@@ -144,7 +138,15 @@ const GENERIC_STYLES = [
   'node_modules/bootstrap/dist/css/bootstrap.css',
   'node_modules/cmf.kendoui/styles/kendo.common.min.css',
   'node_modules/jquery-ui/themes/base/dialog.css',
-  'node_modules/jquery-ui/themes/base/core.css'
+  'node_modules/jquery-ui/themes/base/core.css',
+  'node_modules/cmf-core-connect-iot/assets/fonts/coreconnectiot/icon-core-connect-iot-font.less',
+  'node_modules/cmf-core-iotevents/assets/fonts/coreiotevents/icon-core-iot-events-font.less',
+  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-core-tasks/assets/font/icon-core-tasks-connect-iot-font.less',
+  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-filedrivers-tasks/assets/font/icon-filesbased-iot-font.less',
+  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-oib-tasks/assets/font/icon-oib-tasks-connect-iot-font.less',
+  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-secsgem-tasks/assets/font/icon-secsgem-iot-font.less',
+  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-factoryautomation-tasks/assets/font/icon-factoryautomation-tasks-connect-iot-font.less',
+  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-opcua-tasks/assets/font/icon-opcua-tasks-connect-iot-font.less'
 ];
 
 /**
@@ -165,7 +167,9 @@ export const PROJECT_CORE_STYLES = [
  */
 export const PROJECT_MES_STYLES = [
   ...GENERIC_STYLES,
+  'node_modules/cmf-mes-kpi/assets/fonts/meskpi/icon-mes-kpi-font.less',
   'node_modules/cmf-mes/assets/style/styles.less',
+  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-mes-tasks/assets/font/icon-Mes-connect-iot-font.less',
   ...THEMES.map((theme) => ({
     inject: false,
     bundleName: theme,
