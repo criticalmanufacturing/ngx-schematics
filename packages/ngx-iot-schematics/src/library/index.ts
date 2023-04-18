@@ -73,8 +73,7 @@ function updatePackagejson(options: { project: string; name: string }): Rule {
     }
 
     const rootPack = new JSONFile(tree, 'package.json');
-    const version =
-      rootPack.get(['dependencies', 'cmf-core-ui']) ?? rootPack.get(['dependencies', 'cmf-mes-ui']);
+    const version = rootPack.get(['dependencies', 'cmf-core-connect-iot']);
 
     packJson.modify(['peerDependencies'], {
       ...(packJson.get(['peerDependencies']) ?? {}),
