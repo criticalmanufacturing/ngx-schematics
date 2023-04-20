@@ -24,7 +24,7 @@ import { version as pkgVersion, name as pkgName } from '../../package.json';
 import { Schema } from './schema';
 import { CORE_IOT_PACKAGE, IOT_DEPENDENCIES } from './definition';
 import { JsonArray, JsonObject } from '@angular-devkit/core';
-import { listNpmReleaseTags } from '@criticalmanufacturing/schematics-devkit';
+import { JSONFile, listNpmReleaseTags } from '@criticalmanufacturing/schematics-devkit';
 
 /**
  * Updates the angular.json file with all the relevant configuration
@@ -55,6 +55,18 @@ export function updateWorkspace(): Rule {
 }
 
 /**
+ * Updates the package.json adding the necessary properties
+ */
+function updatePackagejson(): Rule {
+  return async (tree: Tree) => {
+    const workspace = await readWorkspace(tree);
+    const packJson = new JSONFile(tree, 'package.json');
+    const newProjectRoot = (workspace.extensions.newProjectRoot as string) ?? 'projects';
+    packJson.modify(['workspaces'], [`./${newProjectRoot}/*`]);
+  };
+}
+
+/**
  * Updates main.ts file adding the load config method
  */
 function installSchematics(options: Schema) {
@@ -80,6 +92,7 @@ function installSchematics(options: Schema) {
     return chain([
       updateWorkspace(),
       installDependencies(dependencies),
+      updatePackagejson(),
       updateTsConfig([
         [['compilerOptions', 'strictFunctionTypes'], false],
         [['compilerOptions', 'noImplicitAny'], false],
