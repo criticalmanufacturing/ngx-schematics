@@ -110,14 +110,14 @@ export default function (_options: Schema): Rule {
     if (!_options.version) {
       const [appTags, pkgTags] = await Promise.all([
         listNpmReleaseTags(CORE_IOT_PACKAGE),
-        listNpmReleaseTags(`${pkgName}@${pkgVersion}`)
+        listNpmReleaseTags(pkgName, pkgVersion)
       ]);
 
       const valideTags = pkgTags.filter((t) => appTags.includes(t)); // only include matching app package tags
 
       if (valideTags.length === 0) {
         throw new SchematicsException(
-          'There are no matching npm dist-tags for the current application'
+          `Unable to find compatible version of ${CORE_IOT_PACKAGE} with the current schematics version`
         );
       }
 

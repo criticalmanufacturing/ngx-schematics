@@ -102,18 +102,18 @@ function installSchematics(options: Schema) {
 export default function (_options: Schema): Rule {
   return async (tree: Tree, _context: SchematicContext) => {
     if (!_options.version) {
+      const appPackage = _options.application === 'MES' ? MES_BASE_MODULE[0] : CORE_BASE_MODULE[0];
+
       const [appTags, pkgTags] = await Promise.all([
-        listNpmReleaseTags(
-          _options.application === 'MES' ? MES_BASE_MODULE[0] : CORE_BASE_MODULE[0]
-        ),
-        listNpmReleaseTags(`${pkgName}@${pkgVersion}`)
+        listNpmReleaseTags(appPackage),
+        listNpmReleaseTags(pkgName, pkgVersion)
       ]);
 
       const valideTags = pkgTags.filter((t) => appTags.includes(t)); // only include matching app package tags
 
       if (valideTags.length === 0) {
         throw new SchematicsException(
-          'There are no matching npm dist-tags for the current application'
+          `Unable to find compatible version of ${appPackage} with the current schematics version`
         );
       }
 

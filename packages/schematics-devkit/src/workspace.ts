@@ -57,14 +57,23 @@ export async function getMainPath(tree: Tree, project: string): Promise<string |
 /**
  * List ngx-schematics release tags of the current version
  */
-export function listNpmReleaseTags(pkg: string): Promise<string[]> {
+export function listNpmReleaseTags(pkg: string, version?: string): Promise<string[]> {
   return new Promise<string[]>((resolve, reject) => {
     exec(`npm dist-tag ls ${pkg}`, (error, stdout, stderr) => {
       if (error) {
         return reject(new Error(stderr));
       }
 
-      return resolve(stdout.match(/^[^:]+/gm)?.reverse() ?? []);
+      const regExp = /^([^:]+): (.+)$/gm;
+      let match: RegExpExecArray | null;
+      let tags: string[] = [];
+      while ((match = regExp.exec(stdout))) {
+        if (!version || match[2] === version) {
+          tags.push(match[1]);
+        }
+      }
+
+      return resolve(tags.reverse());
     });
   });
 }
