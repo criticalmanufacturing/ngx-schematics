@@ -36,6 +36,10 @@ schematics --help
 
 To publish, simply do:
 
+Update the root package.json version:
+
+Run the following:
+
 ```bash
 npm run build
 node ./scripts/publish.js [tag]
