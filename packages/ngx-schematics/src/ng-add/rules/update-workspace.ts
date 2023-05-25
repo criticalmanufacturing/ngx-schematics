@@ -89,6 +89,9 @@ export function updateWorkspace(options: {
 
         // override options
         if (target.options) {
+          // add preserve symlinks to install custom libraries like cutom lbos
+          target.options.preserveSymlinks = true;
+
           // Add allowedCommonJsDependencies
           if (target.options.allowedCommonJsDependencies instanceof Array) {
             addToJsonArray(
