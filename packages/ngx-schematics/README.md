@@ -14,6 +14,7 @@
 - [widget](#widget)
 - [wizard](#wizard)
 - [wizard-create-edit](#wizard-create-edit)
+- [page](#page)
 
 ## **Project Startup Commands**
 
@@ -256,3 +257,30 @@ Creates a new, generic Wizard Create Edit definition in the given or default pro
 ```
 ng generate wizard-create-edit [name]
 ```
+
+### **page**
+
+Creates a new, generic page in the given or default project
+
+#### **Arguments:**
+
+| Name   | Description           | Value Type |
+| ------ | --------------------- | ---------- |
+| `name` | The name of the page. | `string`   |
+
+#### **Options:**
+
+| Name           | Description                                         | Value Type | Default Value |
+| -------------- | --------------------------------------------------- | ---------- | ------------- |
+| `--project`    | The name of the project.                            | `string`   |               |
+| `--page-id`    | The id of the action used to access the page.       | `string`   |               |
+| `--icon-class` | The class for the icon displayed on the page.       | `string`   |               |
+| `--entrypoint` | Defines how the page will be available to the user. | `string`   | `Menu Item`   |
+| `--style`      | The processor to use for style files.               | `string`   | `less`        |
+
+#### **Usage:**
+
+```
+ng generate page [name]
+```
+
