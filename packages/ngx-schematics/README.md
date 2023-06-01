@@ -270,13 +270,15 @@ Creates a new, generic page in the given or default project
 
 #### **Options:**
 
-| Name           | Description                                         | Value Type | Default Value |
-| -------------- | --------------------------------------------------- | ---------- | ------------- |
-| `--project`    | The name of the project.                            | `string`   |               |
-| `--page-id`    | The id of the action used to access the page.       | `string`   |               |
-| `--icon-class` | The class for the icon displayed on the page.       | `string`   |               |
-| `--entrypoint` | Defines how the page will be available to the user. | `string`   | `Menu Item`   |
-| `--style`      | The processor to use for style files.               | `string`   | `less`        |
+| Name                  | Description                                                                                    | Value Type | Default Value             |
+| --------------------- | ---------------------------------------------------------------------------------------------- | ---------- | ------------------------- |
+| `--project`           | The name of the project.                                                                       | `string`   |                           |
+| `--page-id`           | The id of the action used to access the page.                                                  | `string`   |                           |
+| `--icon-class`        | The class for the icon displayed on the page.                                                  | `string`   | `icon-core-st-lg-generic` |
+| `--entrypoint`        | Defines how the page will be available to the user.                                            | `string`   | `Menu Item`               |
+| `--menu-group-id`     | In case the entrypoint is "Menu Item", specifies the parent Menu Group Id.                     | `string`   |                           |
+| `--menu-sub-group-id` | In case the entrypoint is "Menu Item", specifies the parent Menu Sub Group Id (if applicable). | `string`   |                           |
+| `--style`             | The processor to use for style files.                                                          | `string`   | `less`                    |
 
 #### **Usage:**
 

@@ -37,7 +37,8 @@
     "iconClass": {
       "type": "string",
       "description": "The class for the icon displayed on the page.",
-      "x-prompt": "What is the iconClass?"
+      "x-prompt": "What is the iconClass?",
+      "default": "icon-core-st-lg-generic"
     },
     "style": {
       "description": "The file extension or preprocessor to use for style files, or 'none' to skip generating the style file.",
@@ -51,7 +52,15 @@
       "default": "Menu Item",
       "enum": ["Menu Item", "Action Button"],
       "x-prompt": "How will the page be accessible?"
+    },
+    "menuGroupId": {
+      "type": "string",
+      "description": "In case the entrypoint is \"Menu Item\", specifies the parent Menu Group Id."
+    },
+    "menuSubGroupId": {
+      "type": "string",
+      "description": "In case the entrypoint is \"Menu Item\", specifies the parent Menu Sub Group Id (if applicable)."
     }
   },
-  "required": ["name", "pageId", "iconClass"]
+  "required": ["name", "pageId"]
 }
