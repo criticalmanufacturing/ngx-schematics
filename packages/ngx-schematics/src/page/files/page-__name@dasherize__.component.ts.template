@@ -1,0 +1,140 @@
+import {
+    Component,
+    forwardRef,
+    ViewChild,
+    ViewContainerRef
+} from '@angular/core';
+
+import {
+    CommonModule
+} from '@angular/common';
+
+import { Router } from '@angular/router';
+
+import {
+    Cmf
+} from 'cmf-lbos';
+
+import {
+    CustomizableComponent,
+    HOST_VIEW_COMPONENT,
+    ActionButtonBuildContextHandler
+} from 'cmf-core';
+
+import {
+    BasePage,
+    BasePageModule,
+    ActionBarModule,
+    ActionGroupModule,
+    ActionButtonModule,
+    RequiredFunctionalitiesModule,
+    PageBag
+} from 'cmf-core-controls';
+
+/**
+ * @whatItDoes
+ *
+ * Please provide a meaningful description of this component
+ * Try to answer these questions:
+ * * What is it?
+ * * What it does?
+ * * How does it behave with different sizes?
+ * * Does it retrieve data from any external source (server, local database, text file, etc...)?
+ *
+ * @howToUse
+ *
+ * This component is used with the inputs and outputs mentioned below.
+ *
+ * Besides the description above, please complement it with a meaningful description of this component that answer these questions:
+ * * How to use it?
+ * * Where and When to use it?
+ *
+ * ### Inputs
+ * `string` : **name** - The name of this component
+ * `number` : **value** - The value of this component
+ *
+ * ### Outputs
+ * `string` : **onNameChange** - When the name of the component change, this output emits the new name
+ * `number` : **onValueChange** - When the value of the component change, this output emits the new value
+ *
+ * ### Example
+ * To use the component, assume this HTML Template as an example:
+ *
+ * ```HTML
+ * <<%= dasherize(project) %>-page-<%= dasherize(name) %>></<%= dasherize(project) %>-page-<%= dasherize(name) %>>
+ * ```
+ *
+ * ### _NOTES_
+ * (optional, Provide additional notes here)
+ *
+ * @description
+ *
+ * ## <%= classify(name) %>Component Component
+ *
+ * ### Dependencies
+ *
+ * #### Components
+ * * ComponentA : `package`
+ * * ComponentB : `package`
+ *
+ * #### Services
+ * * ServiceA : `package`
+ * * ServiceB : `package`
+ *
+ * #### Directives
+ * * DirectiveA : `package`
+ * * DirectiveB : `package`
+ *
+ */
+@Component({
+    standalone: true,
+    selector: '<%= dasherize(project) %>-page-<%= dasherize(name) %>',
+    imports: [CommonModule, BasePageModule, ActionBarModule, ActionButtonModule, ActionGroupModule, RequiredFunctionalitiesModule],
+    templateUrl: './page-<%= dasherize(name) %>.component.html',
+    <% if (style !== 'none') { %>styleUrls: ['./page-<%= dasherize(name) %>.component.<%= style %>'],<% } %>
+    viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Page<%= classify(name) %>Component) }]
+})
+export class Page<%= classify(name) %>Component extends CustomizableComponent {
+
+    /**
+     * The nested Base Page element
+     */
+    @ViewChild(BasePage)
+    private _nestedBasePage: BasePage;
+
+    /**
+     * Constructor
+     */
+    constructor(
+        viewContainerRef: ViewContainerRef,
+        private router: Router
+    ) {
+        super(viewContainerRef);
+    }
+
+    /**
+     * Build context for Save Layout Button.
+     * Here are defined the context variables for the wizardSaveLayout
+     */
+    public onBuildContextHandlerForSaveLayoutWizard: ActionButtonBuildContextHandler = (context?: any): Promise<any> => {
+        return this._nestedBasePage.baseBuildContextForSaveLayoutWizard(
+            context,
+            null,
+            null,
+            this.router.url,
+            null);
+    };
+
+    /**
+     * Build context for Reset Layout Button.
+     * Here are defined the context variables for the wizardResetLayout
+     */
+    public onBuildContextHandlerForResetLayoutWizard: ActionButtonBuildContextHandler = (context?: any): Promise<any> => {
+        return this._nestedBasePage.baseBuildContextForResetLayoutWizard(
+            context,
+            null,
+            null,
+            this.router.url,
+            null);
+    };
+}
