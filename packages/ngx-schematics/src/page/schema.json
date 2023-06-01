@@ -53,5 +53,5 @@
       "x-prompt": "How will the page be accessible?"
     }
   },
-  "required": ["name", "pageId"]
+  "required": ["name", "pageId", "iconClass"]
 }

@@ -129,7 +129,7 @@ export default function (_options: Schema): Rule {
       throw new SchematicsException(`Icon class is required`);
     }
 
-    if (_options.entrypoint === 'Menu Item') {
+    if (_options.entrypoint === 'Menu Item' && !_options.menuGroupId) {
       const questions: inquirer.InputQuestion[] = [
         {
           type: 'input',
