@@ -54,6 +54,11 @@
       "description": "Generates a new create edit wizard.",
       "factory": "./wizard-create-edit",
       "schema": "./wizard-create-edit/schema.json"
+    },
+    "page": {
+      "description": "Generates a new page.",
+      "factory": "./page",
+      "schema": "./page/schema.json"
     }
   }
 }
