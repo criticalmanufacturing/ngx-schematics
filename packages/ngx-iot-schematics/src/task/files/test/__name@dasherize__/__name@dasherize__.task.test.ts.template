@@ -2,8 +2,8 @@ import 'reflect-metadata';
 import * as chai from 'chai';
 import { Task } from '@criticalmanufacturing/connect-iot-controller-engine';
 import EngineTestSuite from '@criticalmanufacturing/connect-iot-controller-engine/test';
-<% if(isForProtocol === true) { %>import { DriverProxyMock } from '@criticalmanufacturing/connect-iot-controller-engine/test/mocks/driverProxy.mock';<% } %>
-// import { DataStoreMock } from '@criticalmanufacturing/connect-iot-controller-engine/test/mocks/dataStore.mock';
+<% if(isForProtocol === true) { %>import { DriverProxyMock } from '@criticalmanufacturing/connect-iot-controller-engine/test/mocks/driver-proxy.mock';<% } %>
+// import { DataStoreMock } from '@criticalmanufacturing/connect-iot-controller-engine/test/mocks/data-store.mock';
 
 import { <%= classify(name) %>Settings } from '<%= relativeTo %>/<%= dasherize(name) %>/<%= dasherize(name) %>.task';
 import { <%= classify(name) %>Module } from '<%= relativeTo %>/<%= dasherize(name) %>/<%= dasherize(name) %>.task-module';

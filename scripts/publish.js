@@ -3,9 +3,9 @@ const { readdirSync, readFileSync, writeFileSync } = require("fs");
 const { join } = require("path");
 const { argv } = require("process");
 
-const tag = argv[2];
+const tags = argv.slice(2);
 
-if (!tag) {
+if (tags.length === 0) {
     console.error('Error: Missing tag argument.');
     process.exit(1);
 }
@@ -15,12 +15,12 @@ const packagesDir = join(rootDir, 'packages');
 const packages = readdirSync(packagesDir);
 const rootPackJson = JSON.parse(readFileSync(join(rootDir, 'package.json'), { encoding: 'utf8' }));
 const angularVersion = rootPackJson.dependencies['@schematics/angular'].replace(/^(.\d+)\.\d+\.\d+/, '$1.0.0');
+const packsInfo = [];
 
 packages.forEach(pack => {
     const packJson = JSON.parse(readFileSync(join(packagesDir, pack, 'package.json'), { encoding: 'utf8' }));
 
     packJson.version = rootPackJson.version;
-
     packJson.peerDependencies ??= {};
     packJson.peerDependencies = { "@angular/cli": angularVersion, ...packJson.peerDependencies }
 
@@ -39,7 +39,11 @@ packages.forEach(pack => {
         packJson.dependencies[dep] = rootPackJson.dependencies[dep];
     });
 
+    packsInfo.push({ name: packJson.name, version: packJson.version });
     writeFileSync(join(packagesDir, pack, 'package.json'), JSON.stringify(packJson, null, 2));
 });
 
-concurrently(packages.map(pack => `npm publish ${join(packagesDir, pack)} --tag ${tag}`), { raw: true });
+(async () => {
+    await concurrently(packages.map(pack => `npm publish ${join(packagesDir, pack)}`), { raw: true }).result;
+    await concurrently(packsInfo.map(({ name, version }) => `npm dist-tag add ${name}@${version} ${tags.join(' ')}`), { raw: true }).result;
+})();
