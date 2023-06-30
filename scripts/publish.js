@@ -44,6 +44,11 @@ packages.forEach(pack => {
 });
 
 (async () => {
+    // publish package as latest
     await concurrently(packages.map(pack => `npm publish ${join(packagesDir, pack)}`), { raw: true }).result;
-    await concurrently(packsInfo.map(({ name, version }) => `npm dist-tag add ${name}@${version} ${tags.join(' ')}`), { raw: true }).result;
+
+    // add other dist tags
+    for (const tag of tags) {
+        await concurrently(packsInfo.map(({ name, version }) => `npm dist-tag add ${name}@${version} ${tag}`), { raw: true }).result;
+    }
 })();
