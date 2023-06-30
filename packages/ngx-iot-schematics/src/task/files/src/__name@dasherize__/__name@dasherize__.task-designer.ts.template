@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Task } from '@criticalmanufacturing/connect-iot-controller-engine';
-import { TaskDesigner, TaskDesignerInstance } from 'cmf-core-connect-iot';
+import { TaskDesigner, TaskDesignerInstance, TaskProtocol } from 'cmf-core-connect-iot';
 import { <%= classify(name) %>Settings } from './<%= name %>.task';
 
 @Injectable()
@@ -19,7 +19,7 @@ import { <%= classify(name) %>Settings } from './<%= name %>.task';
         success: Task.OUTPUT_SUCCESS,
         error: Task.OUTPUT_ERROR
     }<% if(isForProtocol === true) { %>,
-    protocol: Task.TaskProtocol.All<% } %>
+    protocol: TaskProtocol.All<% } %>
 })
 export class <%= classify(name) %>Designer implements TaskDesignerInstance, <%= classify(name) %>Settings {
 
