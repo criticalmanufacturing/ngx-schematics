@@ -21,9 +21,9 @@ import {
  } from 'cmf-core-controls';
 
 import {
-    TaskDefinitionSettings, 
+    TaskDefinitionSettings,
     TaskSettingsBase,
-    TaskSettingsModule, 
+    TaskSettingsModule,
     TaskSettingsService
 } from 'cmf-core-connect-iot';
 

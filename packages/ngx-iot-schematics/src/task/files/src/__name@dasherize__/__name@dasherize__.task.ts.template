@@ -4,14 +4,14 @@ import {
     System,
     DI,
     TYPES
-} from "@criticalmanufacturing/connect-iot-controller-engine";
+} from '@criticalmanufacturing/connect-iot-controller-engine';
 
 /** Default values for settings */
 export const SETTINGS_DEFAULTS: <%= classify(name) %>Settings = {
     inputs: [],
     outputs: [],
-    message: ""
-}
+    message: ''
+};
 
 /**
  * @whatItDoes
@@ -71,7 +71,7 @@ export class <%= classify(name) %>Task implements Task.TaskInstance, <%= classif
      * @param changes Task changes
      */
     async onChanges(changes: Task.Changes): Promise<void> {
-        if (changes["activate"]) {
+        if (changes['activate']) {
             // It is advised to reset the activate to allow being reactivated without the value being different
             this.activate = undefined;
 
@@ -80,7 +80,7 @@ export class <%= classify(name) %>Task implements Task.TaskInstance, <%= classif
 
             // or
             this._logger.error(`Something very wrong just happened! Log it!`);
-            throw new Error ("Will stop processing, but Error output will be triggered with this value");
+            throw new Error ('Will stop processing, but Error output will be triggered with this value');
         }
     }
 
