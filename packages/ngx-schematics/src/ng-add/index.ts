@@ -91,7 +91,8 @@ function installSchematics(options: Schema) {
         [['compilerOptions', 'strictFunctionTypes'], false],
         [['compilerOptions', 'noImplicitAny'], false],
         [['compilerOptions', 'strictNullChecks'], false],
-        [['compilerOptions', 'allowSyntheticDefaultImports'], true]
+        [['compilerOptions', 'allowSyntheticDefaultImports'], true],
+        [['compilerOptions', 'preserveSymlinks'], true]
       ])
     ]);
   };
