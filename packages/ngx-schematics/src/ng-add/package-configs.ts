@@ -240,6 +240,7 @@ export const PROJECT_SCRIPTS = [
   'node_modules/cmf.kendoui/js/kendo.dataviz.treemap.min.js',
   'node_modules/cmf.kendoui/js/kendo.calendar.min.js',
   'node_modules/cmf.kendoui/js/kendo.multiviewcalendar.min.js',
+  'node_modules/cmf.kendoui/js/kendo.pdf.min.js',
   {
     bundleName: 'jszip',
     inject: false,
