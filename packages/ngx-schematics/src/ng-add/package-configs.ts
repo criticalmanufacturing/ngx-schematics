@@ -110,6 +110,11 @@ export const PROJECT_ASSETS = [
     glob: 'camera_para.dat',
     input: 'node_modules/cmf-artoolkit',
     output: 'cmf-artoolkit'
+  },
+  {
+    glob: 'index.d.ts',
+    input: 'node_modules/cmf-lbos',
+    output: 'assets/@types/cmf-lbos'
   }
 ];
 
