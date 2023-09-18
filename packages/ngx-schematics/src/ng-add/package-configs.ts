@@ -63,7 +63,7 @@ export const PROJECT_ALLOWED_COMMONJS_DEPENDENCIES = [
 export const PROJECT_ASSETS = [
   {
     glob: 'favicon.ico',
-    input: 'node_modules/cmf-core/src/assets/img',
+    input: 'node_modules/cmf-core/assets/img',
     output: ''
   },
   {
