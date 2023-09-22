@@ -98,25 +98,25 @@ import {
 export class Wizard<%= classify(name) %>Component extends CustomizableComponent implements TransactionExecutionView, OnInit {
 
     /**
+     * The instance of the execution view
+     */
+    public instance: Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>;
+
+    /** Dependencies */
+    protected util = inject(UtilService);
+    protected entityTypes = inject(EntityTypeService);
+    protected pageBag = inject(PageBag);
+
+    /**
      * Nested execution view
      */
     @ViewChild(ExecutionView, { static: true })
     private _nestedExecutionView: ExecutionView;
 
     /**
-     * The instance of the execution view
-     */
-    public instance: Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>;
-
-    /**
      * Constructor
      */
-    constructor(
-        viewContainerRef: ViewContainerRef,
-        private pageBag: PageBag,
-        private util: UtilService,
-        private entityTypes: EntityTypeService
-    ) {
+    constructor(viewContainerRef: ViewContainerRef) {
         super(viewContainerRef);
     }
 

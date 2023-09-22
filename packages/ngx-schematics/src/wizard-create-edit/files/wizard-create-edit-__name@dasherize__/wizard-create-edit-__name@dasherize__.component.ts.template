@@ -112,15 +112,15 @@ export class WizardCreateEdit<%= classify(name) %>Component extends Customizable
      */
     public instance: Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
 
+    /** Dependencies */
+    protected util = inject(UtilService);
+    protected entityTypes = inject(EntityTypeService);
+    protected pageBag = inject(PageBag);
+
     /**
      * Constructor
      */
-    constructor(
-        viewContainerRef: ViewContainerRef,
-        private _pageBag: PageBag,
-        private util: UtilService,
-        private entityTypes: EntityTypeService
-    ) {
+    constructor(viewContainerRef: ViewContainerRef) {
         super(viewContainerRef);
     }
 
@@ -129,15 +129,15 @@ export class WizardCreateEdit<%= classify(name) %>Component extends Customizable
      * Sets the basic wizard content according to the pageBag context
      */
     public ngOnInit(): void {
-        if (this._pageBag != null && this._pageBag.context != null) {
-            if (this._pageBag.context.editMode != null) {
-                this.editMode = this._pageBag.context.editMode;
+        if (this.pageBag != null && this.pageBag.context != null) {
+            if (this.pageBag.context.editMode != null) {
+                this.editMode = this.pageBag.context.editMode;
             }
 
             // edit mode
-            if (this._pageBag.context.editMode === EditMode.Edit) {
-                if (this._pageBag.context.instance == null
-                || !this.util.instanceof(this._pageBag.context.instance, Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>)) {
+            if (this.pageBag.context.editMode === EditMode.Edit) {
+                if (this.pageBag.context.instance == null
+                || !this.util.instanceof(this.pageBag.context.instance, Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>)) {
                     throw new Error($localize`:@<%= dasherize(project) %>/<%= dasherize(name) %>#NO_INSTANCE_FOUND:No Instance Found`);
                 }
 
@@ -161,8 +161,8 @@ export class WizardCreateEdit<%= classify(name) %>Component extends Customizable
 
         if (EditMode.Edit === this.editMode) {
             const loadInstanceInput = new Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.GetObjectByIdInput();
-            loadInstanceInput.Id = this._pageBag.context.instance.Id;
-            loadInstanceInput.Type = this.entityTypes.getEntityTypeTypeName(this._pageBag.context.instance);
+            loadInstanceInput.Id = this.pageBag.context.instance.Id;
+            loadInstanceInput.Type = this.entityTypes.getEntityTypeTypeName(this.pageBag.context.instance);
 
             inputs.push(loadInstanceInput);
         }

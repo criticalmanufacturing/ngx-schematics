@@ -99,25 +99,25 @@ import {
 export class Wizard<%= classify(name) %>Component extends CustomizableComponent implements OnInit, TransactionWizard {
 
     /**
+     * The instance of the wizard
+     */
+    public instance: Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>;
+
+    /** Dependencies */
+    protected util = inject(UtilService);
+    protected entityTypes = inject(EntityTypeService);
+    protected pageBag = inject(PageBag);
+
+    /**
      * The wizard element
      */
     @ViewChild(Wizard, { static: true })
     protected _nestedWizard!: Wizard;
 
     /**
-     * The instance of the wizard
-     */
-    public instance: Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>;
-
-    /**
      * Constructor
      */
-    constructor(
-        viewContainerRef: ViewContainerRef,
-        private pageBag: PageBag,
-        private util: UtilService,
-        private entityTypes: EntityTypeService
-    ) {
+    constructor(viewContainerRef: ViewContainerRef) {
         super(viewContainerRef);
     }
 
