@@ -17,7 +17,7 @@ import {
   createSourceFile,
   strings,
   relativeToRoot,
-  ProjectType
+  getDefaultApplicationProject
 } from '@criticalmanufacturing/schematics-devkit';
 import { updateTsConfig } from '@criticalmanufacturing/schematics-devkit/rules';
 import { Schema } from './schema';
@@ -25,11 +25,7 @@ import { addSymbolToNgModuleMetadata, getAppModulePath } from '../utility/ng-mod
 
 function updateAppModule(options: { packageName: string; namePrefix: string }) {
   return async (tree: Tree) => {
-    const workspace = await readWorkspace(tree);
-
-    const project = Array.from(workspace.projects.entries()).find(
-      ([, def]) => def.extensions.projectType === ProjectType.Application
-    )?.[0];
+    const project = await getDefaultApplicationProject(tree);
 
     if (!project) {
       return;

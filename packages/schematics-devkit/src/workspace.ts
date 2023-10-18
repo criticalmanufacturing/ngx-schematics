@@ -1,6 +1,8 @@
 import { ProjectDefinition, TargetDefinition, readWorkspace } from '@schematics/angular/utility';
 import { Tree } from '@angular-devkit/schematics';
 import { exec } from 'child_process';
+import { JsonArray } from '@angular-devkit/core';
+import { isDeepStrictEqual } from 'util';
 
 /**
  * Project Type
@@ -76,4 +78,34 @@ export function listNpmReleaseTags(pkg: string, version?: string): Promise<strin
       return resolve(tags.reverse());
     });
   });
+}
+
+/**
+ * Adds elements to json array if not already present.
+ * @param array array of elements
+ * @param elementsToAdd elements to add to array
+ */
+export function addToJsonArray(array: JsonArray, elementsToAdd: any[]) {
+  elementsToAdd.forEach((toAdd) => {
+    if (
+      !array.some((existing) =>
+        isDeepStrictEqual(typeof existing === 'object' ? { ...existing } : existing, toAdd)
+      )
+    ) {
+      array.push(toAdd);
+    }
+  });
+}
+
+/**
+ * Finds the name of the first application project defined in the worspace
+ * @param tree Tree
+ * @returns the project name or undefined if not found
+ */
+export async function getDefaultApplicationProject(tree: Tree): Promise<string | undefined> {
+  const workspace = await readWorkspace(tree);
+
+  return Array.from(workspace.projects.entries()).find(([, def]) => {
+    return def.extensions.projectType === ProjectType.Application;
+  })?.[0];
 }

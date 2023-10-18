@@ -15,7 +15,6 @@
   "dependencies": {
     "@angular-devkit/core": "",
     "@angular-devkit/schematics": "",
-    "@angular-eslint/schematics": "",
     "@criticalmanufacturing/schematics-devkit": "",
     "@schematics/angular": "",
     "inquirer": "",

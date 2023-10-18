@@ -231,7 +231,7 @@ describe('Generate Execution View', () => {
     expect(executionViewContent).toContain(`public ngOnInit(): void {`);
   });
 
-  it('should have the constructor receiving the ViewContainerRef, PageBag, UtilService, and EntityTypeService', async () => {
+  it('should inject the PageBag, UtilService, and EntityTypeService', async () => {
     const tree = await schematicRunner.runSchematic(
       'execution-view',
       executionViewOptions,
@@ -241,9 +241,10 @@ describe('Generate Execution View', () => {
     const executionViewContent = tree.readContent(
       `${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`
     );
-    expect(executionViewContent).toMatch(
-      /constructor\(\s*((viewContainerRef: ViewContainerRef|private pageBag: PageBag|private util: UtilService|private entityTypes: EntityTypeService)\s*,?\s*){4}\)/gm
-    );
-    expect(executionViewContent).toContain('super(viewContainerRef);');
+
+    expect(executionViewContent).toContain('protected pageBag = inject(PageBag)');
+    expect(executionViewContent).toContain('protected util = inject(UtilService)');
+    expect(executionViewContent).toContain('protected entityTypes = inject(EntityTypeService)');
+    expect(executionViewContent).not.toContain('constructor');
   });
 });

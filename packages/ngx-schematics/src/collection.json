@@ -1,6 +1,5 @@
 {
   "$schema": "../../../node_modules/@angular-devkit/schematics/collection-schema.json",
-  "extends": ["@angular-eslint/schematics"],
   "schematics": {
     "ng-add": {
       "description": "Update an application with HTML defaults.",

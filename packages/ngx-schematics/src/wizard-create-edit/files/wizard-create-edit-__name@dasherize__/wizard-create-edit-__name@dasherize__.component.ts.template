@@ -118,13 +118,6 @@ export class WizardCreateEdit<%= classify(name) %>Component extends Customizable
     protected pageBag = inject(PageBag);
 
     /**
-     * Constructor
-     */
-    constructor(viewContainerRef: ViewContainerRef) {
-        super(viewContainerRef);
-    }
-
-    /**
      * NgOnInit
      * Sets the basic wizard content according to the pageBag context
      */

@@ -209,15 +209,16 @@ describe('Generate Wizard', () => {
     expect(wizardContent).toContain(`public ngOnInit(): void {`);
   });
 
-  it('should have the constructor receiving the ViewContainerRef, PageBag, UtilService, and EntityTypeService', async () => {
+  it('should inject the PageBag, UtilService, and EntityTypeService', async () => {
     const tree = await schematicRunner.runSchematic('wizard', wizardOptions, appTree);
 
     const wizardContent = tree.readContent(
       `${wizardPath}/wizard-${strings.dasherize(wizardOptions.name)}.component.ts`
     );
-    expect(wizardContent).toMatch(
-      /constructor\(\s*((viewContainerRef: ViewContainerRef|private pageBag: PageBag|private util: UtilService|private entityTypes: EntityTypeService)\s*,?\s*){4}\)/gm
-    );
-    expect(wizardContent).toContain('super(viewContainerRef);');
+
+    expect(wizardContent).toContain('protected pageBag = inject(PageBag)');
+    expect(wizardContent).toContain('protected util = inject(UtilService)');
+    expect(wizardContent).toContain('protected entityTypes = inject(EntityTypeService)');
+    expect(wizardContent).not.toContain('constructor');
   });
 });

@@ -1,3 +1,5 @@
+import { SW_ASSETS } from '../migrations/update-1-2-0/update-service-worker';
+
 /**
  * Project Core Base Module
  */
@@ -81,6 +83,7 @@ export const PROJECT_ASSETS = [
     input: 'node_modules/cmf-core/assets/img/themes',
     output: 'assets/themes'
   },
+  ...SW_ASSETS,
   {
     glob: '**/*',
     input: 'node_modules/monaco-editor/min/vs',

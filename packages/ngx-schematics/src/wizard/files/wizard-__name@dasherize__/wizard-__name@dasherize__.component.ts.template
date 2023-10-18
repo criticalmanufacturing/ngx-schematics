@@ -115,13 +115,6 @@ export class Wizard<%= classify(name) %>Component extends CustomizableComponent 
     protected _nestedWizard!: Wizard;
 
     /**
-     * Constructor
-     */
-    constructor(viewContainerRef: ViewContainerRef) {
-        super(viewContainerRef);
-    }
-
-    /**
      * NgOnInit. Sets the basic wizard content according to the pageBag context.
      */
     public ngOnInit(): void {

@@ -1,6 +1,6 @@
 {
   "name": "@crticalmanufacturing/schematics",
-  "version": "1.1.6",
+  "version": "1.2.0",
   "description": "Critical Manufacturing Angular Schematics",
   "private": true,
   "dependencies": {
@@ -12,6 +12,7 @@
     "@schematics/angular": "^15.2.1",
     "inquirer": "^8.2.0",
     "node-html-parser": "^6.1.5",
+    "ora": "^5.4.1",
     "ts-morph": "^17.0.1"
   },
   "devDependencies": {

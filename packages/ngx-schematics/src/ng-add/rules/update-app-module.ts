@@ -3,6 +3,7 @@ import { createSourceFile } from '@criticalmanufacturing/schematics-devkit';
 import { CORE_BASE_MODULE, MES_BASE_MODULE, METADATA_ROUTING_MODULE } from '../package-configs';
 import { Schema } from '../schema';
 import { addSymbolToNgModuleMetadata, getAppModulePath } from '../../utility/ng-module';
+import { updateServiceWorker } from '../../migrations/update-1-2-0/update-service-worker';
 
 /**
  * Updates app module adding the desired package modules
@@ -37,6 +38,8 @@ export function updateAppModule(options: {
       METADATA_ROUTING_MODULE[1],
       METADATA_ROUTING_MODULE[0]
     );
+
+    updateServiceWorker(source);
 
     source.formatText();
     tree.overwrite(appModulePath, source.getFullText());
