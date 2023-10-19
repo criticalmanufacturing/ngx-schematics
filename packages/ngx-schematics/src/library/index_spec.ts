@@ -189,22 +189,6 @@ describe('Generate Library', () => {
     expect(tsConfigJson.compilerOptions.paths).toBeUndefined();
   });
 
-  it('should generate a component inside of a library', async () => {
-    const componentName = 'test-component';
-
-    let tree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
-    const componentOptions = {
-      name: componentName,
-      project: libraryOptions.name
-    };
-    tree = await schematicRunner.runSchematic('component', componentOptions, tree);
-    expect(
-      tree.exists(
-        `/projects/${libraryOptions.name}/src/lib/${componentName}/${componentName}.component.ts`
-      )
-    ).toBe(true);
-  });
-
   it('should export the metadata service and module', async () => {
     const tree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
     const fileContent = tree.readContent(

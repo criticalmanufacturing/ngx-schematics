@@ -17,7 +17,8 @@ import {
   NodeDependency,
   NodeDependencyType,
   installDependencies,
-  getInstalledDependency
+  getInstalledDependency,
+  installNpmPackages
 } from '@criticalmanufacturing/schematics-devkit/rules';
 
 import { version as pkgVersion, name as pkgName } from '../../package.json';
@@ -130,6 +131,15 @@ export default function (_options: Schema): Rule {
       };
 
       _options.version = (await inquirer.prompt([question])).distTag;
+    }
+
+    if (_options.eslint) {
+      const angularVersion = require('@angular/cli/package.json').version.replace(
+        /^(.\d+)\.\d+\.\d+/,
+        '$1'
+      );
+
+      await installNpmPackages([`@angular-eslint/schematics@${angularVersion}`]);
     }
 
     return chain([

@@ -14,16 +14,17 @@
   "author": "Critical Manufacturing",
   "license": "BSD-3-Clause",
   "schematics": "./src/collection.json",
+  "ng-update": {
+    "migrations": "./src/migrations.json"
+  },
   "dependencies": {
     "@angular-devkit/core": "",
     "@angular-devkit/schematics": "",
-    "@angular-eslint/schematics": "",
-    "@angular/localize": "",
-    "@angular/pwa": "",
     "@criticalmanufacturing/schematics-devkit": "",
     "@schematics/angular": "",
     "inquirer": "",
     "node-html-parser": "",
+    "ora": "",
     "ts-morph": ""
   }
 }

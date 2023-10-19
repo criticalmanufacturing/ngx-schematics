@@ -21,7 +21,8 @@ import {
   NodeDependencyType,
   getInstalledDependency,
   installDependencies,
-  updateTsConfig
+  updateTsConfig,
+  installNpmPackages
 } from '@criticalmanufacturing/schematics-devkit/rules';
 
 import { version as pkgVersion, name as pkgName } from '../../package.json';
@@ -140,6 +141,17 @@ export default function (_options: Schema): Rule {
       !((workspace.extensions.cli as JsonObject)?.schematicCollections as JsonArray)?.includes(
         '@angular-eslint/schematics'
       );
+
+    const angularVersion = require('@angular/cli/package.json').version.replace(
+      /^(.\d+)\.\d+\.\d+/,
+      '$1'
+    );
+
+    await installNpmPackages([
+      `@angular/pwa@${angularVersion}`,
+      `@angular/localize@${angularVersion}`,
+      _options.eslint ? `@angular-eslint/schematics@${angularVersion}` : ''
+    ]);
 
     return chain([
       _options.project && !allDeps.includes('@angular/service-worker')

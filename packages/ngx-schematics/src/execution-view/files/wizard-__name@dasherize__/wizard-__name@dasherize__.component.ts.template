@@ -114,13 +114,6 @@ export class Wizard<%= classify(name) %>Component extends CustomizableComponent 
     private _nestedExecutionView: ExecutionView;
 
     /**
-     * Constructor
-     */
-    constructor(viewContainerRef: ViewContainerRef) {
-        super(viewContainerRef);
-    }
-
-    /**
      * Method that prepares the data for the execution view
      */
     public async prepareDataInput(): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput[]> {
