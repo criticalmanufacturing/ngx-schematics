@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Task } from '@criticalmanufacturing/connect-iot-controller-engine';
+import { Task<% if(hasOutputs){ %>, Utilities<% } %> } from '@criticalmanufacturing/connect-iot-controller-engine';
 import { TaskDesigner, TaskDesignerInstance, TaskProtocol } from 'cmf-core-connect-iot';
 import { <%= classify(name) %>Settings } from './<%= name %>.task';
 
