@@ -1,0 +1,49 @@
+import { Injectable } from '@angular/core';
+import { WidgetModel, WidgetSettingsService, WidgetSettingsDef } from 'cmf-core-dashboards';
+
+/** <%= classify(name) %> Settings Properties */
+export interface <%= classify(name) %>WidgetSettings extends WidgetSettingsDef {
+}
+
+/**
+ * <%= classify(name) %> Settings Service
+ *
+ * This class serves the purpose of besides the widget common properties
+ * save also all other properties that are defined for the <%= classify(name) %> Settings
+ */
+@Injectable()
+export class <%= classify(name) %>WidgetSettingsService extends WidgetSettingsService {
+  /**
+   * Promise containing the widget settings that will be loaded
+   */
+  public on<%= classify(name) %>SettingsLoaded: (settings: <%= classify(name) %>WidgetSettings) => Promise<<%= classify(name) %>WidgetSettings>;
+
+  /**
+   * Promise containing the widget settings that will be saved
+   */
+  public on<%= classify(name) %>SaveSettings: (settings: <%= classify(name) %>WidgetSettings) => <%= classify(name) %>WidgetSettings;
+
+  /**
+   * On Load hook for widget settings.
+   *
+   * @param widgetSettings Settings that are being loaded.
+   * @returns A Promise to the widget settings that will be saved.
+   */
+  public override async onAfterLoad(widgetSettings: WidgetModel): Promise<WidgetModel> {
+    const model = await super.onAfterLoad(widgetSettings);
+    model.settings = await this.on<%= classify(name) %>SettingsLoaded(model.settings);
+    return model;
+  }
+
+  /**
+   * On Save hook for widget settings.
+   *
+   * @param widgetSettings Widget Settings that will be saved.
+   * @returns A Promise to the widget settings that will be saved.
+   */
+  public override onBeforeSave(widgetSettings: WidgetModel): WidgetModel {
+    const model = super.onBeforeSave(widgetSettings);
+    model.settings = this.on<%= classify(name) %>SaveSettings(model.settings);
+    return model;
+  }
+}

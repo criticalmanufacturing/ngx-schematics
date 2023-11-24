@@ -1,19 +1,9 @@
-import {
-    Component,
-    ViewContainerRef
-} from '@angular/core';
+import { Component, Inject, ViewContainerRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { CustomizableComponent } from 'cmf-core';
+import { WidgetSettingsModule, WidgetSettingsService } from 'cmf-core-dashboards';
 
-import {
-    CommonModule
-} from '@angular/common';
-
-import {
-    CustomizableComponent
-} from 'cmf-core';
-
-import {
-    WidgetSettingsModule
-} from 'cmf-core-dashboards';
+import { <%= classify(name) %>WidgetSettingsService, <%= classify(name) %>WidgetSettings } from './<%= dasherize(name) %>-widget-settings.service';
 
 /**
  * @whatItDoes
@@ -50,14 +40,39 @@ import {
     selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget-settings',
     imports: [CommonModule, WidgetSettingsModule],
     templateUrl: './<%= dasherize(name) %>-widget-settings.component.html',
-    <% if (style !== 'none') { %>styleUrls: ['./<%= dasherize(name) %>-widget-settings.component.<%= style %>']<% } %>
+    <% if (style !== 'none') { %>styleUrls: ['./<%= dasherize(name) %>-widget-settings.component.<%= style %>']<% } %>,    
+    providers: [
+        { provide: WidgetSettingsService, useClass: <%= classify(name) %>WidgetSettingsService }
+    ]
 })
 export class <%= classify(name) %>WidgetSettingsComponent extends CustomizableComponent {
 
     /**
      * Constructor
      */
-    constructor(viewContainerRef: ViewContainerRef) {
+    constructor(
+        viewContainerRef: ViewContainerRef,
+        @Inject(WidgetSettingsService) settings: <%= classify(name) %>WidgetSettingsService
+    ) {
         super(viewContainerRef);
+
+        settings.on<%= classify(name) %>SettingsLoaded = this.onLoad.bind(this);
+        settings.on<%= classify(name) %>SaveSettings = this.onSave.bind(this);
+    }
+
+    
+    /**
+     * Loads the widget settings
+     * @returns: A Promise to resolve the settings
+     */
+    public async onLoad(settings: <%= classify(name) %>WidgetSettings): Promise<<%= classify(name) %>WidgetSettings> {
+        return settings;
+    }
+
+    /**
+     * Saves the widget settings
+     */
+    public onSave(settings: <%= classify(name) %>WidgetSettings): <%= classify(name) %>WidgetSettings {
+        return settings;
     }
 }
