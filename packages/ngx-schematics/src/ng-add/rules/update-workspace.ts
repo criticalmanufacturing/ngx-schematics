@@ -70,20 +70,16 @@ export function updateWorkspace(options: {
       // Configure project options
       for (const target of buildTargets) {
         // override configurations
-        if (target.configurations) {
-          const budgets = target.configurations!['production']?.['budgets'] as
-            | JsonArray
-            | undefined;
-          const initialBudget = budgets?.findIndex(
+        if (target.configurations && target.configurations['production']?.['budgets']) {
+          const budgets = target.configurations['production']['budgets'] as JsonArray;
+
+          const initialBudget = budgets.findIndex(
             (budget) => (budget as JsonObject).type === 'initial'
           );
 
-          if (budgets && initialBudget != null && initialBudget >= 0) {
-            budgets[initialBudget] = {
-              ...(budgets[initialBudget] as JsonObject),
-              maximumWarning: options.application === 'MES' ? '11mb' : '10mb',
-              maximumError: options.application === 'MES' ? '12mb' : '11mb'
-            };
+          if (initialBudget >= 0) {
+            // delete initial budget configuration
+            budgets.splice(initialBudget, 1);
           }
         }
 
