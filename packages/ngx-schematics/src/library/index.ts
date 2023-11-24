@@ -19,7 +19,10 @@ import {
   relativeToRoot,
   getDefaultApplicationProject
 } from '@criticalmanufacturing/schematics-devkit';
-import { updateTsConfig } from '@criticalmanufacturing/schematics-devkit/rules';
+import {
+  updateNgPackageJson,
+  updateTsConfig
+} from '@criticalmanufacturing/schematics-devkit/rules';
 import { Schema } from './schema';
 import { addSymbolToNgModuleMetadata, getAppModulePath } from '../utility/ng-module';
 
@@ -111,10 +114,13 @@ export default function (_options: Schema): Rule {
     delete _options.skipMetadata;
 
     return chain([
-      externalSchematic(lint ? '@angular-eslint/schematics' : '@schematics/angular', 'library', {
-        ..._options
-      }),
-      !skipMetadata ? createMetadataSubEntry({ ..._options }) : noop()
+      externalSchematic(
+        lint ? '@angular-eslint/schematics' : '@schematics/angular',
+        'library',
+        _options
+      ),
+      updateNgPackageJson(_options),
+      !skipMetadata ? createMetadataSubEntry(_options) : noop()
     ]);
   };
 }

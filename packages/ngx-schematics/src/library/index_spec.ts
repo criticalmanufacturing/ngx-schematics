@@ -1,6 +1,7 @@
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { parse } from 'jsonc-parser';
 import { getAllFilesFromDir } from '@criticalmanufacturing/schematics-devkit/testing';
+import { JsonObject } from '@angular-devkit/core';
 
 function getFileContent(tree: UnitTestTree, path: string) {
   const content = tree.readContent(path).toString();
@@ -215,5 +216,16 @@ describe('Generate Library', () => {
         `projects/${libraryOptions.name}/metadata/src/lib/${libraryOptions.name}-metadata.service.ts`
       ])
     );
+  });
+
+  it('should update the ng-package.json', async () => {
+    const options = { ...libraryOptions };
+
+    const tree = await schematicRunner.runSchematic('library', options, appTree);
+    expect(
+      (tree.readJson(`projects/${libraryOptions.name}/ng-package.json`) as JsonObject)[
+        'deleteDestPath'
+      ]
+    ).toEqual(false);
   });
 });

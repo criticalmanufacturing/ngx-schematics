@@ -20,7 +20,8 @@ import { JSONFile, relativeToRoot, strings } from '@criticalmanufacturing/schema
 import {
   NodeDependencyType,
   removeDirectory,
-  installDependencies
+  installDependencies,
+  updateNgPackageJson
 } from '@criticalmanufacturing/schematics-devkit/rules';
 
 /**
@@ -218,6 +219,7 @@ export default function (_options: Schema): Rule {
         ..._options,
         entryFile
       }),
+      updateNgPackageJson(_options),
       addIoTLibrary({
         project: _options.name,
         skipInstall: _options.skipInstall ?? false,
