@@ -98,7 +98,9 @@ function updatePackagejson(options: { project: string; name: string }): Rule {
         'nyc -r cobertura -r lcov -r text-summary mocha test/**/*.test.js -- --timeout 5000 --exit -r mocha-multi-reporters -r mocha-junit-reporter --reporter-options mochaFile=./test/test-results.xml',
       pretest: 'npm run build',
       watch:
-        'npm run build:runtime -- -w | mocha --timeout 5000 --exit --reporter min -w test/**/*.test.js'
+        'npm run build:runtime -- -w | mocha --timeout 5000 --exit --reporter min -w test/**/*.test.js',
+      lint:
+        'ng lint'
     });
   };
 }
@@ -179,6 +181,7 @@ export default function (_options: Schema): Rule {
     const entryFile = 'public-api-designer';
     const workspace = await readWorkspace(tree);
 
+    // Retrieve namespace (i.e @criticalmanufacturing/test -> @criticalmanufacturing)
     let namespace = /^@.*\/.*/.test(_options.name)
       ? _options.name.split('/')[0]
       : _options.namespace;
