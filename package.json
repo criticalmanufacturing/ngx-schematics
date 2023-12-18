@@ -27,7 +27,8 @@
   },
   "scripts": {
     "build": "npm run build -w ./packages/schematics-devkit && concurrently \"npm run build -w ./packages/ngx-schematics\" \"npm run build -w ./packages/ngx-iot-schematics\" -r",
-    "test": "npm run test -w ./packages/ngx-schematics"
+    "test": "npm run test -w ./packages/ngx-schematics",
+    "test:iot": "npm run test -w ./packages/ngx-iot-schematics"
   },
   "author": "Critical Manufacturing",
   "license": "ISC",

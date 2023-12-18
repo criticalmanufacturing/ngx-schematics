@@ -63,6 +63,14 @@ function updatePackagejson(): Rule {
     const workspace = await readWorkspace(tree);
     const packJson = new JSONFile(tree, 'package.json');
     const newProjectRoot = (workspace.extensions.newProjectRoot as string) ?? 'projects';
+    
+    packJson.modify(['scripts'], {
+      ...(packJson.get(['scripts']) ?? {}),
+      lint:
+        'npm run lint -ws',
+      build:
+        'npm run build -ws'
+    });
     packJson.modify(['workspaces'], [`./${newProjectRoot}/*`]);
   };
 }

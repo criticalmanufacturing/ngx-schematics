@@ -4,7 +4,8 @@
   "description": "Critical Manufacturing Angular IoT Schematics",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "watch": "tsc -w -p tsconfig.json"
+    "watch": "tsc -w -p tsconfig.json",
+    "test": "jasmine src/**/*_spec.js"
   },
   "keywords": [
     "schematics"
