@@ -1,4 +1,5 @@
 import { ConverterDesigner } from 'cmf-core-connect-iot';
+import { Converter } from '@criticalmanufacturing/connect-iot-controller-engine';
 
 @ConverterDesigner({
     name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>#TITLE:<%= nameify(name) %>`,
