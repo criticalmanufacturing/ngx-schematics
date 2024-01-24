@@ -83,7 +83,7 @@ Creates a new, generic IoT Task definition in the given or default project
 #### **Usage:**
 
 ```
-ng generate data-source [name]
+ng generate task [name]
 ```
 
 ### **library**
