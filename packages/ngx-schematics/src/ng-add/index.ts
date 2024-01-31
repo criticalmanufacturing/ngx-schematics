@@ -12,7 +12,7 @@ import { readWorkspace } from '@schematics/angular/utility';
 
 import { JsonArray, JsonObject } from '@angular-devkit/core';
 
-import * as inquirer from 'inquirer';
+import inquirer, { ListQuestion } from 'inquirer';
 
 import { CORE_BASE_MODULE, MES_BASE_MODULE } from './package-configs';
 
@@ -119,7 +119,7 @@ export default function (_options: Schema): Rule {
         );
       }
 
-      const question: inquirer.ListQuestion = {
+      const question: ListQuestion = {
         type: 'list',
         name: 'distTag',
         message: 'What is the distribution to utilize?',

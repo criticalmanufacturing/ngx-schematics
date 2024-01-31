@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "baseUrl": "tsconfig",
-    "lib": ["es2018", "dom"],
+    "lib": ["es2022"],
     "declaration": true,
-    "target": "es6",
+    "target": "es2022",
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": true,
@@ -15,6 +15,7 @@
     "sourceMap": true,
     "strict": true,
     "resolveJsonModule": true,
+    "skipLibCheck": true,
     "types": ["jasmine", "node"]
   }
 }

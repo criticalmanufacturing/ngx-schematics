@@ -15,7 +15,7 @@ import {
 import { Schema } from './schema';
 import { JsonArray, JsonObject, basename, join, normalize } from '@angular-devkit/core';
 import { readWorkspace } from '@schematics/angular/utility';
-import * as inquirer from 'inquirer';
+import inquirer, { InputQuestion } from 'inquirer';
 import { JSONFile, relativeToRoot, strings } from '@criticalmanufacturing/schematics-devkit';
 import {
   NodeDependencyType,
@@ -99,8 +99,7 @@ function updatePackagejson(options: { project: string; name: string }): Rule {
       pretest: 'npm run build',
       watch:
         'npm run build:runtime -- -w | mocha --timeout 5000 --exit --reporter min -w test/**/*.test.js',
-      lint:
-        'ng lint'
+      lint: 'ng lint'
     });
   };
 }
@@ -187,7 +186,7 @@ export default function (_options: Schema): Rule {
       : _options.namespace;
 
     if (!namespace) {
-      const question: inquirer.InputQuestion = {
+      const question: InputQuestion = {
         type: 'input',
         name: 'namespace',
         message: 'What is your package namespace?',

@@ -19,7 +19,7 @@ import {
   strings
 } from '@criticalmanufacturing/schematics-devkit';
 import { ProjectDefinition, readWorkspace } from '@schematics/angular/utility';
-import * as inquirer from 'inquirer';
+import inquirer, { InputQuestion } from 'inquirer';
 import {
   getMetadataFilePath,
   insertRoutesMetadata,
@@ -50,12 +50,12 @@ function updateRoutesMetadata(project: ProjectDefinition, options: any) {
       loadChildren: () => import(
           /* webpackExports: "Page${strings.classify(options.name)}RoutingModule" */
           '${strings.dasherize(options.project)}').then(m => m.Page${strings.classify(
-      options.name
-    )}RoutingModule),
+            options.name
+          )}RoutingModule),
       data: {
         title: $localize\`:@@${strings.dasherize(options.project)}/page-${strings.dasherize(
-      options.name
-    )}#TITLE:${strings.nameify(options.name)}\`,
+          options.name
+        )}#TITLE:${strings.nameify(options.name)}\`,
         iconClass: '${options.iconClass}',
         requiredFunctionalities: '${options.pageId}'
       }
@@ -79,8 +79,8 @@ function getEntrypointMetadata(options: Schema): UpdateMetadataOptions {
           options.menuSubGroupId!.length > 0 ? `\nmenuSubGroupId: '${options.menuSubGroupId}',` : ''
         }
         title: $localize\`:@@${strings.dasherize(options.project)}/page-${strings.dasherize(
-        options.name
-      )}#TITLE:${strings.nameify(options.name)}\`,
+          options.name
+        )}#TITLE:${strings.nameify(options.name)}\`,
         actionId: '${options.pageId}',
         position: 1,
         iconClass: '${options.iconClass}',
@@ -97,8 +97,8 @@ function getEntrypointMetadata(options: Schema): UpdateMetadataOptions {
       id: '${options.pageId}',
       actionId: '${options.pageId}',
       title: $localize\`:@@${strings.dasherize(options.project)}/page-${strings.dasherize(
-      options.name
-    )}#TITLE:${strings.nameify(options.name)}\`,
+        options.name
+      )}#TITLE:${strings.nameify(options.name)}\`,
       iconClass: '${options.iconClass}',
     }`
   };
@@ -130,7 +130,7 @@ export default function (_options: Schema): Rule {
     }
 
     if (_options.entrypoint === 'Menu Item' && !_options.menuGroupId) {
-      const questions: inquirer.InputQuestion[] = [
+      const questions: InputQuestion[] = [
         {
           type: 'input',
           name: 'menuGroupId',

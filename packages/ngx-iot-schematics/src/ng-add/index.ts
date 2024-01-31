@@ -10,7 +10,7 @@ import {
 
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 
-import * as inquirer from 'inquirer';
+import inquirer, { ListQuestion } from 'inquirer';
 
 import {
   updateTsConfig,
@@ -63,13 +63,11 @@ function updatePackagejson(): Rule {
     const workspace = await readWorkspace(tree);
     const packJson = new JSONFile(tree, 'package.json');
     const newProjectRoot = (workspace.extensions.newProjectRoot as string) ?? 'projects';
-    
+
     packJson.modify(['scripts'], {
       ...(packJson.get(['scripts']) ?? {}),
-      lint:
-        'npm run lint -ws',
-      build:
-        'npm run build -ws'
+      lint: 'npm run lint -ws',
+      build: 'npm run build -ws'
     });
     packJson.modify(['workspaces'], [`./${newProjectRoot}/*`]);
   };
@@ -131,7 +129,7 @@ export default function (_options: Schema): Rule {
         );
       }
 
-      const question: inquirer.ListQuestion = {
+      const question: ListQuestion = {
         type: 'list',
         name: 'distTag',
         message: 'What is the distribution to utilize?',

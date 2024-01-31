@@ -11,7 +11,7 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace, ProjectDefinition } from '@schematics/angular/utility';
-import * as inquirer from 'inquirer';
+import inquirer, { ListQuestion, InputQuestion } from 'inquirer';
 import {
   createSourceFile,
   getDefaultPath,
@@ -47,8 +47,8 @@ function updateRoutesMetadata(project: ProjectDefinition, options: any) {
     loadChildren: () => import(
         /* webpackExports: "Page${strings.classify(options.name)}RoutingModule" */
         '${strings.dasherize(options.project)}').then(m => m.Page${strings.classify(
-      options.name
-    )}RoutingModule)
+          options.name
+        )}RoutingModule)
 }
 `;
 
@@ -60,7 +60,7 @@ function updateRoutesMetadata(project: ProjectDefinition, options: any) {
 export default function (_options: Schema): Rule {
   return async (tree: Tree, _context: SchematicContext) => {
     if (!_options.namespace) {
-      const question: inquirer.ListQuestion = {
+      const question: ListQuestion = {
         type: 'list',
         name: 'namespace',
         message: 'What is the business objects namespace of the entity type?',
@@ -70,7 +70,7 @@ export default function (_options: Schema): Rule {
       _options.namespace = (await inquirer.prompt([question])).namespace;
 
       if (_options.namespace!.startsWith('Other')) {
-        const question: inquirer.InputQuestion = {
+        const question: InputQuestion = {
           type: 'input',
           name: 'namespace',
           message: 'Namespace'

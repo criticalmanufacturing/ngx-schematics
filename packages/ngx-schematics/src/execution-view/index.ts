@@ -13,7 +13,7 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
-import * as inquirer from 'inquirer';
+import inquirer, { ListQuestion, InputQuestion } from 'inquirer';
 
 import { MetadataProperty, updateMetadata } from '../utility/metadata';
 import { getDefaultPath, parseName, strings } from '@criticalmanufacturing/schematics-devkit';
@@ -23,7 +23,7 @@ import { updateLibraryAPI } from '../utility/update-library-api';
 export default function (_options: Schema): Rule {
   return async (tree: Tree, _context: SchematicContext) => {
     if (!_options.namespace) {
-      const question: inquirer.ListQuestion = {
+      const question: ListQuestion = {
         type: 'list',
         name: 'namespace',
         message: 'What is the business objects namespace of the entity type?',
@@ -33,7 +33,7 @@ export default function (_options: Schema): Rule {
       _options.namespace = (await inquirer.prompt([question])).namespace;
 
       if (_options.namespace!.startsWith('Other')) {
-        const question: inquirer.InputQuestion = {
+        const question: InputQuestion = {
           type: 'input',
           name: 'namespace',
           message: 'Namespace'

@@ -13,7 +13,7 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
-import * as inquirer from 'inquirer';
+import inquirer, { ListQuestion, InputQuestion } from 'inquirer';
 import { getDefaultPath, parseName, strings } from '@criticalmanufacturing/schematics-devkit';
 import { MetadataProperty, updateMetadata } from '../utility/metadata';
 import { Schema } from './schema';
@@ -22,7 +22,7 @@ import { updateLibraryAPI } from '../utility/update-library-api';
 export default function (_options: Schema): Rule {
   return async (tree: Tree, _context: SchematicContext) => {
     if (!_options.namespace) {
-      const question: inquirer.ListQuestion = {
+      const question: ListQuestion = {
         type: 'list',
         name: 'namespace',
         message: 'What is the business objects namespace of the entity type?',
@@ -32,7 +32,7 @@ export default function (_options: Schema): Rule {
       _options.namespace = (await inquirer.prompt([question])).namespace;
 
       if (_options.namespace!.startsWith('Other')) {
-        const question: inquirer.InputQuestion = {
+        const question: InputQuestion = {
           type: 'input',
           name: 'namespace',
           message: 'Namespace'
@@ -86,8 +86,8 @@ export default function (_options: Schema): Rule {
       toInsert: `\
 {
   id: '${strings.classify(_options.entityType)}.${strings
-        .classify(_options.name)
-        .replace(strings.classify(_options.entityType), '')}',
+    .classify(_options.name)
+    .replace(strings.classify(_options.entityType), '')}',
   loadComponent: () => import(
     /* webpackExports: "Wizard${strings.classify(_options.name)}Component" */
     '${_options.project}').then(m => m.Wizard${strings.classify(_options.name)}Component),

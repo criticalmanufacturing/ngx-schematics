@@ -1,5 +1,5 @@
 import { SpawnOptions, spawn } from 'child_process';
-import * as ora from 'ora';
+import ora from 'ora';
 
 enum SaveOptions {
   SaveDev = '-D',
