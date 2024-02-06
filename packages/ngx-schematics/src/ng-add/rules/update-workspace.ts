@@ -9,6 +9,7 @@ import {
   PROJECT_CORE_STYLES,
   PROJECT_MES_ASSETS,
   PROJECT_MES_STYLES,
+  PROJECT_POLYFILLS,
   PROJECT_SCRIPTS
 } from '../package-configs';
 import { Schema } from '../schema';
@@ -89,6 +90,7 @@ export function updateWorkspace(options: {
           target.options.preserveSymlinks = true;
 
           // Add allowedCommonJsDependencies
+          target.options.allowedCommonJsDependencies ??= [];
           if (target.options.allowedCommonJsDependencies instanceof Array) {
             addToJsonArray(
               target.options.allowedCommonJsDependencies,
@@ -99,6 +101,7 @@ export function updateWorkspace(options: {
           }
 
           // Add assets
+          target.options.assets ??= [];
           if (target.options.assets instanceof Array) {
             const index = target.options.assets.indexOf('src/favicon.ico');
             if (index >= 0) {
@@ -115,6 +118,7 @@ export function updateWorkspace(options: {
           }
 
           // Add styles
+          target.options.styles ??= [];
           if (target.options.styles instanceof Array) {
             addToJsonArray(
               target.options.styles,
@@ -123,8 +127,15 @@ export function updateWorkspace(options: {
           }
 
           // Add scripts
+          target.options.scripts ??= [];
           if (target.options.scripts instanceof Array) {
             addToJsonArray(target.options.scripts, PROJECT_SCRIPTS);
+          }
+
+          // Add polyfills
+          target.options.polyfills ??= [];
+          if (target.options.polyfills instanceof Array) {
+            addToJsonArray(target.options.polyfills, PROJECT_POLYFILLS);
           }
         }
       }

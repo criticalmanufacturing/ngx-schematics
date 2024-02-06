@@ -20,7 +20,10 @@ export function getBuildTargets(project: ProjectDefinition): TargetDefinition[] 
   const targets = [];
 
   for (const target of project.targets.values()) {
-    if (target.builder === '@angular-devkit/build-angular:browser') {
+    if (
+      target.builder === '@angular-devkit/build-angular:browser' ||
+      target.builder === '@angular-devkit/build-angular:application'
+    ) {
       targets.push(target);
     }
   }
@@ -53,7 +56,13 @@ export async function getMainPath(tree: Tree, project: string): Promise<string |
     return;
   }
 
-  return appProject.targets.get('build')?.options?.main as string;
+  const builder = appProject.targets.get('build');
+
+  if (builder?.builder.endsWith('@angular-devkit/build-angular:application')) {
+    return builder.options?.browser as string | undefined;
+  }
+
+  return builder?.options?.main as string | undefined;
 }
 
 /**

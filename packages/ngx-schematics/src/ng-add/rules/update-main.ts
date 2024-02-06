@@ -33,9 +33,10 @@ export function updateMain(options: { project: string }) {
       return;
     }
 
-    const bootstrapCall = source
-      .getDescendantsOfKind(SyntaxKind.CallExpression)
-      .find((node) => node.getExpression().getText().endsWith('bootstrapModule'));
+    const bootstrapCall = source.getDescendantsOfKind(SyntaxKind.CallExpression).find((node) => {
+      const name = node.getExpression().getText();
+      return name.endsWith('bootstrapModule') || name.endsWith('bootstrapApplication');
+    });
 
     if (!bootstrapCall) {
       return;
@@ -49,18 +50,20 @@ export function updateMain(options: { project: string }) {
     }
 
     // remove app module import declaration
-    source
+    const appImport = source
       .getDescendantsOfKind(SyntaxKind.Identifier)
       .filter((node) => node.getText() === moduleIdentifier.getText())
       .find((node) => node.getFirstAncestorByKind(SyntaxKind.ImportDeclaration))
-      ?.getFirstAncestorByKindOrThrow(SyntaxKind.ImportDeclaration)
-      .remove();
+      ?.getFirstAncestorByKindOrThrow(SyntaxKind.ImportDeclaration);
+
+    const appModulePath = appImport?.getModuleSpecifierValue();
+    appImport?.remove();
 
     // add load application config statement
     moduleIdentifier.replaceWithText(`m.${moduleIdentifier.getText()}`);
     bootstrapStatement.replaceWithText(`\
 loadApplicationConfig('assets/config.json').then(() => {
-    import(/* webpackMode: "eager" */'./app/app.module').then((m) => {
+    import(/* webpackMode: "eager" */ '${appModulePath ?? './app/app.module'}').then((m) => {
         ${bootstrapStatement.getText(true)}
     });
 });`);

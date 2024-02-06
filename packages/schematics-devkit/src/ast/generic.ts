@@ -1,12 +1,16 @@
-import { isAbsolute, normalize } from '@angular-devkit/core';
+import { dirname, isAbsolute, join, normalize } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
 import {
+  ArrayLiteralExpression,
+  Node,
+  ObjectLiteralElementLike,
   ObjectLiteralExpression,
   Project,
   QuoteKind,
   SourceFile,
   StructureKind,
-  SyntaxKind
+  SyntaxKind,
+  ts
 } from 'ts-morph';
 
 /**
@@ -183,4 +187,76 @@ export function updateObjectArrayProperty(
   }
 
   loader.formatText();
+}
+
+/**
+ * Retrives the import path of the given node relative to the provided source file
+ * @param source the source file
+ * @param node the node to search the import
+ */
+export function getRelativeImportPath(source: SourceFile, node: Node<ts.Node>): string | undefined {
+  let moduleRelativePath: string | undefined;
+  if (node.getKind() === SyntaxKind.Identifier) {
+    moduleRelativePath = source
+      .getImportDeclarations()
+      .find((impNode) => impNode.getNamedImports().some((imp) => imp.getName() === node.getText()))
+      ?.getModuleSpecifierValue();
+  } else if (node.getKind() === SyntaxKind.PropertyAccessExpression) {
+    moduleRelativePath = source
+      .getDescendantsOfKind(SyntaxKind.CallExpression)
+      .find((node) => node.getExpression().getText() === 'import')
+      ?.getArguments()[0]
+      ?.asKind(SyntaxKind.StringLiteral)
+      ?.getLiteralValue();
+  }
+
+  if (!moduleRelativePath) {
+    return;
+  }
+
+  return join(dirname(normalize(source.getFilePath())), moduleRelativePath) + '.ts';
+}
+
+/**
+ * Gets the desired property from the object
+ * @param object object literal
+ * @param propertyName object property name
+ * @returns the object property
+ */
+export function getObjectProperty(
+  object: ObjectLiteralExpression,
+  propertyName: string
+): ObjectLiteralElementLike | undefined {
+  return object
+    .getProperties()
+    .find((prop) => prop.asKind(SyntaxKind.PropertyAssignment)?.getName() === propertyName);
+}
+
+/**
+ * Adds a symbol to an array literal
+ * @param arryaLiteral the array literal node
+ * @param toInsert the symbol to insert
+ * @param before the symbol to insert before
+ * @returns
+ */
+export function addSymbolToArrayLiteral(
+  arryaLiteral: ArrayLiteralExpression,
+  toInsert: string,
+  before?: string
+): void {
+  if (arryaLiteral.getElements().some((elem) => elem.getText() === toInsert)) {
+    return;
+  }
+
+  let index = arryaLiteral.getElements().length;
+
+  if (before) {
+    const beforeIndex = arryaLiteral.getElements().findIndex((elem) => elem.getText() === before);
+
+    if (beforeIndex >= 0) {
+      index = beforeIndex;
+    }
+  }
+
+  arryaLiteral.insertElement(index, toInsert);
 }

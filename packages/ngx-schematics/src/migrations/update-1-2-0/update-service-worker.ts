@@ -1,4 +1,4 @@
-import { SourceFile, SyntaxKind } from 'ts-morph';
+import { Node, SyntaxKind, ts } from 'ts-morph';
 
 export const SW_ASSETS = [
   {
@@ -12,7 +12,7 @@ export const SW_ASSETS = [
  * Updates the service worker module register value to use our custom service worker.
  * @param file source file to edit
  */
-export function updateServiceWorker(source: SourceFile): void {
+export function updateServiceWorker(source: Node<ts.Node>): void {
   const callExp = source
     .getFirstDescendant((node) => {
       if (!node.isKind(SyntaxKind.CallExpression)) {

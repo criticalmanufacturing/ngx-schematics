@@ -16,6 +16,7 @@
     "strict": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
+    "esModuleInterop": true,
     "types": ["jasmine", "node"]
   }
 }

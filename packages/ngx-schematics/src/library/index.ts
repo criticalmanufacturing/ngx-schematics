@@ -69,7 +69,7 @@ function createMetadataSubEntry(options: { name: string; skipTsConfig?: boolean 
 
     const packageName = `${options.name}/metadata`;
     const folderName = basename(normalize(project!.root));
-    const distRoot = `dist/${folderName}/metadata`;
+    const distRoot = `./dist/${folderName}/metadata`;
     const namePrefix = options.name.replace(/^cmf-/, '');
 
     const templateSource = apply(url('./files'), [

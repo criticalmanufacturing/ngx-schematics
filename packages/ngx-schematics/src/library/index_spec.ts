@@ -171,8 +171,8 @@ describe('Generate Library', () => {
     const tree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
 
     const tsConfigJson = getFileContent(tree, 'tsconfig.json');
-    expect(tsConfigJson.compilerOptions.paths[`${libraryOptions.name}`]).toEqual([
-      `dist/${libraryOptions.name}`
+    expect(tsConfigJson.compilerOptions.paths[`${libraryOptions.name}/metadata`]).toEqual([
+      `./dist/${libraryOptions.name}/metadata`
     ]);
   });
 

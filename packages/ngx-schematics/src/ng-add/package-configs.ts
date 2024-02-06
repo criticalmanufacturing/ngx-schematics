@@ -1,19 +1,22 @@
 import { SW_ASSETS } from '../migrations/update-1-2-0/update-service-worker';
 
 /**
- * Project Core Base Module
+ * Project Core Base provider/Module
  */
 export const CORE_BASE_MODULE: [string, string] = ['cmf-core-ui', 'CoreUIModule.forRoot()'];
+export const CORE_BASE_PROVIDE: [string, string] = ['cmf-core-ui', 'provideCoreUI()'];
 
 /**
- * Project MES Base Module
+ * Project MES Base provider/Module
  */
 export const MES_BASE_MODULE: [string, string] = ['cmf-mes-ui', 'MesUIModule.forRoot()'];
+export const MES_BASE_PROVIDE: [string, string] = ['cmf-mes-ui', 'provideMesUI()'];
 
 /**
- * Project Metadata Routing Module
+ * Project Metadata Routing provider/Module
  */
 export const METADATA_ROUTING_MODULE: [string, string] = ['cmf-core', 'MetadataRoutingModule'];
+export const METADATA_ROUTING_PROVIDE: [string, string] = ['cmf-core', 'provideMetadataRouter()'];
 
 /**
  * THEMES
@@ -177,7 +180,7 @@ export const PROJECT_MES_STYLES = [
   ...GENERIC_STYLES,
   'node_modules/cmf-mes-kpi/assets/fonts/meskpi/icon-mes-kpi-font.less',
   'node_modules/cmf-mes/assets/style/styles.less',
-  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-mes-tasks/assets/font/icon-Mes-connect-iot-font.less',
+  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-mes-tasks/assets/font/icon-mes-connect-iot-font.less',
   ...THEMES.map((theme) => ({
     inject: false,
     bundleName: theme,
@@ -260,3 +263,5 @@ export const PROJECT_SCRIPTS = [
     input: 'node_modules/fullcalendar/dist/fullcalendar.min.js'
   }
 ];
+
+export const PROJECT_POLYFILLS = ['reflect-metadata'];

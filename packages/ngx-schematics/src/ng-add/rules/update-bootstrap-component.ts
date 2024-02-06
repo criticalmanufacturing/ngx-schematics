@@ -1,51 +1,64 @@
 import { dirname, join, normalize } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
-import { ObjectLiteralExpression, PropertyAssignment, SourceFile, SyntaxKind } from 'ts-morph';
-import { createSourceFile } from '@criticalmanufacturing/schematics-devkit';
-import { getAppModulePath } from '../../utility/ng-module';
+import { ObjectLiteralExpression, SourceFile, SyntaxKind } from 'ts-morph';
+import {
+  createSourceFile,
+  getRelativeImportPath,
+  getMainPath,
+  getObjectProperty
+} from '@criticalmanufacturing/schematics-devkit';
+import { getNgModuleBootstrapComponentPath } from '../../utility/ng-module';
 
 /**
  * Gets the bootstrap component file location
  * @param source the app module source file
  * @returns the file location or undefined if not found
  */
-async function getBootstrapComponentPath(source: SourceFile): Promise<string | undefined> {
-  let metadataNode: ObjectLiteralExpression | undefined;
-  for (const classNode of source.getClasses()) {
-    metadataNode = classNode
-      .getDecorator('NgModule')
-      ?.getArguments()[0]
-      ?.asKind(SyntaxKind.ObjectLiteralExpression);
+async function getBootstrapComponentPath(tree: Tree, project: string): Promise<string | undefined> {
+  const mainPath = await getMainPath(tree, project);
 
-    if (metadataNode) {
-      break;
+  if (!mainPath) {
+    return;
+  }
+
+  const mainSource = createSourceFile(tree, mainPath);
+
+  if (!mainSource) {
+    return;
+  }
+
+  const bootstrapAppCall = mainSource
+    .getDescendantsOfKind(SyntaxKind.CallExpression)
+    .find((descNode) => descNode.getExpression().getText().endsWith('bootstrapApplication'));
+
+  if (bootstrapAppCall) {
+    return getRelativeImportPath(mainSource, bootstrapAppCall.getArguments()[0]);
+  }
+
+  const bootstrapModuleCall = mainSource
+    .getDescendantsOfKind(SyntaxKind.CallExpression)
+    .find((descNode) => descNode.getExpression().getText().endsWith('bootstrapModule'));
+
+  if (bootstrapModuleCall) {
+    const appModulePath = getRelativeImportPath(mainSource, bootstrapModuleCall.getArguments()[0]);
+    if (!appModulePath) {
+      return;
     }
+
+    const appModule = createSourceFile(tree, appModulePath);
+
+    if (!appModule) {
+      return;
+    }
+
+    const relCompPath = getNgModuleBootstrapComponentPath(appModule);
+
+    if (!relCompPath) {
+      return;
+    }
+
+    return join(dirname(normalize(appModulePath)), relCompPath);
   }
-
-  if (!metadataNode) {
-    return;
-  }
-
-  const bootstrapProperty = getMetadataProperty(metadataNode, 'bootstrap');
-
-  if (!bootstrapProperty) {
-    return;
-  }
-
-  const arrLiteral = bootstrapProperty.getInitializer()?.asKind(SyntaxKind.ArrayLiteralExpression);
-
-  const componentSymbol = arrLiteral?.getElements()[0]?.getText();
-
-  if (!componentSymbol) {
-    return;
-  }
-
-  const relativePath = source
-    .getImportDeclarations()
-    .find((impDec) => impDec.getNamedImports().some((imp) => imp.getName() === componentSymbol))
-    ?.getModuleSpecifierValue();
-
-  return relativePath + '.ts';
 }
 
 /**
@@ -69,47 +82,18 @@ function getComponentMetadata(source: SourceFile): ObjectLiteralExpression | und
 }
 
 /**
- * Gets the desired property from the component decorator object
- * @param metadata decorator object literal
- * @param propertyName object property name
- * @returns the object property
- */
-function getMetadataProperty(
-  metadata: ObjectLiteralExpression,
-  propertyName: string
-): PropertyAssignment | undefined {
-  return metadata
-    .getProperties()
-    .find((prop) => prop.asKind(SyntaxKind.PropertyAssignment)?.getName() === propertyName)
-    ?.asKindOrThrow(SyntaxKind.PropertyAssignment);
-}
-
-/**
  * Updates the bootstrap component:
  * 1. Adds the router directive in the component template
  */
 export function updateBootstrapComponent(options: { project: string }) {
   return async (tree: Tree) => {
-    const modulePath = await getAppModulePath(tree, options.project);
-
-    if (!modulePath) {
-      return;
-    }
-
-    const moduleSource = createSourceFile(tree, modulePath);
-
-    if (!moduleSource) {
-      return;
-    }
-
-    const compPath = await getBootstrapComponentPath(moduleSource);
+    const compPath = await getBootstrapComponentPath(tree, options.project);
 
     if (!compPath) {
       return;
     }
 
-    const compFilePath = join(dirname(normalize(modulePath)), compPath);
-    const compSource = createSourceFile(tree, compFilePath);
+    const compSource = createSourceFile(tree, compPath);
 
     if (!compSource) {
       return;
@@ -121,10 +105,12 @@ export function updateBootstrapComponent(options: { project: string }) {
       return;
     }
 
-    const templateNode = getMetadataProperty(compMetadata, 'template')
+    const templateNode = getObjectProperty(compMetadata, 'template')
+      ?.asKindOrThrow(SyntaxKind.PropertyAssignment)
       ?.getInitializer()
       ?.asKind(SyntaxKind.StringLiteral);
-    const templateUrlNode = getMetadataProperty(compMetadata, 'templateUrl')
+    const templateUrlNode = getObjectProperty(compMetadata, 'templateUrl')
+      ?.asKindOrThrow(SyntaxKind.PropertyAssignment)
       ?.getInitializer()
       ?.asKind(SyntaxKind.StringLiteral);
 
@@ -133,7 +119,7 @@ export function updateBootstrapComponent(options: { project: string }) {
       tree.overwrite(compPath, compSource.getFullText());
     } else if (templateUrlNode) {
       const templateUrl = templateUrlNode.getLiteralValue();
-      const templatePath = join(dirname(compFilePath), templateUrl);
+      const templatePath = join(dirname(normalize(compPath)), templateUrl);
       tree.overwrite(templatePath, '<router-outlet></router-outlet>');
     }
   };
