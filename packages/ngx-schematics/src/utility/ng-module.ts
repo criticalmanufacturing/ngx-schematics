@@ -1,9 +1,11 @@
-import { dirname, join, normalize } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
 import { ObjectLiteralExpression, SourceFile, SyntaxKind } from 'ts-morph';
 import {
+  addSymbolToArrayLiteral,
   createSourceFile,
+  getRelativeImportPath,
   getMainPath,
+  getObjectProperty,
   insertImport
 } from '@criticalmanufacturing/schematics-devkit';
 
@@ -47,28 +49,7 @@ export function findBootstrapModulePath(source: SourceFile): string | undefined 
     return;
   }
 
-  let moduleRelativePath: string | undefined;
-  if (bootstrapArg.getKind() === SyntaxKind.Identifier) {
-    moduleRelativePath = source
-      .getImportDeclarations()
-      .find((impNode) =>
-        impNode.getNamedImports().some((imp) => imp.getName() === bootstrapArg.getText())
-      )
-      ?.getModuleSpecifierValue();
-  } else if (bootstrapArg.getKind() === SyntaxKind.PropertyAccessExpression) {
-    moduleRelativePath = source
-      .getDescendantsOfKind(SyntaxKind.CallExpression)
-      .find((node) => node.getExpression().getText() === 'import')
-      ?.getArguments()[0]
-      ?.asKind(SyntaxKind.StringLiteral)
-      ?.getLiteralValue();
-  }
-
-  if (!moduleRelativePath) {
-    return;
-  }
-
-  return join(dirname(normalize(source.getFilePath())), moduleRelativePath) + '.ts';
+  return getRelativeImportPath(source, bootstrapArg);
 }
 
 /**
@@ -84,8 +65,8 @@ export function addSymbolToNgModuleMetadata(
   source: SourceFile,
   metadataField: string,
   symbolName: string,
-  importPath: string | null = null,
-  insertBefore: string | null = null
+  importPath?: string,
+  insertBefore?: string
 ): void {
   // Find the decorator declaration.
   let decoratorMetadata: ObjectLiteralExpression | undefined;
@@ -114,7 +95,7 @@ export function addSymbolToNgModuleMetadata(
       initializer: `[\n${symbolName}\n]`
     });
 
-    if (importPath !== null) {
+    if (importPath) {
       insertImport(source, symbolName.replace(/\..*$/, ''), importPath);
     }
 
@@ -128,19 +109,124 @@ export function addSymbolToNgModuleMetadata(
     return;
   }
 
-  if (arrLiteral.getElements().some((elem) => elem.getText() === symbolName)) {
+  addSymbolToArrayLiteral(arrLiteral, symbolName, insertBefore);
+
+  if (importPath) {
+    insertImport(source, symbolName.replace(/\..*$/, ''), importPath);
+  }
+}
+
+/**
+ * Gets the bootstrap component file location
+ * @param source the app module source file
+ * @returns the file location or undefined if not found
+ */
+export function getNgModuleBootstrapComponentPath(source: SourceFile): string | undefined {
+  let metadataNode: ObjectLiteralExpression | undefined;
+  for (const classNode of source.getClasses()) {
+    metadataNode = classNode
+      .getDecorator('NgModule')
+      ?.getArguments()[0]
+      ?.asKind(SyntaxKind.ObjectLiteralExpression);
+
+    if (metadataNode) {
+      break;
+    }
+  }
+
+  if (!metadataNode) {
     return;
   }
 
-  let index = arrLiteral.getElements().length;
+  const bootstrapProperty = getObjectProperty(metadataNode, 'bootstrap')?.asKindOrThrow(
+    SyntaxKind.PropertyAssignment
+  );
 
-  if (insertBefore) {
-    index = arrLiteral.getElements().findIndex((elem) => elem.getText() === insertBefore) ?? index;
+  if (!bootstrapProperty) {
+    return;
   }
 
-  arrLiteral.insertElement(index, symbolName);
+  const arrLiteral = bootstrapProperty.getInitializer()?.asKind(SyntaxKind.ArrayLiteralExpression);
 
-  if (importPath !== null) {
-    insertImport(source, symbolName.replace(/\..*$/, ''), importPath);
+  const componentSymbol = arrLiteral?.getElements()[0]?.getText();
+
+  if (!componentSymbol) {
+    return;
+  }
+
+  const relativePath = source
+    .getImportDeclarations()
+    .find((impDec) => impDec.getNamedImports().some((imp) => imp.getName() === componentSymbol))
+    ?.getModuleSpecifierValue();
+
+  return relativePath + '.ts';
+}
+
+/**
+ * Removes a symbol from a ng module metadata
+ * @param source the source file containing a module
+ * @param metadataField the metadata field of the module
+ * @param symbolName the symbol from the metadata fild to remove
+ */
+export function removeSymbolFromNgModuleMetadata(
+  source: SourceFile,
+  metadataField: string,
+  symbolName: string
+): void {
+  let decoratorMetadata: ObjectLiteralExpression | undefined;
+  for (const classNode of source.getClasses()) {
+    decoratorMetadata = classNode
+      .getDecorator('NgModule')
+      ?.getArguments()[0]
+      ?.asKind(SyntaxKind.ObjectLiteralExpression);
+
+    if (decoratorMetadata) {
+      break;
+    }
+  }
+
+  if (!decoratorMetadata) {
+    return;
+  }
+
+  const metadataProperty = decoratorMetadata
+    .getProperty(metadataField)
+    ?.asKind(SyntaxKind.PropertyAssignment);
+
+  if (!metadataProperty) {
+    return;
+  }
+
+  const arrLiteral = metadataProperty.getInitializer()?.asKind(SyntaxKind.ArrayLiteralExpression);
+
+  if (arrLiteral) {
+    const toRemove = arrLiteral
+      .getElements()
+      .findIndex((node) => node.asKind(SyntaxKind.Identifier)?.getText() === symbolName);
+
+    if (toRemove >= 0) {
+      arrLiteral.removeElement(toRemove);
+    }
+  }
+
+  const leftOverNodes = source
+    .getDescendantsOfKind(SyntaxKind.Identifier)
+    .filter((node) => node.getText() === symbolName);
+
+  if (leftOverNodes.length === 1) {
+    const importDec = leftOverNodes[0].getFirstAncestorByKind(SyntaxKind.ImportDeclaration);
+
+    if (!importDec || importDec.getNamespaceImport()) {
+      return;
+    }
+
+    if (importDec.getNamedImports().length === 1) {
+      importDec.remove();
+    }
+
+    importDec
+      .getNamedImports()
+      .find((node) => node.getName() === symbolName)
+      ?.remove();
   }
 }

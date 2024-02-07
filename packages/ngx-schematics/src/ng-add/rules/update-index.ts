@@ -61,17 +61,6 @@ export function updateIndexFiles(options: { project: string }): Rule {
         );
       }
 
-      const head = index.querySelector('head');
-      if (head && !head.querySelector('style#initial-theme')) {
-        head.appendChild(
-          parse(`\
-  <style id="initial-theme">
-    @import url("cmf.style.blue.css") (prefers-color-scheme: light);
-    @import url("cmf.style.dark.css") (prefers-color-scheme: dark);
-  </style>\n`)
-        );
-      }
-
       tree.overwrite(path, index.toString());
     }
   };

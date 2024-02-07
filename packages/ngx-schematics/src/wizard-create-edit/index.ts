@@ -13,7 +13,7 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
-import inquirer, { ListQuestion, InputQuestion } from 'inquirer';
+import inquirer, { InputQuestion, ListQuestion } from 'inquirer';
 
 import { getDefaultPath, parseName, strings } from '@criticalmanufacturing/schematics-devkit';
 import { Schema } from './schema';

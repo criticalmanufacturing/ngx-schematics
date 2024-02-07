@@ -42,7 +42,7 @@ export function updateAppModule(options: {
     updateServiceWorker(source);
 
     source.formatText();
-    tree.overwrite(appModulePath, source.getFullText());
+    tree.overwrite(source.getFilePath(), source.getFullText());
 
     return;
   };

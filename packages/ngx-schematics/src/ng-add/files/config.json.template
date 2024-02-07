@@ -18,6 +18,12 @@
     "isLoadBalancerEnabled": false,
     "useExternalAuthentication": false
   },
+  "lboGenerator": {
+    "enableSsl": false,
+    "address": "",
+    "port": 0,
+    "timeout": 120000
+  },
   "general": {
     "supportedCultures": <%= supportedCultures %>,
     "supportedThemes": <%= supportedThemes %>,

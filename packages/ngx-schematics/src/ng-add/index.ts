@@ -29,11 +29,12 @@ import { version as pkgVersion, name as pkgName } from '../../package.json';
 import { Schema } from './schema';
 import { updateIndexFiles } from './rules/update-index';
 import { updateBootstrapComponent } from './rules/update-bootstrap-component';
-import { updateAppModule } from './rules/update-app-module';
 import { updateMain } from './rules/update-main';
 import { addConfigJson } from './rules/add-config-json';
 import { updateWorkspace } from './rules/update-workspace';
 import { listNpmReleaseTags } from '@criticalmanufacturing/schematics-devkit';
+import { updateAppModule } from './rules/update-app-module';
+import { updateAppConfig } from './rules/update-app-config';
 
 /**
  * Updates main.ts file adding the load config method
@@ -83,6 +84,7 @@ function installSchematics(options: Schema) {
             updateIndexFiles(options as Required<Schema>),
             updateBootstrapComponent({ project: options.project }),
             updateAppModule({ project: options.project, application: options.application }),
+            updateAppConfig({ project: options.project, application: options.application }),
             updateMain({ project: options.project })
           ]
         : [noop()]),
@@ -92,7 +94,6 @@ function installSchematics(options: Schema) {
         [['compilerOptions', 'strictFunctionTypes'], false],
         [['compilerOptions', 'noImplicitAny'], false],
         [['compilerOptions', 'strictNullChecks'], false],
-        [['compilerOptions', 'allowSyntheticDefaultImports'], true],
         [['compilerOptions', 'preserveSymlinks'], true]
       ])
     ]);

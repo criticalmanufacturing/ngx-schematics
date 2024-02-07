@@ -17,7 +17,8 @@ describe('Test ng-update', () => {
     inlineTemplate: false,
     routing: false,
     skipTests: false,
-    skipPackageJson: false
+    skipPackageJson: false,
+    standalone: false
   };
 
   const ngAddOptions = {
