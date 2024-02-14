@@ -256,11 +256,6 @@ export const PROJECT_SCRIPTS = [
     bundleName: 'jszip',
     inject: false,
     input: 'node_modules/cmf.kendoui/js/jszip.min.js'
-  },
-  {
-    bundleName: 'fullcalendar',
-    inject: false,
-    input: 'node_modules/fullcalendar/dist/fullcalendar.min.js'
   }
 ];
 
