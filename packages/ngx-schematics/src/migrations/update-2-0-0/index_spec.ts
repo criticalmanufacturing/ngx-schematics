@@ -1,4 +1,5 @@
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { FULL_CALENDAR } from '.';
 
 describe('Test ng-update', () => {
   const migrationsSchematicRunner = new SchematicTestRunner(
@@ -121,6 +122,19 @@ export class AppModule { }`
       const tree = await migrationsSchematicRunner.runSchematic('update-2-0-0', {}, appTree);
       const appModule = tree.readText('/application/src/app/app.module.ts');
       expect(appModule).not.toContain('CoreModule');
+    });
+
+    it('should update the default project builder scripts', async () => {
+      const workspace = JSON.parse(appTree.readContent('angular.json'));
+      workspace.projects.application.architect.build.scripts ??= [];
+      workspace.projects.application.architect.build.scripts.push(FULL_CALENDAR);
+
+      const tree = await migrationsSchematicRunner.runSchematic('update-2-0-0', {}, appTree);
+
+      const updatedWorkspace = JSON.parse(tree.readContent('angular.json'));
+      expect(updatedWorkspace.projects.application.architect.build.options.scripts).not.toContain(
+        FULL_CALENDAR
+      );
     });
   });
 });

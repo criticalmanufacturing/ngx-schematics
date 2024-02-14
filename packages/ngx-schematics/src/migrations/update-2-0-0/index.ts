@@ -3,12 +3,19 @@ import {
   addToJsonArray,
   createSourceFile,
   getBuildTargets,
-  getDefaultApplicationProject
+  getDefaultApplicationProject,
+  removeFromJsonArray
 } from '@criticalmanufacturing/schematics-devkit';
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 import { PROJECT_POLYFILLS } from '../../ng-add/package-configs';
 import parse from 'node-html-parser';
 import { getAppModulePath, removeSymbolFromNgModuleMetadata } from '../../utility/ng-module';
+
+export const FULL_CALENDAR = {
+  bundleName: 'fullcalendar',
+  inject: false,
+  input: 'node_modules/fullcalendar/dist/fullcalendar.min.js'
+};
 
 /**
  * Updates the default project builder polyfills
@@ -102,20 +109,43 @@ function removeCoreModule(options: { project: string }): Rule {
   };
 }
 
+function updateAppScripts(options: { project: string }): Rule {
+  return async (tree: Tree) => {
+    const workspace = await readWorkspace(tree);
+    const project = workspace.projects.get(options.project);
+
+    // if there is no project defined, we are done.
+    if (!project) {
+      throw new SchematicsException(`Project "${options.project}" does not exist.`);
+    }
+
+    const buildTargets = getBuildTargets(project);
+
+    // Configure project options
+    for (const target of buildTargets) {
+      // Add polyfills
+      if (target.options?.scripts instanceof Array) {
+        removeFromJsonArray(target.options?.scripts, [FULL_CALENDAR]);
+      }
+    }
+
+    await writeWorkspace(tree, workspace);
+  };
+}
+
 export default function (): Rule {
   return async (tree: Tree) => {
-    const options = {
-      project: await getDefaultApplicationProject(tree)
-    };
+    const project = await getDefaultApplicationProject(tree);
 
-    if (!options.project) {
+    if (!project) {
       return;
     }
 
     return chain([
-      updateAppPolyfills(options as { project: string }),
-      updateAppIndex(options as { project: string }),
-      removeCoreModule(options as { project: string })
+      updateAppPolyfills({ project }),
+      updateAppIndex({ project }),
+      removeCoreModule({ project }),
+      updateAppScripts({ project })
     ]);
   };
 }
