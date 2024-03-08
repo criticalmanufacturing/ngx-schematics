@@ -17,7 +17,10 @@ import {
   createSourceFile,
   strings,
   relativeToRoot,
-  getDefaultApplicationProject
+  getDefaultApplicationProject,
+  getObjectProperty,
+  addSymbolToArrayLiteral,
+  insertImport
 } from '@criticalmanufacturing/schematics-devkit';
 import {
   updateNgPackageJson,
@@ -25,8 +28,46 @@ import {
 } from '@criticalmanufacturing/schematics-devkit/rules';
 import { Schema } from './schema';
 import { addSymbolToNgModuleMetadata, getAppModulePath } from '../utility/ng-module';
+import { getDefaultAppConfig } from '../utility/app-config';
+import { SyntaxKind } from 'ts-morph';
+import { METADATA_ROUTING_PROVIDE } from '../ng-add/package-configs';
 
-function updateAppModule(options: { packageName: string; namePrefix: string }) {
+function updateAppConfig(options: { packageName: string; namePrefix: string }): Rule {
+  return async (tree: Tree) => {
+    const appConfig = await getDefaultAppConfig(tree);
+
+    if (!appConfig) {
+      return;
+    }
+
+    const arrLiteral = getObjectProperty(appConfig, 'providers')
+      ?.asKind(SyntaxKind.PropertyAssignment)
+      ?.getInitializerIfKind(SyntaxKind.ArrayLiteralExpression);
+
+    if (!arrLiteral) {
+      return;
+    }
+
+    addSymbolToArrayLiteral(
+      arrLiteral,
+      `provide${strings.classify(options.namePrefix)}()`,
+      METADATA_ROUTING_PROVIDE[1]
+    );
+    insertImport(
+      arrLiteral.getSourceFile(),
+      `provide${strings.classify(options.namePrefix)}`,
+      options.packageName
+    );
+
+    arrLiteral.getSourceFile().formatText();
+    tree.overwrite(
+      arrLiteral.getSourceFile().getFilePath(),
+      arrLiteral.getSourceFile().getFullText()
+    );
+  };
+}
+
+function updateAppModule(options: { packageName: string; namePrefix: string }): Rule {
   return async (tree: Tree) => {
     const project = await getDefaultApplicationProject(tree);
 
@@ -89,7 +130,8 @@ function createMetadataSubEntry(options: { name: string; skipTsConfig?: boolean 
       options.skipTsConfig
         ? noop()
         : updateTsConfig([[['compilerOptions', 'paths', packageName], [distRoot]]]),
-      updateAppModule({ packageName, namePrefix })
+      updateAppModule({ packageName, namePrefix }),
+      updateAppConfig({ packageName, namePrefix })
     ]);
   };
 }

@@ -197,17 +197,19 @@ export function updateObjectArrayProperty(
 export function getRelativeImportPath(source: SourceFile, node: Node<ts.Node>): string | undefined {
   let moduleRelativePath: string | undefined;
   if (node.getKind() === SyntaxKind.Identifier) {
-    moduleRelativePath = source
-      .getImportDeclarations()
-      .find((impNode) => impNode.getNamedImports().some((imp) => imp.getName() === node.getText()))
-      ?.getModuleSpecifierValue();
-  } else if (node.getKind() === SyntaxKind.PropertyAccessExpression) {
-    moduleRelativePath = source
-      .getDescendantsOfKind(SyntaxKind.CallExpression)
-      .find((node) => node.getExpression().getText() === 'import')
-      ?.getArguments()[0]
-      ?.asKind(SyntaxKind.StringLiteral)
-      ?.getLiteralValue();
+    moduleRelativePath =
+      source
+        .getImportDeclarations()
+        .find((impNode) =>
+          impNode.getNamedImports().some((imp) => imp.getName() === node.getText())
+        )
+        ?.getModuleSpecifierValue() ??
+      source
+        .getDescendantsOfKind(SyntaxKind.CallExpression)
+        .find((node) => node.getExpression().getText() === 'import')
+        ?.getArguments()[0]
+        ?.asKind(SyntaxKind.StringLiteral)
+        ?.getLiteralValue();
   }
 
   if (!moduleRelativePath) {

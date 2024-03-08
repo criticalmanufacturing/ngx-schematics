@@ -228,4 +228,11 @@ describe('Generate Library', () => {
       ]
     ).toEqual(false);
   });
+
+  it('should update the app.config.ts', async () => {
+    const options = { ...libraryOptions };
+
+    const tree = await schematicRunner.runSchematic('library', options, appTree);
+    expect(tree.readText(`/projects/app/src/app/app.config.ts`)).toContain(`provideTestlib()`);
+  });
 });

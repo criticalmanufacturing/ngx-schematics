@@ -1,64 +1,14 @@
 import { Rule, Tree } from '@angular-devkit/schematics';
 import { Schema } from '../schema';
-import { ObjectLiteralExpression, SyntaxKind } from 'ts-morph';
+import { SyntaxKind } from 'ts-morph';
 import {
   addSymbolToArrayLiteral,
-  createSourceFile,
-  getRelativeImportPath,
-  getMainPath,
   getObjectProperty,
   insertImport
 } from '@criticalmanufacturing/schematics-devkit';
 import { CORE_BASE_PROVIDE, MES_BASE_PROVIDE, METADATA_ROUTING_PROVIDE } from '../package-configs';
 import { updateServiceWorker } from '../../migrations/update-1-2-0/update-service-worker';
-
-/**
- * Reatrives the application config object literal
- */
-async function getAppConfig(
-  tree: Tree,
-  project: string
-): Promise<ObjectLiteralExpression | undefined> {
-  const mainPath = await getMainPath(tree, project);
-
-  if (!mainPath) {
-    return;
-  }
-
-  const mainSource = createSourceFile(tree, mainPath);
-
-  if (!mainSource) {
-    return;
-  }
-
-  const bootstrapAppCall = mainSource
-    .getDescendantsOfKind(SyntaxKind.CallExpression)
-    .find((descNode) => descNode.getExpression().getText().endsWith('bootstrapApplication'));
-
-  if (!bootstrapAppCall) {
-    return;
-  }
-
-  const appConfigNode = bootstrapAppCall.getArguments()[1];
-  const appConfigPath = getRelativeImportPath(mainSource, appConfigNode);
-
-  if (!appConfigPath) {
-    return;
-  }
-
-  const appConfig = createSourceFile(tree, appConfigPath);
-
-  if (!appConfig) {
-    return;
-  }
-
-  return appConfig
-    .getDescendantsOfKind(SyntaxKind.VariableDeclaration)
-    .find(
-      (descNode) => descNode.getName() === appConfigNode.asKind(SyntaxKind.Identifier)?.getText()
-    )
-    ?.getInitializerIfKind(SyntaxKind.ObjectLiteralExpression);
-}
+import { getAppConfig } from '../../utility/app-config';
 
 /**
  * Updates the application config providers base on the provided application type
