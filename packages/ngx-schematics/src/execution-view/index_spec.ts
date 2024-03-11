@@ -155,7 +155,7 @@ describe('Generate Execution View', () => {
     expect(executionViewTemplateContent).toMatch(templateRegExp);
   });
 
-  it('should have the Component decorator with properties selector, templateUrl, styleUrls, and viewProviders', async () => {
+  it('should have the Component decorator with properties selector, templateUrl, styleUrl, and viewProviders', async () => {
     const tree = await schematicRunner.runSchematic(
       'execution-view',
       executionViewOptions,
@@ -179,7 +179,7 @@ describe('Generate Execution View', () => {
       `templateUrl: './wizard-${strings.dasherize(executionViewOptions.name)}.component.html'`
     );
     expect(executionViewContent).toContain(
-      `styleUrls: ['./wizard-${strings.dasherize(executionViewOptions.name)}.component.less']`
+      `styleUrl: './wizard-${strings.dasherize(executionViewOptions.name)}.component.less'`
     );
     expect(executionViewContent).toContain(
       `viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Wizard${strings.classify(

@@ -88,7 +88,7 @@ import {
     selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget',
     imports: [CommonModule],
     templateUrl: './<%= dasherize(name) %>-widget.component.html',
-    <% if (style !== 'none') { %>styleUrls: ['./<%= dasherize(name) %>-widget.component.<%= style %>']<% } %>
+    <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-widget.component.<%= style %>'<% } %>
 })
 export class <%= classify(name) %>Widget extends WidgetGeneric implements WidgetRepresentation {
 

@@ -208,7 +208,7 @@ describe('Generate Data Source', () => {
       expect(dataSourceSettingsStyleContent).toEqual('');
     });
 
-    it('should have the Component decorator with properties selector, templateUrl, and styleUrls', async () => {
+    it('should have the Component decorator with properties selector, templateUrl, and styleUrl', async () => {
       const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
 
       const dataSourceSettingsContent = tree.readContent(
@@ -230,9 +230,9 @@ describe('Generate Data Source', () => {
         )}-data-source-settings.component.html'`
       );
       expect(dataSourceSettingsContent).toContain(
-        `styleUrls: ['./${strings.dasherize(
+        `styleUrl: './${strings.dasherize(
           dataSourceOptions.name
-        )}-data-source-settings.component.less']`
+        )}-data-source-settings.component.less'`
       );
     });
 
@@ -245,13 +245,13 @@ describe('Generate Data Source', () => {
         `${defaultDataSourceSettingsComponentFilePath}.ts`
       );
       expect(dataSourceSettingsContent).toContain(
-        `styleUrls: ['./${strings.dasherize(
+        `styleUrl: './${strings.dasherize(
           dataSourceOptions.name
-        )}-data-source-settings.component.${options.style}']`
+        )}-data-source-settings.component.${options.style}'`
       );
     });
 
-    it('should have the Component decorator without property styleUrls', async () => {
+    it('should have the Component decorator without property styleUrl', async () => {
       const options = { ...dataSourceOptions, style: 'none' };
 
       const tree = await schematicRunner.runSchematic('data-source', options, appTree);
@@ -260,8 +260,8 @@ describe('Generate Data Source', () => {
         `${defaultDataSourceSettingsComponentFilePath}.ts`
       );
       expect(dataSourceSettingsContent)
-        .withContext('The styleUrls should not be fulfilled')
-        .not.toMatch(/styleUrls: \['.\/(\w*-*)+.component.\w*'\]/);
+        .withContext('The styleUrl should not be fulfilled')
+        .not.toMatch(/styleUrl: '.\/(\w*-*)+.component.\w*'/);
     });
 
     it('should extend CustomizableComponent', async () => {

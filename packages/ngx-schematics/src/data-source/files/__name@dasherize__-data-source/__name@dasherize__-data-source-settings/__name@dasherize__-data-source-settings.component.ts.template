@@ -46,7 +46,7 @@ import {
     selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-data-source-settings',
     imports: [CommonModule, DataSourceSettingsModule],
     templateUrl: './<%= dasherize(name) %>-data-source-settings.component.html',
-    <% if (style !== 'none') { %>styleUrls: ['./<%= dasherize(name) %>-data-source-settings.component.<%= dasherize(style) %>']<% } %>
+    <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-data-source-settings.component.<%= dasherize(style) %>'<% } %>
 })
 export class <%= classify(name) %>DataSourceSettingsComponent extends CustomizableComponent {
 

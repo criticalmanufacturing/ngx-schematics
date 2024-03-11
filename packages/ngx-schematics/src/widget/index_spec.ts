@@ -150,22 +150,22 @@ describe('Generate Widget', () => {
 
     const widgetSettingsContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
     expect(widgetSettingsContent).toContain(
-      `styleUrls: ['./${strings.dasherize(widgetOptions.name)}-widget.component.${options.style}']`
+      `styleUrl: './${strings.dasherize(widgetOptions.name)}-widget.component.${options.style}'`
     );
   });
 
-  it('should have the Component decorator without property styleUrls', async () => {
+  it('should have the Component decorator without property styleUrl', async () => {
     const options = { ...widgetOptions, style: 'none' };
 
     const tree = await schematicRunner.runSchematic('widget', options, appTree);
 
     const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
     expect(widgetContent)
-      .withContext('The styleUrls should not be fulfilled')
-      .not.toMatch(/styleUrls: \['.\/(\w*-*)+-widget.component.\w*'\]/);
+      .withContext('The styleUrl should not be fulfilled')
+      .not.toMatch(/styleUrl: '.\/(\w*-*)+-widget.component.\w*'/);
   });
 
-  it('should have the selector, templateUrl, and styleUrls properties in the Component decorator', async () => {
+  it('should have the selector, templateUrl, and styleUrl properties in the Component decorator', async () => {
     const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
 
     const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
@@ -178,7 +178,7 @@ describe('Generate Widget', () => {
       `templateUrl: './${strings.dasherize(widgetOptions.name)}-widget.component.html'`
     );
     expect(widgetContent).toContain(
-      `styleUrls: ['./${strings.dasherize(widgetOptions.name)}-widget.component.less']`
+      `styleUrl: './${strings.dasherize(widgetOptions.name)}-widget.component.less'`
     );
   });
 
@@ -244,7 +244,7 @@ describe('Generate Widget', () => {
       expect(widgetSettingsStyleContent).toEqual('');
     });
 
-    it('should have the Component decorator with properties selector, templateUrl, and styleUrls', async () => {
+    it('should have the Component decorator with properties selector, templateUrl, and styleUrl', async () => {
       const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
 
       const widgetSettingsContent = tree.readContent(
@@ -262,7 +262,7 @@ describe('Generate Widget', () => {
         `templateUrl: './${strings.dasherize(widgetOptions.name)}-widget-settings.component.html'`
       );
       expect(widgetSettingsContent).toContain(
-        `styleUrls: ['./${strings.dasherize(widgetOptions.name)}-widget-settings.component.less']`
+        `styleUrl: './${strings.dasherize(widgetOptions.name)}-widget-settings.component.less'`
       );
     });
 
@@ -275,13 +275,13 @@ describe('Generate Widget', () => {
         `${defaultWidgetSettingsComponentFilePath}.ts`
       );
       expect(widgetSettingsContent).toContain(
-        `styleUrls: ['./${strings.dasherize(widgetOptions.name)}-widget-settings.component.${
+        `styleUrl: './${strings.dasherize(widgetOptions.name)}-widget-settings.component.${
           options.style
-        }']`
+        }'`
       );
     });
 
-    it('should have the Component decorator without property styleUrls', async () => {
+    it('should have the Component decorator without property styleUrl', async () => {
       const options = { ...widgetOptions, style: 'none' };
 
       const tree = await schematicRunner.runSchematic('widget', options, appTree);
@@ -290,8 +290,8 @@ describe('Generate Widget', () => {
         `${defaultWidgetSettingsComponentFilePath}.ts`
       );
       expect(widgetSettingsContent)
-        .withContext('The styleUrls should not be fulfilled')
-        .not.toMatch(/styleUrls: \['.\/(\w*-*)+.component.\w*'\]/);
+        .withContext('The styleUrl should not be fulfilled')
+        .not.toMatch(/styleUrl: '.\/(\w*-*)+.component.\w*'/);
     });
 
     it('should extend CustomizableComponent', async () => {

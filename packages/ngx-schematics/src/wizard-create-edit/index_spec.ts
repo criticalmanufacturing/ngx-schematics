@@ -146,7 +146,7 @@ describe('Generate Wizard Create Edit', () => {
     expect(wizardTemplateContent).toMatch(templateRegExp);
   });
 
-  it('should have the Component decorator with properties selector, templateUrl, and styleUrls', async () => {
+  it('should have the Component decorator with properties selector, templateUrl, and styleUrl', async () => {
     const tree = await schematicRunner.runSchematic('wizard-create-edit', wizardOptions, appTree);
 
     const wizardContent = tree.readContent(
@@ -166,7 +166,7 @@ describe('Generate Wizard Create Edit', () => {
       `templateUrl: './wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.html'`
     );
     expect(wizardContent).toContain(
-      `styleUrls: ['./wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.less']`
+      `styleUrl: './wizard-create-edit-${strings.dasherize(wizardOptions.name)}.component.less'`
     );
   });
 

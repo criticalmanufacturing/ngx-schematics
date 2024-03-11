@@ -40,7 +40,7 @@ import { <%= classify(name) %>WidgetSettingsService, <%= classify(name) %>Widget
     selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget-settings',
     imports: [CommonModule, WidgetSettingsModule],
     templateUrl: './<%= dasherize(name) %>-widget-settings.component.html',
-    <% if (style !== 'none') { %>styleUrls: ['./<%= dasherize(name) %>-widget-settings.component.<%= style %>']<% } %>,    
+    <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-widget-settings.component.<%= style %>'<% } %>,    
     providers: [
         { provide: WidgetSettingsService, useClass: <%= classify(name) %>WidgetSettingsService }
     ]

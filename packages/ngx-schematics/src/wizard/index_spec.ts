@@ -145,7 +145,7 @@ describe('Generate Wizard', () => {
     expect(wizardTemplateContent).toMatch(templateRegExp);
   });
 
-  it('should have the Component decorator with properties selector, templateUrl, styleUrls, and viewProviders', async () => {
+  it('should have the Component decorator with properties selector, templateUrl, styleUrl, and viewProviders', async () => {
     const tree = await schematicRunner.runSchematic('wizard', wizardOptions, appTree);
 
     const wizardContent = tree.readContent(
@@ -165,7 +165,7 @@ describe('Generate Wizard', () => {
       `templateUrl: './wizard-${strings.dasherize(wizardOptions.name)}.component.html'`
     );
     expect(wizardContent).toContain(
-      `styleUrls: ['./wizard-${strings.dasherize(wizardOptions.name)}.component.less']`
+      `styleUrl: './wizard-${strings.dasherize(wizardOptions.name)}.component.less'`
     );
     expect(wizardContent).toContain(
       `viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Wizard${strings.classify(

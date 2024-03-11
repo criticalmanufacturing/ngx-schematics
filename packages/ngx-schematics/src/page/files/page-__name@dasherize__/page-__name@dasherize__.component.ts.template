@@ -91,7 +91,7 @@ import {
     selector: '<%= dasherize(project) %>-page-<%= dasherize(name) %>',
     imports: [CommonModule, BasePageModule, ActionBarModule, ActionButtonModule, ActionGroupModule, RequiredFunctionalitiesModule],
     templateUrl: './page-<%= dasherize(name) %>.component.html',
-    <% if (style !== 'none') { %>styleUrls: ['./page-<%= dasherize(name) %>.component.<%= style %>'],<% } %>
+    <% if (style !== 'none') { %>styleUrl: './page-<%= dasherize(name) %>.component.<%= style %>',<% } %>
     viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Page<%= classify(name) %>Component) }]
 })
 export class Page<%= classify(name) %>Component extends CustomizableComponent {
