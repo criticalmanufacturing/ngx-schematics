@@ -233,8 +233,8 @@ describe('Test ng-add', () => {
 
         const mainContent = tree.readContent('/application/src/main.ts');
         expect(mainContent).toContain(`loadApplicationConfig('assets/config.json').then(() => {
-  import(/* webpackMode: "eager" */ './app/app.module').then((m) => {
-    platformBrowserDynamic().bootstrapModule(m.AppModule)
+  import(/* webpackMode: "eager" */ './app/app.module').then(({ AppModule }) => {
+    platformBrowserDynamic().bootstrapModule(AppModule)
       .catch(err => console.error(err));
   });
 });`);
@@ -315,8 +315,8 @@ describe('Test ng-add', () => {
 
         const mainContent = tree.readContent('/application/src/main.ts');
         expect(mainContent).toContain(`loadApplicationConfig('assets/config.json').then(() => {
-  import(/* webpackMode: "eager" */ './app/app.component').then((m) => {
-    bootstrapApplication(m.AppComponent, appConfig)
+  import(/* webpackMode: "eager" */ './app/app.config').then(({ appConfig }) => {
+    bootstrapApplication(AppComponent, appConfig)
       .catch((err) => console.error(err));
   });
 });`);

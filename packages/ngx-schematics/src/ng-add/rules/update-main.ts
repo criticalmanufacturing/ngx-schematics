@@ -43,7 +43,9 @@ export function updateMain(options: { project: string }) {
     }
 
     const bootstrapStatement = bootstrapCall.getFirstAncestorByKind(SyntaxKind.ExpressionStatement);
-    const moduleIdentifier = bootstrapCall.getArguments()[0]?.asKind(SyntaxKind.Identifier);
+    const moduleIdentifier = bootstrapCall.getExpression().getText().endsWith('bootstrapModule')
+      ? bootstrapCall.getArguments()[0]?.asKind(SyntaxKind.Identifier)
+      : bootstrapCall.getArguments()[1]?.asKind(SyntaxKind.Identifier);
 
     if (!bootstrapStatement || !moduleIdentifier) {
       return;
@@ -60,10 +62,9 @@ export function updateMain(options: { project: string }) {
     appImport?.remove();
 
     // add load application config statement
-    moduleIdentifier.replaceWithText(`m.${moduleIdentifier.getText()}`);
     bootstrapStatement.replaceWithText(`\
 loadApplicationConfig('assets/config.json').then(() => {
-    import(/* webpackMode: "eager" */ '${appModulePath ?? './app/app.module'}').then((m) => {
+    import(/* webpackMode: "eager" */ '${appModulePath ?? './app/app.module'}').then(({ ${moduleIdentifier.getText()} }) => {
         ${bootstrapStatement.getText(true)}
     });
 });`);
