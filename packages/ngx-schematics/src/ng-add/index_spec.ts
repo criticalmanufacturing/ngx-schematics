@@ -1,3 +1,4 @@
+import { JsonArray, JsonObject } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { parse } from 'jsonc-parser';
 
@@ -83,8 +84,25 @@ describe('Test ng-add', () => {
 
       const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
       const buildOptions = angularJsonContent.projects.application.architect.build.options;
+
       expect(buildOptions.serviceWorker).toBeTrue();
       expect(buildOptions.ngswConfigPath).toBe('application/ngsw-config.json');
+
+      const ngswConfig = tree.readJson('application/ngsw-config.json');
+
+      const appAssetGroup = ((ngswConfig as JsonObject)['assetGroups'] as JsonArray).find(
+        (assetGroup) => (assetGroup as JsonObject)['name'] === 'app'
+      );
+
+      const configDataGroup = ((ngswConfig as JsonObject)['dataGroups'] as JsonArray).find(
+        (assetGroup) => (assetGroup as JsonObject)['name'] === 'config'
+      );
+
+      expect(
+        ((appAssetGroup as JsonObject)?.['resources'] as JsonObject)?.['files'] as JsonArray
+      ).toContain('/monaco-editor/**/*.js');
+
+      expect(configDataGroup).not.toBeNull();
     });
 
     it('should have webmanifest in assets', async () => {

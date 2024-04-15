@@ -38,7 +38,7 @@ describe('Generate Widget', () => {
 
   const defaultWidgetFilePath = `projects/${libraryOptions.name}/src/lib/${widgetOptions.name}-widget/${widgetOptions.name}-widget.component`;
   const defaultWidgetSettingsFilePath = `projects/${libraryOptions.name}/src/lib/${widgetOptions.name}-widget/${widgetOptions.name}-widget-settings/${widgetOptions.name}-widget-settings`;
-  const defaultWidgetSettingsComponentFilePath = defaultWidgetSettingsFilePath +`.component`;
+  const defaultWidgetSettingsComponentFilePath = defaultWidgetSettingsFilePath + `.component`;
 
   let appTree: UnitTestTree;
 
@@ -294,7 +294,7 @@ describe('Generate Widget', () => {
         .not.toMatch(/styleUrls: \['.\/(\w*-*)+.component.\w*'\]/);
     });
 
-    xit('should extend CustomizableComponent', async () => {
+    it('should extend CustomizableComponent', async () => {
       const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
 
       const widgetSettingsClassName = `${strings.classify(
@@ -316,7 +316,7 @@ describe('Generate Widget', () => {
         `${defaultWidgetSettingsComponentFilePath}.ts`
       );
       expect(widgetSettingsContent).toMatch(
-        /constructor\(viewContainerRef: ViewContainerRef, @Inject(WidgetSettingsService) settings: TestWidgetSettingsService\) {\s*super\(viewContainerRef\);\s*}/gm
+        /constructor\(\s*viewContainerRef: ViewContainerRef,\s*@Inject\(WidgetSettingsService\) settings: TestWidgetSettingsService\s*\) {\s*super\(viewContainerRef\);/gm
       );
     });
   });
