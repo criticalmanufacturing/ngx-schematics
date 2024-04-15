@@ -35,6 +35,7 @@ import { updateWorkspace } from './rules/update-workspace';
 import { listNpmReleaseTags } from '@criticalmanufacturing/schematics-devkit';
 import { updateAppModule } from './rules/update-app-module';
 import { updateAppConfig } from './rules/update-app-config';
+import { updateNgswConfig } from './rules/update-ngsw-config';
 
 /**
  * Updates main.ts file adding the load config method
@@ -88,6 +89,7 @@ function installSchematics(options: Schema) {
             updateMain({ project: options.project })
           ]
         : [noop()]),
+      updateNgswConfig(options as Required<Schema>),
       updateWorkspace(options),
       installDependencies(dependencies),
       updateTsConfig([
