@@ -48,8 +48,7 @@ export function updateNgswConfig(options: { project: string }): Rule {
       cacheConfig: {
         maxSize: 1,
         maxAge: '30d',
-        strategy: 'freshness',
-        timeout: '0u'
+        strategy: 'freshness'
       }
     });
 
