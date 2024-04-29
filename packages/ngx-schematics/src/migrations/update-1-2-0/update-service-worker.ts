@@ -19,7 +19,12 @@ export function updateServiceWorker(source: Node<ts.Node>): void {
         return false;
       }
 
-      return node.getExpression().getText() === 'ServiceWorkerModule.register';
+      const expressionText = node.getExpression().getText();
+
+      return (
+        expressionText === 'ServiceWorkerModule.register' ||
+        expressionText === 'provideServiceWorker'
+      );
     })
     ?.asKind(SyntaxKind.CallExpression);
 

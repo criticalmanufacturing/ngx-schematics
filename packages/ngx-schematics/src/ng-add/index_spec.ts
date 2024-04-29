@@ -377,6 +377,13 @@ describe('Test ng-add', () => {
         expect(appModuleImports).toContain('provideMesUI()');
         expect(appModuleImports).toContain('provideMetadataRouter()');
       });
+
+      it('should update the service worker to register', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const appModuleContent = tree.readText('/application/src/app/app.config.ts');
+        expect(appModuleContent).toContain(`provideServiceWorker('ngsw-loader-worker.js'`);
+      });
     });
   });
 });
