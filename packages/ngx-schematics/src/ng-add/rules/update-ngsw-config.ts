@@ -1,6 +1,6 @@
 import { JsonArray, JsonObject, join, normalize } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
-import { addToJsonArray } from '@criticalmanufacturing/schematics-devkit';
+import { addToJsonArray, removeFromJsonArray } from '@criticalmanufacturing/schematics-devkit';
 import { readWorkspace } from '@schematics/angular/utility';
 
 function getAssetGroup(ngswConfig: JsonObject, name: string): JsonObject | undefined {
@@ -11,6 +11,10 @@ function getAssetGroup(ngswConfig: JsonObject, name: string): JsonObject | undef
 
 function addAssets(assetGroup: JsonObject, assets: string[]): void {
   addToJsonArray((assetGroup?.['resources'] as JsonObject)?.['files'] as JsonArray, assets);
+}
+
+function removeAssets(assetGroup: JsonObject, assets: string[]): void {
+  removeFromJsonArray((assetGroup?.['resources'] as JsonObject)?.['files'] as JsonArray, assets);
 }
 
 /**
@@ -34,6 +38,7 @@ export function updateNgswConfig(options: { project: string }): Rule {
 
     if (appAssetGroup) {
       addAssets(appAssetGroup, ['/monaco-editor/**/*.js']);
+      removeAssets(appAssetGroup, ['/index.html']);
     }
 
     if (assetsAssetGroup) {
@@ -51,6 +56,8 @@ export function updateNgswConfig(options: { project: string }): Rule {
         strategy: 'freshness'
       }
     });
+
+    ngswConfig['navigationRequestStrategy'] = 'freshness';
 
     tree.overwrite(ngswConfigPath, JSON.stringify(ngswConfig, undefined, 2));
   };

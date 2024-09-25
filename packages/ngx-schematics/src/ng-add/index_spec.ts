@@ -86,19 +86,24 @@ describe('Test ng-add', () => {
       it('should set service worker', async () => {
         const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
 
-        const ngswConfig = tree.readJson('application/ngsw-config.json');
+        const ngswConfig = tree.readJson('application/ngsw-config.json') as JsonObject;
 
-        const appAssetGroup = ((ngswConfig as JsonObject)['assetGroups'] as JsonArray).find(
+        const appAssetGroup = (ngswConfig['assetGroups'] as JsonArray).find(
           (assetGroup) => (assetGroup as JsonObject)['name'] === 'app'
         );
 
-        const configDataGroup = ((ngswConfig as JsonObject)['dataGroups'] as JsonArray).find(
+        const configDataGroup = (ngswConfig['dataGroups'] as JsonArray).find(
           (assetGroup) => (assetGroup as JsonObject)['name'] === 'config'
         );
 
-        expect(
-          ((appAssetGroup as JsonObject)?.['resources'] as JsonObject)?.['files'] as JsonArray
-        ).toContain('/monaco-editor/**/*.js');
+        const appAssetFiles = ((appAssetGroup as JsonObject)?.['resources'] as JsonObject)?.[
+          'files'
+        ] as JsonArray;
+
+        expect(ngswConfig['navigationRequestStrategy']).toBe('freshness');
+
+        expect(appAssetFiles).toContain('/monaco-editor/**/*.js');
+        expect(appAssetFiles).not.toContain('/index.html');
 
         expect(configDataGroup).not.toBeNull();
       });

@@ -2,14 +2,19 @@
   "$schema": "../../../node_modules/@angular-devkit/schematics/collection-schema.json",
   "schematics": {
     "update-1-2-0": {
-      "version": "1.2.0",
-      "description": "Updates @criticalmanufacturing/ngx-schematics to v1.2",
+      "version": "11.0.0",
+      "description": "Updates the service worker registered in the app.module.ts",
       "factory": "./migrations/update-1-2-0"
     },
     "update-2-0-0": {
-      "version": "2.0.0",
-      "description": "Updates @criticalmanufacturing/ngx-schematics to v2.0",
+      "version": "11.0.0",
+      "description": "Adds support for angular v17. Updates angular.json scripts and removes index.html initial themes.",
       "factory": "./migrations/update-2-0-0"
+    },
+    "update-11-0-4": {
+      "version": "11.0.4",
+      "description": "Updates service worker ngsw-config.json.",
+      "factory": "./migrations/update-11-0-4"
     }
   }
 }

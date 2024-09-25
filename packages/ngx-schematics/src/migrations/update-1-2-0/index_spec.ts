@@ -51,12 +51,41 @@ describe('Test ng-update', () => {
         appTree
       );
 
-      let appModuleContent = tree.readText('/application/src/app/app.module.ts');
-      expect(appModuleContent).toContain(`ServiceWorkerModule.register('ngsw-worker.js'`);
+      appTree.overwrite(
+        '/application/src/app/app.module.ts',
+        `\
+import { NgModule, isDevMode } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+
+import { AppComponent } from './app.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { CoreUIModule } from 'cmf-core-ui';
+import { MetadataRoutingModule } from 'cmf-core';
+
+@NgModule({
+    declarations: [
+        AppComponent
+    ],
+    imports: [
+        BrowserModule,
+        ServiceWorkerModule.register('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            // Register the ServiceWorker as soon as the application is stable
+            // or after 30 seconds (whichever comes first).
+            registrationStrategy: 'registerWhenStable:30000'
+        }),
+        CoreUIModule.forRoot(),
+        MetadataRoutingModule
+    ],
+    providers: [],
+    bootstrap: [AppComponent]
+})
+export class AppModule { }`
+      );
 
       await migrationsSchematicRunner.runSchematic('update-1-2-0', {}, tree);
 
-      appModuleContent = tree.readText('/application/src/app/app.module.ts');
+      const appModuleContent = tree.readText('/application/src/app/app.module.ts');
       expect(appModuleContent).toContain(`ServiceWorkerModule.register('ngsw-loader-worker.js'`);
     });
 
