@@ -1,6 +1,7 @@
 import {
     Component,
     forwardRef,
+    inject,
     OnInit,
     ViewChild,
     ViewContainerRef
