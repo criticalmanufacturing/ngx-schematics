@@ -389,6 +389,16 @@ describe('Test ng-add', () => {
         const appModuleContent = tree.readText('/application/src/app/app.config.ts');
         expect(appModuleContent).toContain(`provideServiceWorker('ngsw-loader-worker.js'`);
       });
+
+      it('should update the application builder outputPath', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
+        expect(angularJsonContent.projects.application.architect.build.options.outputPath).toEqual({
+          base: 'dist/application',
+          browser: ''
+        });
+      });
     });
   });
 });

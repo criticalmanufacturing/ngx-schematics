@@ -137,6 +137,13 @@ export function updateWorkspace(options: {
           if (target.options.polyfills instanceof Array) {
             addToJsonArray(target.options.polyfills, PROJECT_POLYFILLS);
           }
+
+          if (typeof target.options.outputPath === 'string') {
+            target.options.outputPath = {
+              base: target.options.outputPath,
+              browser: ''
+            };
+          }
         }
       }
     }
