@@ -23,7 +23,8 @@ import {
   insertRoutesMetadata,
   MetadataProperty,
   getMetadataFilePath,
-  updateMetadata
+  updateMetadata,
+  UpdateMetadataOptions
 } from '../utility/metadata';
 import { updateLibraryAPI } from '../utility/update-library-api';
 
@@ -111,12 +112,22 @@ export default function (_options: Schema): Rule {
       move(parsedPath.path)
     ]);
 
-    const metadataOptions = {
+    const metadataOptions: UpdateMetadataOptions = {
       identifier: MetadataProperty.EntityType,
-      imports: {},
+      imports: { DEFAULT_DETAILS_VIEW_ID: 'cmf-core' },
       toInsert: `\
 {
-  name: '${strings.classify(_options.name)}'
+  name: '${strings.classify(_options.name)}',
+  views: [
+    {
+        id: DEFAULT_DETAILS_VIEW_ID,
+        loadChildren: () => import(
+            /* webpackExports: "Page${strings.classify(_options.name)}DetailsViewRoutingModule" */
+            '${strings.dasherize(_options.project)}').then(m => m.Page${strings.classify(
+              _options.name
+            )}DetailsViewRoutingModule))
+    },
+  ]
 }`
     };
 
