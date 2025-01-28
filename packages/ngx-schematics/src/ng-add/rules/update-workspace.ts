@@ -144,6 +144,16 @@ export function updateWorkspace(options: {
               browser: ''
             };
           }
+
+          if (
+            target.builder === '@angular-devkit/build-angular:application' &&
+            typeof target.options.outputPath === 'string'
+          ) {
+            target.options.outputPath = {
+              base: target.options.outputPath,
+              browser: ''
+            };
+          }
         }
       }
     }
