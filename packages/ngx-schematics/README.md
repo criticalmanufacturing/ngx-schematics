@@ -286,3 +286,18 @@ Creates a new, generic page in the given or default project
 ng generate page [name]
 ```
 
+### **Documentation**
+
+Generates the documentation for a given component
+
+#### **Arguments:**
+
+| Name   | Description           | Value Type |
+| ------ | --------------------- | ---------- |
+| `file` | The path to the file. | `string`   |
+
+#### **Usage:**
+
+```
+ng generate doc [file]
+```
