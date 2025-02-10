@@ -15,7 +15,7 @@
 - [wizard](#wizard)
 - [wizard-create-edit](#wizard-create-edit)
 - [page](#page)
-- [Documentation](#documentation)
+- [doc](#doc)
 
 ## **Project Startup Commands**
 
@@ -287,7 +287,7 @@ Creates a new, generic page in the given or default project
 ng generate page [name]
 ```
 
-### **Documentation**
+### **doc**
 
 Generates the documentation for a given component
 
