@@ -3,6 +3,8 @@ import { Tree } from '@angular-devkit/schematics';
 import { exec } from 'child_process';
 import { JsonArray } from '@angular-devkit/core';
 import { isDeepStrictEqual } from 'util';
+import { dirname, join, parse } from 'path';
+import { existsSync } from 'fs';
 
 /**
  * Project Type
@@ -134,4 +136,22 @@ export async function getDefaultApplicationProject(tree: Tree): Promise<string |
   return Array.from(workspace.projects.entries()).find(([, def]) => {
     return def.extensions.projectType === ProjectType.Application;
   })?.[0];
+}
+
+/**
+ * Fetches the absolute root directory of the angular workspace
+ */
+export function tryGetRoot(): string | undefined {
+  const from = process.cwd();
+  const root = parse(from).root;
+
+  let currentDir = from;
+  while (currentDir && currentDir !== root) {
+    if (existsSync(join(currentDir, 'angular.json'))) {
+      return currentDir;
+    }
+    currentDir = dirname(currentDir);
+  }
+
+  return;
 }

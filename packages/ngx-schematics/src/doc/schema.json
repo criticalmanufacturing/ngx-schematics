@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsDoc",
+  "title": "Doc Options Schema",
+  "type": "object",
+  "properties": {
+    "file": {
+      "type": "string",
+      "description": "The path to the file to generate the doc.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    }
+  },
+  "required": ["file"]
+}

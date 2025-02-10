@@ -58,6 +58,11 @@
       "description": "Generates a new page.",
       "factory": "./page",
       "schema": "./page/schema.json"
+    },
+    "doc": {
+      "description": "Generates the documentation for a file.",
+      "factory": "./doc",
+      "schema": "./doc/schema.json"
     }
   }
 }

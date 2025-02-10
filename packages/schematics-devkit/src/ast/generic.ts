@@ -9,8 +9,7 @@ import {
   QuoteKind,
   SourceFile,
   StructureKind,
-  SyntaxKind,
-  ts
+  SyntaxKind
 } from 'ts-morph';
 
 /**
@@ -190,22 +189,38 @@ export function updateObjectArrayProperty(
 }
 
 /**
- * Retrives the import path of the given node relative to the provided source file
- * @param source the source file
+ * Retrives the import path of the given node
  * @param node the node to search the import
  */
-export function getRelativeImportPath(source: SourceFile, node: Node<ts.Node>): string | undefined {
-  const moduleRelativePath =
-    source
+export function getImportPath(node: Node): string | undefined {
+  const importPath =
+    node
+      .getSourceFile()
       .getImportDeclarations()
-      .find((impNode) => impNode.getNamedImports().some((imp) => imp.getName() === node.getText()))
+      .find((impNode) =>
+        impNode
+          .getNamedImports()
+          .some((imp) => (imp.getAliasNode()?.getText() ?? imp.getName()) === node.getText())
+      )
       ?.getModuleSpecifierValue() ??
-    source
+    node
+      .getSourceFile()
       .getDescendantsOfKind(SyntaxKind.CallExpression)
       .find((node) => node.getExpression().getText() === 'import')
       ?.getArguments()[0]
       ?.asKind(SyntaxKind.StringLiteral)
       ?.getLiteralValue();
+
+  return importPath;
+}
+
+/**
+ * Retrives the import path of the given node relative to the provided source file
+ * @param source the source file
+ * @param node the node to search the import
+ */
+export function getRelativeImportPath(source: SourceFile, node: Node): string | undefined {
+  const moduleRelativePath = getImportPath(node);
 
   if (!moduleRelativePath) {
     return;
