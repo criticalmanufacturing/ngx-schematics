@@ -15,8 +15,7 @@
       "port": 0,
       "timeout": 120000
     },
-    "isLoadBalancerEnabled": false,
-    "useExternalAuthentication": false
+    "isLoadBalancerEnabled": false
   },
   "lboGenerator": {
     "enableSsl": false,
