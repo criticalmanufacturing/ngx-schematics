@@ -49,6 +49,11 @@
       "factory": "./wizard",
       "schema": "./wizard/schema.json"
     },
+    "wizard-step": {
+      "description": "Generate a new step with a column view.",
+      "factory": "./wizard-step",
+      "schema": "./wizard-step/schema.json"
+    },
     "wizard-create-edit": {
       "description": "Generates a new create edit wizard.",
       "factory": "./wizard-create-edit",
