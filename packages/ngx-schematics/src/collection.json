@@ -50,7 +50,7 @@
       "schema": "./wizard/schema.json"
     },
     "wizard-step": {
-      "description": "Generate a new step with a column view.",
+      "description": "Generate a new wizard step.",
       "factory": "./wizard-step",
       "schema": "./wizard-step/schema.json"
     },
