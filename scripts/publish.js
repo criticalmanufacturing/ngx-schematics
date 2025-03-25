@@ -45,7 +45,7 @@ packages.forEach(pack => {
 
 (async () => {
     // publish package as latest
-    await concurrently(packages.map(pack => `npm publish ${join(packagesDir, pack)}`), { raw: true }).result;
+    await concurrently(packages.map(pack => `npm publish ${join(packagesDir, pack)} --registry https://registry.npmjs.org/`), { raw: true }).result;
 
     // add other dist tags
     for (const tag of tags) {
