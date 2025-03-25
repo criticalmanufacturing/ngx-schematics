@@ -49,6 +49,6 @@ packages.forEach(pack => {
 
     // add other dist tags
     for (const tag of tags) {
-        await concurrently(packsInfo.map(({ name, version }) => `npm dist-tag add ${name}@${version} ${tag}`), { raw: true }).result;
+        await concurrently(packsInfo.map(({ name, version }) => `npm dist-tag add ${name}@${version} ${tag} --registry https://registry.npmjs.org/`), { raw: true }).result;
     }
 })();
