@@ -1,0 +1,335 @@
+import {
+    Component,
+    forwardRef,
+    OnInit,
+    input,
+    output,
+    inject
+} from '@angular/core';
+
+import {
+    CommonModule
+} from '@angular/common';
+
+import {
+    Cmf
+} from 'cmf-lbos';
+
+import {
+    CustomizableComponent,
+    HOST_VIEW_COMPONENT,
+    ResultMessageType,
+    UtilService
+} from 'cmf-core';
+
+import {
+    ValidatorModule,
+    OnValidateArgs,
+    ColumnViewModule,
+    ColumnViewSelectedArgs,
+    ColumnViewLeaf,
+    ColumnViewModel,
+    ColumnViewAddArgs,
+    ColumnViewLeafTag,
+    ColumnViewItem,
+    ColumnViewRemoveArgs,
+    ColumnViewLeafState
+} from 'cmf-core-controls';
+
+import {
+    PropertyViewerModule,
+    PropertyEditorModule,
+    PropertyContainerModule,
+    EntityPropertyViewerModule
+} from 'cmf-core-business-controls';
+
+
+/**
+ * <%= classify(name) %> tag type used in ColumnView elements
+ */
+type <%= classify(name) %>Tag = ColumnViewLeafTag & { entity: Cmf.Foundation.BusinessObjects.Entity };
+
+
+/**
+ * @whatItDoes
+ *
+ * Please provide a meaningful description of this component
+ * Try to answer these questions:
+ * * What is it?
+ * * What it does?
+ * * How does it behave with different sizes?
+ * * Does it retrieve data from any external source (server, local database, text file, etc...)?
+ *
+ * @howToUse
+ *
+ * This component is used with the inputs and outputs mentioned below.
+ *
+ * Besides the description above, please complement it with a meaningful description of this component that answer these questions:
+ * * How to use it?
+ * * Where and When to use it?
+ *
+ * ### Inputs
+ * `string` : **name** - The name of this component
+ * `number` : **value** - The value of this component
+ *
+ * ### Outputs
+ * `string` : **onNameChange** - When the name of the component change, this output emits the new name
+ * `number` : **onValueChange** - When the value of the component change, this output emits the new value
+ *
+ * ### Example
+ * To use the component, assume this HTML Template as an example:
+ *
+ * ```HTML
+ * <<%= dasherize(project) %>-page-<%= dasherize(name) %>></<%= dasherize(project) %>-page-<%= dasherize(name) %>>
+ * ```
+ *
+ * ### _NOTES_
+ * (optional, Provide additional notes here)
+ *
+ * @description
+ *
+ * ## <%= classify(name) %>Component Component
+ *
+ * ### Dependencies
+ *
+ * #### Components
+ * * ComponentA : `package`
+ * * ComponentB : `package`
+ *
+ * #### Services
+ * * ServiceA : `package`
+ * * ServiceB : `package`
+ *
+ * #### Directives
+ * * DirectiveA : `package`
+ * * DirectiveB : `package`
+ *
+ */
+@Component({
+    standalone: true,
+    selector: '<%= dasherize(project) %>-wizard-<%= dasherize(wizard) %>-step-<%= dasherize(name) %>',
+    imports: [
+        CommonModule,
+        ValidatorModule,
+        ColumnViewModule,
+        PropertyViewerModule,
+        PropertyEditorModule,
+        PropertyContainerModule,
+        EntityPropertyViewerModule
+    ],
+    templateUrl: './step-<%= dasherize(name) %>.component.html',
+    <% if (style !== 'none') { %>styleUrl: './step-<%= dasherize(name) %>.component.<%= style %>',<% } %>
+    viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Step<%= classify(name) %>Component) }]
+})
+export class Step<%= classify(name) %>Component extends CustomizableComponent implements OnInit {
+
+    /**
+     * Instance input
+     * @Input({ required: true })
+     */
+    public instance = input.required<Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>>();
+
+    /**
+    * Column view title
+    */
+    public columnViewTitle: string = $localize`:@@<%= dasherize(project) %>-wizard-<%= dasherize(wizard) %>#steps.step-<%= dasherize(name) %>.COLUMN_VIEW_TITLE:Materials`;
+
+    /**
+     * Selected Entities
+     */
+    public selectedEntities: Cmf.Foundation.BusinessObjects.Entity[] = [];
+
+    /**
+     * Selected Leaf
+     */
+    public selectedLeaf: ColumnViewLeaf<<%= classify(name) %>Tag> | null = null;
+
+    /**
+     * Model used by the ColumnView component that is shown on the template.
+     */
+    public columnViewModel: ColumnViewModel | null = null;
+
+    /**
+     * The entities changed event
+     * @Output()
+     */
+    public entitiesChanged = output<Cmf.Foundation.BusinessObjects.Entity[]>();
+
+    /**
+     * Services to inject
+     */
+    protected util = inject(UtilService);
+
+    /**
+     * Gets the HTML Name for Column View Row
+     * @param name row name
+     * @param description row description
+     */
+    private getHTMLForName(name: string, description: string) {
+        let html: string;
+
+        if (description) {
+            html =
+                `${name
+                    ? `<div class="row-top">${name}</div>`
+                    : `<div class="row-top cmf-placeholder-alike">${
+                        $localize`:@@<%= dasherize(project) %>-wizard-<%= dasherize(wizard) %>#steps.step-<%= dasherize(name) %>.NEW_ITEM:\
+New Item`}</div>`}
+                <div class="row-bottom">${description}</div>`;
+        } else if (name) {
+            html = `<div>${name}</div>`;
+        } else {
+            html = `<div class="cmf-placeholder-alike">${
+                $localize`:@@<%= dasherize(project) %>-wizard-<%= dasherize(wizard) %>#steps.step-<%= dasherize(name) %>.NEW_ITEM:\
+New Item`}</div>`;
+        }
+
+        html = `<div class="row-name-container"><div class="row-name">${html}</div></div>`;
+
+        return html;
+    }
+
+    /**
+     * Build an empty leaf
+     * @returns new leaf
+     */
+    private buildEmptyLeaf(): ColumnViewLeaf<<%= classify(name) %>Tag> {
+        const leafTag: <%= classify(name) %>Tag = {
+            id: this.util._.uniqueId('fields_'),
+            state: ColumnViewLeafState.Added,
+            valid: true,
+            entity: null
+        };
+
+        const newLeaf: ColumnViewLeaf<<%= classify(name) %>Tag> = {
+            id: this.util._.uniqueId('row_'),
+            name: this.getHTMLForName(null, null),
+            tag: leafTag,
+            value: null,
+            canRemove: true
+        };
+
+        return newLeaf;
+    }
+
+    /**
+     * Builds column view model
+     */
+    private buildColumnViewModel(): void {
+        this.columnViewModel = {
+            rootNode: {
+                id: 'root',
+                name: $localize`:@@<%= dasherize(project) %>-wizard-<%= dasherize(wizard) %>#steps.step-<%= dasherize(name) %>.ITEMS:Items`,
+                value: $localize`:@@<%= dasherize(project) %>-wizard-<%= dasherize(wizard) %>#steps.step-<%= dasherize(name) %>.VALUE:Value`,
+                children: [
+                    this.buildEmptyLeaf() // Only needed if we want the column view to start with an empty row
+                ]
+            }
+        };
+    }
+
+
+    /**
+     * Callback used for the "selected" sent by the ColumnView component that
+     * is used to display the sub-materials that will be detached by this
+     * Detach wizard.
+     *
+     * @param event The payload sent by the "(selected)" event of the ColumnView component.
+     * @returns Nothing.
+     */
+    public onSelectedRow(event: ColumnViewSelectedArgs): void {
+        this.selectedLeaf = event?.selectedRow?.rootNode as ColumnViewLeaf;
+    }
+
+    /**
+     * Adds a new row to the ColumnView
+     * @param event ColumnViewAddArgs
+     */
+    public onAddRow(event: ColumnViewAddArgs<<%= classify(name) %>Tag>): void {
+        const newLeaf: ColumnViewLeaf<<%= classify(name) %>Tag> = this.buildEmptyLeaf();
+
+        (this.columnViewModel.rootNode.children as ColumnViewItem[]).push(newLeaf);
+
+        event.add(true);
+
+        this.selectedLeaf = newLeaf;
+    }
+
+    /**
+     * Removes the selected row from the ColumnView
+     * @param event ColumnViewRemoveArgs
+     */
+    public onRemoveRow(event: ColumnViewRemoveArgs<<%= classify(name) %>Tag>) {
+        const entity = event.selectedRow.rootNode.tag.entity;
+        // Remove old entity from the selected list
+        if (entity != null) {
+            const oldEntityIndex = this.selectedEntities.findIndex(x => x.Id === entity.Id);
+            this.selectedEntities.splice(oldEntityIndex, 1);
+        }
+
+        event.remove(true);
+
+        if (this.columnViewModel.rootNode?.children?.length === 0 ||
+            (this.selectedLeaf?.tag?.entity?.Id != null && this.selectedLeaf?.tag?.entity?.Id === entity?.Id)) {
+            this.selectedLeaf = null;
+        }
+
+        this.entitiesChanged.emit(this.selectedEntities);
+    }
+
+    /**
+     * Entity selection change event handler
+     * @param newEntity new value for the entity
+     */
+    public onEntitySelectionChange(newEntity: Cmf.Foundation.BusinessObjects.Entity) {
+        if (this.selectedLeaf == null) {
+            return;
+        }
+
+        // Remove old entity from the selected list
+        if (this.selectedLeaf.tag.entity != null) {
+            const oldMaterialIndex = this.selectedEntities.findIndex(x => x.Id === this.selectedLeaf.tag.entity.Id);
+            this.selectedEntities.splice(oldMaterialIndex, 1);
+        }
+
+        // Add new entity to the selected list
+        if (newEntity != null) {
+            this.selectedEntities.push(newEntity);
+        }
+
+        this.selectedLeaf.tag.entity = newEntity;
+
+
+        this.selectedLeaf.name = this.getHTMLForName(newEntity?.Name, newEntity?.Description);
+        this.selectedLeaf.value = newEntity?.Id;
+    }
+
+    /**
+     * The validation for this component
+     *
+     * @param validationContext The validation context.
+     */
+    public onValidate(validationContext: OnValidateArgs): Promise<boolean> {
+        if (this.selectedEntities == null || this.selectedEntities.length === 0) {
+            if (validationContext.resultMessages == null) {
+                validationContext.resultMessages = [];
+            }
+
+            validationContext.resultMessages.push({
+                type: ResultMessageType.Error,
+                message: $localize`:@@<%= dasherize(project) %>-wizard-<%= dasherize(wizard) %>#steps.step-<%= dasherize(name) %>.ERROR_NO_ENTITY_SELECTED:It's \
+necessary to select at least one Entity to perform the operation.`,
+            });
+            return Promise.resolve(false);
+        }
+
+        return Promise.resolve(true);
+    }
+
+    /**
+     * OnInit event handler
+     */
+    public ngOnInit(): void {
+        this.buildColumnViewModel();
+    }
+}

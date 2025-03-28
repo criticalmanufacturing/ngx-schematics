@@ -1,0 +1,50 @@
+<div class="container" cmf-core-controls-validator>
+    <cmf-core-controls-columnView
+        [mainTitle]="columnViewTitle"
+        i18n-leafTitle="@@<%= dasherize(project) %>-wizard-<%= dasherize(wizard) %>#steps.step-<%= dasherize(name) %>.TITLE"
+        leafTitle="<%= nameify(name) %>"
+        [max-columns]="1"
+        [model]="columnViewModel"
+        [columnViewFlexWeight]="1"
+        [showActionAdd]="true"
+        [showActionRemove]="true"
+        [showColumnsHeader]="true"
+        [preSelectFirstRow]="true"
+        (selected)="onSelectedRow($event)"
+        (add)="onAddRow($event)"
+        (remove)="onRemoveRow($event)"
+        #columnView>
+
+        <leaf-content>
+            @if (selectedLeaf) {
+                <div class="content"> 
+                    <cmf-core-business-controls-propertyContainer>
+                        <!-- Entity to select (e.g. Area) -->
+                        <cmf-core-business-controls-propertyEditor
+                            i18n-label="@@<%= dasherize(project) %>-wizard-<%= dasherize(wizard) %>#steps.step-<%= dasherize(name) %>.ENTITY_TO_SELECT_LABEL"
+                            label="Entity to Select"
+                            valueType="ReferenceType"
+                            valueReferenceType="EntityType"
+                            referenceTypeName="Area"
+                            [required]="true"
+                            [value]="$any(selectedLeaf.tag).entity"
+                            (valueChange)="onEntitySelectionChange($event)">
+                        </cmf-core-business-controls-propertyEditor>
+
+                        @if (selectedLeaf?.tag?.entity) {
+                            <!-- Entity Description -->
+                            <cmf-core-business-controls-entityPropertyViewer
+                                [instance]="selectedLeaf.tag.entity"
+                                i18n-label="@@<%= dasherize(project) %>-wizard-<%= dasherize(wizard) %>#steps.step-<%= dasherize(name) %>.ENTITY_DESCRIPTION"
+                                label="Entity Description"
+                                property="Description"
+                                data-tag="EntityDescription">
+                            </cmf-core-business-controls-entityPropertyViewer>
+                        }
+
+                    </cmf-core-business-controls-propertyContainer>
+                </div>
+            }
+        </leaf-content>
+    </cmf-core-controls-columnView>
+</div>
