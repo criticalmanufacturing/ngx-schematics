@@ -1,0 +1,304 @@
+import {
+    Component,
+    forwardRef,
+    input,
+    inject,
+    signal,
+    computed,
+    OnChanges,
+    SimpleChanges,
+    ViewContainerRef
+} from '@angular/core';
+
+import { CommonModule } from '@angular/common';
+
+import { Cmf } from 'cmf-lbos';
+
+import { CustomizableComponent, HOST_VIEW_COMPONENT, ResultMessageType, UtilService } from 'cmf-core';
+
+import {
+    ValidatorModule,
+    OnValidateArgs,
+    ColumnViewModule,
+    ColumnViewSelectedArgs,
+    ColumnViewLeaf,
+    ColumnViewModel,
+    ColumnViewAddArgs,
+    ColumnViewRemoveArgs,
+    Validator
+} from 'cmf-core-controls';
+
+import {
+    PropertyViewerModule,
+    PropertyEditorModule,
+    PropertyContainerModule,
+} from 'cmf-core-business-controls';
+
+import Entity = Cmf.Foundation.BusinessObjects.Entity;
+
+/**
+ * Cenas tag type used in ColumnView elements
+ */
+interface DataRowTag {
+    data: Entity;
+}
+
+/**
+ * @whatItDoes
+ *
+ * Please provide a meaningful description of this component
+ * Try to answer these questions:
+ * * What is it?
+ * * What it does?
+ * * How does it behave with different sizes?
+ * * Does it retrieve data from any external source (server, local database, text file, etc...)?
+ *
+ * @howToUse
+ *
+ * This component is used with the inputs and outputs mentioned below.
+ *
+ * Besides the description above, please complement it with a meaningful description of this component that answer these questions:
+ * * How to use it?
+ * * Where and When to use it?
+ *
+ * ### Inputs
+ * `string` : **name** - The name of this component
+ * `number` : **value** - The value of this component
+ *
+ * ### Outputs
+ * `string` : **onNameChange** - When the name of the component change, this output emits the new name
+ * `number` : **onValueChange** - When the value of the component change, this output emits the new value
+ *
+ * ### Example
+ * To use the component, assume this HTML Template as an example:
+ *
+ * ```HTML
+ * <<%= dasherize(project) %>-page-<%= dasherize(name) %>></<%= dasherize(project) %>-page-<%= dasherize(name) %>>
+ * ```
+ *
+ * ### _NOTES_
+ * (optional, Provide additional notes here)
+ *
+ * @description
+ *
+ * ## <%= classify(name) %>Component Component
+ *
+ * ### Dependencies
+ *
+ * #### Components
+ * * ComponentA : `package`
+ * * ComponentB : `package`
+ *
+ * #### Services
+ * * ServiceA : `package`
+ * * ServiceB : `package`
+ *
+ * #### Directives
+ * * DirectiveA : `package`
+ * * DirectiveB : `package`
+ *
+ */
+@Component({
+    standalone: true,
+    selector: '<%= dasherize(project) %>-<%= dasherize(name) %>',
+    imports: [
+        CommonModule,
+        ValidatorModule,
+        ColumnViewModule,
+        PropertyViewerModule,
+        PropertyEditorModule,
+        PropertyContainerModule,
+    ],
+    hostDirectives: [Validator],
+    templateUrl: './<%= dasherize(name) %>.component.html',
+    <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>.component.<%= style %>',<% } %>
+    providers: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => StepCenasComponent) }]
+})
+export class <%= classify(name) %>Component extends CustomizableComponent implements OnChanges {
+    /** Column view initial data */
+    readonly data = input<Entity[]>([]);
+
+    /** Selected Leaf */
+    readonly selectedLeaf = signal<ColumnViewLeaf<DataRowTag>>(null);
+
+    /** Model used by the ColumnView component that is shown on the template. */
+    readonly model = computed(() => this._computeModel());
+
+    /** Services to inject */
+    protected readonly _util = inject(UtilService);
+
+    /** Column view leafs. */
+    protected _leafs = signal<ColumnViewLeaf<DataRowTag>[]>([]);
+
+    /** Messages. */
+    protected readonly _messages = {
+        noItemSelected: $localize`No Item Selected`,
+        noItemsFound: $localize`No Items Found`
+    };
+
+    /** Column view internal model. */
+    private _internalModel: ColumnViewModel = {
+        rootNode: {
+            id: 'root',
+            name: $localize`Items`,
+            value: $localize`Value`,
+            children: []
+        }
+    };
+
+    constructor(viewContainerRef: ViewContainerRef) {
+        super(viewContainerRef);
+
+        this._leafs.set(this._computeColumnViewLeafs());
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if ('data' in changes) {
+            this._leafs.set(this._computeColumnViewLeafs());
+        }
+    }
+
+    /**
+     * The validation for this component
+     * @param context The validation context.
+     */
+    async onValidate(context: OnValidateArgs): Promise<boolean> {
+        context.resultMessages ??= [];
+
+        if (this.getNewData().length === 0) {
+            context.resultMessages.push({
+                type: ResultMessageType.Error,
+                message: $localize`It's necessary to select at least one Entity to perform the operation.`
+            });
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Fetches the column view data.
+     * @returns the selected entities.
+     */
+    getNewData(): Entity[] {
+        return this._leafs()
+            .map(leaf => leaf.tag.data)
+            .filter(data => data != null);
+    }
+
+    /**
+     * Callback used for the "selected" sent by the ColumnView component that
+     * is used to display the sub-materials that will be detached by this
+     * Detach wizard.
+     * @param event The payload sent by the "(selected)" event of the ColumnView component.
+     * @returns Nothing.
+     */
+    protected _onSelectedRow(event: ColumnViewSelectedArgs): void {
+        this.selectedLeaf.set(event?.selectedRow?.rootNode as ColumnViewLeaf);
+    }
+
+    /**
+     * Adds a new row to the ColumnView
+     * @param event ColumnViewAddArgs
+     */
+    protected _onAddRow(event: ColumnViewAddArgs<DataRowTag>): void {
+        const newLeaf = this._buildEmptyLeaf();
+        this._leafs.update(leafs => [...leafs, newLeaf]);
+
+        event.add(true);
+        this.selectedLeaf.set(newLeaf);
+    }
+
+    /**
+     * Removes the selected row from the ColumnView
+     * @param event ColumnViewRemoveArgs
+     */
+    protected _onRemoveRow(event: ColumnViewRemoveArgs<DataRowTag>) {
+        this._leafs.update(leafs => leafs.filter(leaf => leaf !== event.selectedRow.rootNode));
+
+        event.remove(true);
+        this.selectedLeaf.set(null);
+    }
+
+    /**
+     * Entity selection change event handler
+     * @param newEntity new value for the entity
+     */
+    protected _onEntitySelected(newEntity: Entity) {
+        if (this.selectedLeaf == null) {
+            return;
+        }
+
+        this.selectedLeaf().tag.data = newEntity;
+        this.selectedLeaf().name = this._getRowName(newEntity);
+    }
+
+    /**
+     * Computes the column view model.
+     */
+    private _computeModel(): ColumnViewModel {
+        const leafs = this._leafs();
+        this._internalModel.rootNode.children = leafs;
+
+        return this._internalModel;
+    }
+
+    /**
+     * Computes the column view leafs.
+     */
+    private _computeColumnViewLeafs(): ColumnViewLeaf<DataRowTag>[] {
+        const data = this.data();
+
+        if (data == null) {
+            return [];
+        }
+
+        return data.map(
+            dataRow =>
+                ({
+                    id: this._util._.uniqueId('leaf_'),
+                    name: this._getRowName(dataRow),
+                    value: '',
+                    tag: {
+                        data: dataRow
+                    }
+                } satisfies ColumnViewLeaf<DataRowTag>)
+        );
+    }
+
+    /**
+     * Gets the HTML Name for Column View Row
+     * @param name row name
+     * @param description row description
+     */
+    private _getRowName(data: Entity) {
+        return `\
+<div class="property-row">\
+    ${
+        data
+            ? `\
+    <div class="cmf-truncate">${data.Name}</div>
+    ${data.Description ? `<div class="cmf-truncate">${data.Description}</div>` : ''}`
+            : `\
+    <div class= "cmf-placeholder-alike" >${$localize`:@@cmf-core-controls-wizard-coisas#steps.step-cenas.NEW_ITEM:New Item`}</div>`
+    }
+</div>`;
+    }
+
+    /**
+     * Build an empty leaf
+     * @returns new leaf
+     */
+    private _buildEmptyLeaf(): ColumnViewLeaf<DataRowTag> {
+        return {
+            id: this._util._.uniqueId('row_'),
+            name: this._getRowName(null),
+            value: null,
+            canRemove: true,
+            tag: {
+                data: null
+            }
+        };
+    }
+}
