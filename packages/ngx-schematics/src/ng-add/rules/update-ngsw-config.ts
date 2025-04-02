@@ -42,7 +42,7 @@ export function updateNgswConfig(options: { project: string }): Rule {
     }
 
     if (assetsAssetGroup) {
-      addAssets(assetsAssetGroup, ['!/assets/config.json', '/media/**']);
+      addAssets(assetsAssetGroup, ['!/assets/config.json', '/media/**', '!/ngsw-loader-worker.js']);
     }
 
     ngswConfig['dataGroups'] ??= [];

@@ -15,6 +15,11 @@
       "version": "11.0.4",
       "description": "Updates service worker ngsw-config.json.",
       "factory": "./migrations/update-11-0-4"
+    },
+    "update-11-0-8": {
+      "version": "11.0.8",
+      "description": "Updates service worker ngsw-config.json.",
+      "factory": "./migrations/update-11-0-8"
     }
   }
 }
