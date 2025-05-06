@@ -14,6 +14,7 @@
 - [widget](#widget)
 - [wizard](#wizard)
 - [wizard-create-edit](#wizard-create-edit)
+- [wizard-step](#wizard-step)
 - [page](#page)
 - [doc](#doc)
 
@@ -252,6 +253,30 @@ Creates a new, generic Wizard Create Edit definition in the given or default pro
 | `--entity-type` | The name of the entity type.          | `string`   |               |
 | `--namespace`   | The namespace of the entity type.     | `string`   |               |
 | `--style`       | The processor to use for style files. | `string`   | `less`        |
+
+#### **Usage:**
+
+```
+ng generate wizard-create-edit [name]
+```
+
+### **wizard-step**
+
+Creates a new, generic Wizard Step in the given or default project
+
+#### **Arguments:**
+
+| Name       | Description                  | Value Type |
+| ---------- | ---------------------------- | ---------- |
+| `name`     | The name of the wizard step. | `string`   |
+| `stepType` | The type of the step.        | `string`   |
+
+#### **Options:**
+
+| Name        | Description                           | Value Type | Default Value |
+| ----------- | ------------------------------------- | ---------- | ------------- |
+| `--project` | The name of the project.              | `string`   |               |
+| `--style`   | The processor to use for style files. | `string`   | `less`        |
 
 #### **Usage:**
 
