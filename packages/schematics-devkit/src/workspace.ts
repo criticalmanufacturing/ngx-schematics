@@ -81,6 +81,23 @@ export function listNpmReleaseTags(pkg: string, version?: string): Promise<strin
 }
 
 /**
+ * Remove the provided element from a json array
+ * @param array the array
+ * @param elementToRemove the element to remove
+ */
+export function removeFromJsonArray(array: JsonArray, elementsToRemove: any[]): void {
+  elementsToRemove.forEach((toRemove) => {
+    const indexToRemove = array.findIndex((existing) =>
+      isDeepStrictEqual(typeof existing === 'object' ? { ...existing } : existing, toRemove)
+    );
+
+    if (indexToRemove >= 0) {
+      array.splice(indexToRemove, 1);
+    }
+  });
+}
+
+/**
  * Adds elements to json array if not already present.
  * @param array array of elements
  * @param elementsToAdd elements to add to array
