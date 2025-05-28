@@ -13,11 +13,7 @@ describe('Generate Library', () => {
     require.resolve('../collection.json')
   );
 
-  const workspaceOptions = {
-    name: 'workspace',
-    newProjectRoot: 'projects',
-    version: '10.0.0'
-  };
+  const workspaceOptions = { name: 'workspace', newProjectRoot: 'projects', version: '10.0.0' };
 
   const appOptions = {
     name: 'app',
@@ -33,7 +29,7 @@ describe('Generate Library', () => {
     skipPackageJson: false,
     skipTsConfig: false,
     skipInstall: false,
-    namespace: "@testlib"
+    namespace: '@testlib'
   };
 
   let appTree: UnitTestTree;
@@ -60,34 +56,35 @@ describe('Generate Library', () => {
 
     expect(files).toEqual(
       jasmine.arrayContaining([
-        `projects/${libraryOptions.name}/src/lib/tasks/${libraryOptions.name}/${libraryOptions.name}-settings.component.html`, 
-        `projects/${libraryOptions.name}/src/lib/tasks/${libraryOptions.name}/${libraryOptions.name}-settings.component.ts`, 
-        `projects/${libraryOptions.name}/src/lib/tasks/${libraryOptions.name}/${libraryOptions.name}-settings.component.less`, 
-        `projects/${libraryOptions.name}/src/lib/tasks/${libraryOptions.name}/${libraryOptions.name}.task-designer.ts`, 
-        `projects/${libraryOptions.name}/src/lib/tasks/${libraryOptions.name}/${libraryOptions.name}.task-module.ts`, 
-        `projects/${libraryOptions.name}/src/lib/tasks/${libraryOptions.name}/${libraryOptions.name}.task.ts`, 
+        `projects/${libraryOptions.name}/src/lib/tasks/${libraryOptions.name}/${libraryOptions.name}-settings.component.html`,
+        `projects/${libraryOptions.name}/src/lib/tasks/${libraryOptions.name}/${libraryOptions.name}-settings.component.ts`,
+        `projects/${libraryOptions.name}/src/lib/tasks/${libraryOptions.name}/${libraryOptions.name}-settings.component.less`,
+        `projects/${libraryOptions.name}/src/lib/tasks/${libraryOptions.name}/${libraryOptions.name}.task-designer.ts`,
+        `projects/${libraryOptions.name}/src/lib/tasks/${libraryOptions.name}/${libraryOptions.name}.task-module.ts`,
+        `projects/${libraryOptions.name}/src/lib/tasks/${libraryOptions.name}/${libraryOptions.name}.task.ts`,
 
-        `projects/${libraryOptions.name}/test/unit/tasks/${libraryOptions.name}/${libraryOptions.name}.task.test.ts`, 
+        `projects/${libraryOptions.name}/test/unit/tasks/${libraryOptions.name}/${libraryOptions.name}.task.test.ts`,
 
-        `projects/${libraryOptions.name}/src/public-api-designer.ts`, 
-        `projects/${libraryOptions.name}/src/public-api-runtime.ts`, 
-        
-        `projects/${libraryOptions.name}/metadata/src/lib/metadata.ts`, 
-        `projects/${libraryOptions.name}/metadata/src/public-api.ts`, 
-        `projects/${libraryOptions.name}/metadata/ng-package.json`, 
+        `projects/${libraryOptions.name}/src/public-api-designer.ts`,
+        `projects/${libraryOptions.name}/src/public-api-runtime.ts`,
 
-        `projects/${libraryOptions.name}/test/unit/tsconfig.json`, 
+        `projects/${libraryOptions.name}/metadata/src/lib/metadata.ts`,
+        `projects/${libraryOptions.name}/metadata/src/public-api.ts`,
+        `projects/${libraryOptions.name}/metadata/ng-package.json`,
 
-        `projects/${libraryOptions.name}/tsconfig.spec.json`, 
-        `projects/${libraryOptions.name}/tsconfig.lib.json`, 
-        `projects/${libraryOptions.name}/tsconfig.lib.prod.json`, 
-        `projects/${libraryOptions.name}/tsconfig.lib.runtime.json`, 
-        `projects/${libraryOptions.name}/ng-package.json`, 
-        `projects/${libraryOptions.name}/packConfig.json`, 
-        `projects/${libraryOptions.name}/package.json`, 
+        `projects/${libraryOptions.name}/test/unit/tsconfig.json`,
+
+        `projects/${libraryOptions.name}/tsconfig.spec.json`,
+        `projects/${libraryOptions.name}/tsconfig.lib.json`,
+        `projects/${libraryOptions.name}/tsconfig.lib.prod.json`,
+        `projects/${libraryOptions.name}/tsconfig.lib.runtime.json`,
+        `projects/${libraryOptions.name}/ng-package.json`,
+        `projects/${libraryOptions.name}/packConfig.json`,
+        `projects/${libraryOptions.name}/package.json`,
 
         `projects/${libraryOptions.name}/.gitignore`,
-        `projects/${libraryOptions.name}/README.md`])
+        `projects/${libraryOptions.name}/README.md`
+      ])
     );
   });
 
@@ -106,22 +103,22 @@ describe('Generate Library', () => {
 
   it(`should have a linter in the package.json`, async () => {
     const tree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
-    
-    const packageJsonContent = getFileContent(tree, `/projects/${libraryOptions.name}/package.json`);
+
+    const packageJsonContent = getFileContent(
+      tree,
+      `/projects/${libraryOptions.name}/package.json`
+    );
     expect(packageJsonContent.scripts.lint).toBeDefined();
     expect(packageJsonContent.scripts.lint).toBe('ng lint');
   });
 
   it('should use default value for baseDir and entryFile', async () => {
     const name = 'test-default-values';
-    const namespace = "@testlib";
+    const namespace = '@testlib';
 
     const tree = await schematicRunner.runSchematic(
       'library',
-      {
-        name: name,
-        namespace: namespace
-      },
+      { name: name, namespace: namespace },
       appTree
     );
     expect(tree.files).toContain(`/projects/${name}/src/public-api-designer.ts`);
@@ -160,14 +157,10 @@ describe('Generate Library', () => {
   });
 
   it(`should not modify the file when --skipPackageJson`, async () => {
-    const namespace = "@testlib";
+    const namespace = '@testlib';
     const tree = await schematicRunner.runSchematic(
       'library',
-      {
-        name: 'test-skip-package-json',
-        skipPackageJson: true,
-        namespace: namespace
-      },
+      { name: 'test-skip-package-json', skipPackageJson: true, namespace: namespace },
       appTree
     );
 
@@ -180,19 +173,15 @@ describe('Generate Library', () => {
 
     const tsConfigJson = getFileContent(tree, 'tsconfig.json');
     expect(tsConfigJson.compilerOptions.paths[`${libraryOptions.name}`]).toEqual([
-      `dist/${libraryOptions.name}`
+      `./dist/${libraryOptions.name}`
     ]);
   });
 
   it(`should not modify the file when --skipTsConfig`, async () => {
-    const namespace = "@testlib";
+    const namespace = '@testlib';
     const tree = await schematicRunner.runSchematic(
       'library',
-      {
-        name: 'test-skip-tsconfig',
-        skipTsConfig: true,
-        namespace: namespace
-      },
+      { name: 'test-skip-tsconfig', skipTsConfig: true, namespace: namespace },
       appTree
     );
 

@@ -5,6 +5,7 @@ on:
 
 jobs:
   test:
+    name: Run Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -19,8 +20,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Build packages
+        run: npm run build
+
       - name: Run schematics tests
         run: npm run test
-
-      - name: Run schematics iot tests
-        run: npm run test:iot

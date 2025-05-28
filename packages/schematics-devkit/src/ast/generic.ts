@@ -2,6 +2,7 @@ import { dirname, isAbsolute, join, normalize } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
 import {
   ArrayLiteralExpression,
+  ImportSpecifier,
   Node,
   ObjectLiteralElementLike,
   ObjectLiteralExpression,
@@ -189,20 +190,24 @@ export function updateObjectArrayProperty(
 }
 
 /**
+ * Retrives the import specifier of the given node
+ * @param node the node to search the import
+ */
+export function getImportSpecifier(node: Node): ImportSpecifier | undefined {
+  return node
+    .getSourceFile()
+    .getImportDeclarations()
+    .flatMap((impNode) => impNode.getNamedImports())
+    .find((imp) => (imp.getAliasNode()?.getText() ?? imp.getName()) === node.getText());
+}
+
+/**
  * Retrives the import path of the given node
  * @param node the node to search the import
  */
 export function getImportPath(node: Node): string | undefined {
   const importPath =
-    node
-      .getSourceFile()
-      .getImportDeclarations()
-      .find((impNode) =>
-        impNode
-          .getNamedImports()
-          .some((imp) => (imp.getAliasNode()?.getText() ?? imp.getName()) === node.getText())
-      )
-      ?.getModuleSpecifierValue() ??
+    getImportSpecifier(node)?.getImportDeclaration().getModuleSpecifierValue() ??
     node
       .getSourceFile()
       .getDescendantsOfKind(SyntaxKind.CallExpression)

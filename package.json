@@ -16,19 +16,18 @@
     "ts-morph": "^21.0.1"
   },
   "devDependencies": {
-    "@angular-devkit/schematics-cli": "^17.1.1",
-    "@types/inquirer": "^9.0.7",
-    "@types/jasmine": "^5.1.4",
-    "@types/node": "^20.11.10",
+    "@angular-devkit/schematics-cli": "^17.3.17",
+    "@types/inquirer": "^9.0.8",
+    "@types/jasmine": "^5.1.8",
+    "@types/node": "^20.17.52",
     "concurrently": "^8.2.2",
-    "jasmine": "^5.1.0",
-    "prettier": "^3.2.4",
-    "typescript": "~5.3.3"
+    "jasmine": "^5.7.1",
+    "prettier": "^3.5.3",
+    "typescript": "^5.3.3"
   },
   "scripts": {
     "build": "npm run build -w ./packages/schematics-devkit && concurrently \"npm run build -w ./packages/ngx-schematics\" \"npm run build -w ./packages/ngx-iot-schematics\" -r",
-    "test": "npm run test -w ./packages/ngx-schematics",
-    "test:iot": "npm run test -w ./packages/ngx-iot-schematics"
+    "test": "npm run test -w ./packages/ngx-schematics -w ./packages/ngx-iot-schematics"
   },
   "author": "Critical Manufacturing",
   "license": "ISC",
