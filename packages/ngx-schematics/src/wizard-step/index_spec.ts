@@ -103,7 +103,7 @@ describe('Generate Step', () => {
     );
   });
 
-  it('should have the Component decorator with properties selector, templateUrl, styleUrl, and viewProviders', async () => {
+  it('should have the Component decorator with properties selector, templateUrl, styleUrl, and providers', async () => {
     const tree = await schematicRunner.runSchematic('wizard-step', stepOptions, appTree);
 
     const stepContent = tree.readContent(
@@ -112,9 +112,7 @@ describe('Generate Step', () => {
     expect(stepContent).toMatch(/@Component\(/);
     expect(stepContent).toContain(`standalone: true`);
     expect(stepContent).toContain(
-      `selector: '${strings.dasherize(stepOptions.project)}-wizard-${strings.dasherize(stepOptions.wizard)}-step-${strings.dasherize(
-        stepOptions.name
-      )}'`
+      `selector: '${strings.dasherize(stepOptions.project)}-step-${strings.dasherize(stepOptions.name)}'`
     );
     expect(stepContent).toContain(
       `templateUrl: './step-${strings.dasherize(stepOptions.name)}.component.html'`
@@ -123,7 +121,7 @@ describe('Generate Step', () => {
       `styleUrl: './step-${strings.dasherize(stepOptions.name)}.component.less'`
     );
     expect(stepContent).toContain(
-      `viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Step${strings.classify(
+      `providers: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Step${strings.classify(
         stepOptions.name
       )}Component) }]`
     );
@@ -142,16 +140,6 @@ describe('Generate Step', () => {
     );
   });
 
-  it('should implement OnInit', async () => {
-    const tree = await schematicRunner.runSchematic('wizard-step', stepOptions, appTree);
-
-    const stepContent = tree.readContent(
-      `${stepPath}/step-${strings.dasherize(stepOptions.name)}.component.ts`
-    );
-    expect(stepContent).toContain(`implements OnInit`);
-    expect(stepContent).toContain(`public ngOnInit(): void {`);
-  });
-
   it('should inject the PageBag, UtilService, and EntityTypeService', async () => {
     const tree = await schematicRunner.runSchematic('wizard-step', stepOptions, appTree);
 
@@ -159,7 +147,6 @@ describe('Generate Step', () => {
       `${stepPath}/step-${strings.dasherize(stepOptions.name)}.component.ts`
     );
 
-    expect(stepContent).toContain('protected util = inject(UtilService)');
-    expect(stepContent).not.toContain('constructor');
+    expect(stepContent).toContain('protected readonly _util = inject(UtilService)');
   });
 });

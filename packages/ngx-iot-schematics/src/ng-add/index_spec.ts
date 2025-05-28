@@ -7,10 +7,7 @@ describe('Test ng-add', () => {
     require.resolve('../collection.json')
   );
 
-  const workspaceOptions = {
-    name: 'workspace',
-    version: '10.0.0'
-  };
+  const workspaceOptions = { name: 'workspace', version: '10.0.0' };
 
   const appOptions = {
     name: 'application',
@@ -21,11 +18,7 @@ describe('Test ng-add', () => {
     skipPackageJson: false
   };
 
-  const ngAddOptions = {
-    project: 'application',
-    application: 'Core',
-    version: 'dev'
-  };
+  const ngAddOptions = { project: 'application', application: 'Core', version: 'dev' };
 
   let appTree: UnitTestTree;
 
@@ -67,7 +60,7 @@ describe('Test ng-add', () => {
         '/application/src/main.ts',
         '/application/src/styles.css',
         '/application/src/assets/.gitkeep',
-        '/application/src/app/app.module.ts',
+        '/application/src/app/app.config.ts',
         '/application/src/app/app.component.html',
         '/application/src/app/app.component.spec.ts',
         '/application/src/app/app.component.ts',

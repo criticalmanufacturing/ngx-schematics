@@ -100,7 +100,7 @@ interface DataRowTag {
  */
 @Component({
     standalone: true,
-    selector: '<%= dasherize(project) %>-<%= dasherize(name) %>',
+    selector: '<%= dasherize(project) %>-step-<%= dasherize(name) %>',
     imports: [
         CommonModule,
         ValidatorModule,
@@ -110,11 +110,11 @@ interface DataRowTag {
         PropertyContainerModule,
     ],
     hostDirectives: [Validator],
-    templateUrl: './<%= dasherize(name) %>.component.html',
-    <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>.component.<%= style %>',<% } %>
-    providers: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => StepCenasComponent) }]
+    templateUrl: './step-<%= dasherize(name) %>.component.html',
+    <% if (style !== 'none') { %>styleUrl: './step-<%= dasherize(name) %>.component.<%= style %>',<% } %>
+    providers: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Step<%= classify(name) %>Component) }]
 })
-export class <%= classify(name) %>Component extends CustomizableComponent implements OnChanges {
+export class Step<%= classify(name) %>Component extends CustomizableComponent implements OnChanges {
     /** Column view initial data */
     readonly data = input<Entity[]>([]);
 
