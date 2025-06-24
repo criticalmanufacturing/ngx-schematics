@@ -34,7 +34,7 @@ _No arguments available._
 | --------------- | -------------------------------- | ---------- | ------------- |
 | `--project`     | The name of the project.         | `string`   |               |
 | `--registry`    | The npm registry to use.         | `string`   |               |
-| `--lint`        | Adds eslint to the project.      | `boolean`  | `true`        |
+| `--eslint`      | Adds eslint to the project.      | `boolean`  | `true`        |
 | `--application` | The base application to be used. | `string`   | `MES`         |
 | `--version`     | The version to be used.          | `string`   |               |
 
