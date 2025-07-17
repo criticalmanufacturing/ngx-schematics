@@ -9,15 +9,8 @@ cmf-core-controls-columnview {
 
 :host {
     cmf-core-controls-columnview {
-        ::ng-deep .cmf-core-controls-columnViewRow {
-            line-height: unset;
-
-            .property-row {
-                display: flex;
-                flex-direction: column;
-                height: 100%;
-                justify-content: center;
-            }
+        ::ng-deep .row-container {
+            white-space: pre;
         }
     }
 }

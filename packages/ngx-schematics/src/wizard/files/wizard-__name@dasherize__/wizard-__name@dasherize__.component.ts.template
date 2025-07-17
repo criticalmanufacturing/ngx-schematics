@@ -52,14 +52,6 @@ import {
  * * How to use it?
  * * Where and When to use it?
  *
- * ### Inputs
- * `string` : **name** - The name of this component
- * `number` : **value** - The value of this component
- *
- * ### Outputs
- * `string` : **onNameChange** - When the name of the component change, this output emits the new name
- * `number` : **onValueChange** - When the value of the component change, this output emits the new value
- *
  * ### Example
  * To use the component, assume this HTML Template as an example:
  *
@@ -73,20 +65,6 @@ import {
  * @description
  *
  * ## <%= classify(name) %>Component Component
- *
- * ### Dependencies
- *
- * #### Components
- * * ComponentA : `package`
- * * ComponentB : `package`
- *
- * #### Services
- * * ServiceA : `package`
- * * ServiceB : `package`
- *
- * #### Directives
- * * DirectiveA : `package`
- * * DirectiveB : `package`
  *
  */
 @Component({

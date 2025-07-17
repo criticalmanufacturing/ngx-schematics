@@ -3,8 +3,6 @@ import {
     forwardRef,
     input,
     inject,
-    signal,
-    computed,
     OnChanges,
     SimpleChanges,
     ViewContainerRef
@@ -61,14 +59,6 @@ interface DataRowTag {
  * * How to use it?
  * * Where and When to use it?
  *
- * ### Inputs
- * `string` : **name** - The name of this component
- * `number` : **value** - The value of this component
- *
- * ### Outputs
- * `string` : **onNameChange** - When the name of the component change, this output emits the new name
- * `number` : **onValueChange** - When the value of the component change, this output emits the new value
- *
  * ### Example
  * To use the component, assume this HTML Template as an example:
  *
@@ -82,20 +72,6 @@ interface DataRowTag {
  * @description
  *
  * ## <%= classify(name) %>Component Component
- *
- * ### Dependencies
- *
- * #### Components
- * * ComponentA : `package`
- * * ComponentB : `package`
- *
- * #### Services
- * * ServiceA : `package`
- * * ServiceB : `package`
- *
- * #### Directives
- * * DirectiveA : `package`
- * * DirectiveB : `package`
  *
  */
 @Component({
@@ -119,25 +95,10 @@ export class Step<%= classify(name) %>Component extends CustomizableComponent im
     readonly data = input<Entity[]>([]);
 
     /** Selected Leaf */
-    readonly selectedLeaf = signal<ColumnViewLeaf<DataRowTag>>(null);
+    selectedLeaf: ColumnViewLeaf<DataRowTag> = null;
 
     /** Model used by the ColumnView component that is shown on the template. */
-    readonly model = computed(() => this._computeModel());
-
-    /** Services to inject */
-    protected readonly _util = inject(UtilService);
-
-    /** Column view leafs. */
-    protected _leafs = signal<ColumnViewLeaf<DataRowTag>[]>([]);
-
-    /** Messages. */
-    protected readonly _messages = {
-        noItemSelected: $localize`No Item Selected`,
-        noItemsFound: $localize`No Items Found`
-    };
-
-    /** Column view internal model. */
-    private _internalModel: ColumnViewModel = {
+    readonly model: ColumnViewModel<DataRowTag> = {
         rootNode: {
             id: 'root',
             name: $localize`Items`,
@@ -146,15 +107,21 @@ export class Step<%= classify(name) %>Component extends CustomizableComponent im
         }
     };
 
-    constructor(viewContainerRef: ViewContainerRef) {
-        super(viewContainerRef);
+    /** Services to inject */
+    protected readonly _util = inject(UtilService);
 
-        this._leafs.set(this._computeColumnViewLeafs());
-    }
+    /** Column View Util */
+    protected readonly _columnViewUtil = inject(ColumnViewUtil);
+
+    /** Messages. */
+    protected readonly _messages = {
+        noItemSelected: $localize`No Item Selected`,
+        noItemsFound: $localize`No Items Found`
+    };
 
     ngOnChanges(changes: SimpleChanges): void {
         if ('data' in changes) {
-            this._leafs.set(this._computeColumnViewLeafs());
+            this.model.rootNode.children = this._buildColumnViewModel();
         }
     }
 
@@ -162,7 +129,7 @@ export class Step<%= classify(name) %>Component extends CustomizableComponent im
      * The validation for this component
      * @param context The validation context.
      */
-    async onValidate(context: OnValidateArgs): Promise<boolean> {
+    onValidate(context: OnValidateArgs): Promise<boolean> {
         context.resultMessages ??= [];
 
         if (this.getNewData().length === 0) {
@@ -171,10 +138,10 @@ export class Step<%= classify(name) %>Component extends CustomizableComponent im
                 message: $localize`It's necessary to select at least one Entity to perform the operation.`
             });
 
-            return false;
+            return Promise.resolve(false);
         }
 
-        return true;
+        return Promise.resolve(true);
     }
 
     /**
@@ -182,7 +149,7 @@ export class Step<%= classify(name) %>Component extends CustomizableComponent im
      * @returns the selected entities.
      */
     getNewData(): Entity[] {
-        return this._leafs()
+        return (this.model.rootNode.children as ColumnViewLeaf<DataRowTag>[])
             .map(leaf => leaf.tag.data)
             .filter(data => data != null);
     }
@@ -195,7 +162,7 @@ export class Step<%= classify(name) %>Component extends CustomizableComponent im
      * @returns Nothing.
      */
     protected _onSelectedRow(event: ColumnViewSelectedArgs): void {
-        this.selectedLeaf.set(event?.selectedRow?.rootNode as ColumnViewLeaf);
+        this.selectedLeaf = event?.selectedRow?.rootNode as ColumnViewLeaf<DataRowTag>;
     }
 
     /**
@@ -204,10 +171,10 @@ export class Step<%= classify(name) %>Component extends CustomizableComponent im
      */
     protected _onAddRow(event: ColumnViewAddArgs<DataRowTag>): void {
         const newLeaf = this._buildEmptyLeaf();
-        this._leafs.update(leafs => [...leafs, newLeaf]);
+        (this.model.rootNode.children as ColumnViewLeaf<DataRowTag>[]).push(newLeaf);
 
-        event.add(true);
-        this.selectedLeaf.set(newLeaf);
+        void event.add(true);
+        this.selectedLeaf = newLeaf;
     }
 
     /**
@@ -215,10 +182,8 @@ export class Step<%= classify(name) %>Component extends CustomizableComponent im
      * @param event ColumnViewRemoveArgs
      */
     protected _onRemoveRow(event: ColumnViewRemoveArgs<DataRowTag>) {
-        this._leafs.update(leafs => leafs.filter(leaf => leaf !== event.selectedRow.rootNode));
-
         event.remove(true);
-        this.selectedLeaf.set(null);
+        this.selectedLeaf = null;
     }
 
     /**
@@ -230,24 +195,14 @@ export class Step<%= classify(name) %>Component extends CustomizableComponent im
             return;
         }
 
-        this.selectedLeaf().tag.data = newEntity;
-        this.selectedLeaf().name = this._getRowName(newEntity);
-    }
-
-    /**
-     * Computes the column view model.
-     */
-    private _computeModel(): ColumnViewModel {
-        const leafs = this._leafs();
-        this._internalModel.rootNode.children = leafs;
-
-        return this._internalModel;
+        this.selectedLeaf.tag.data = newEntity;
+        this.selectedLeaf.name = this._getRowName(newEntity);
     }
 
     /**
      * Computes the column view leafs.
      */
-    private _computeColumnViewLeafs(): ColumnViewLeaf<DataRowTag>[] {
+    private _buildColumnViewModel(): ColumnViewLeaf<DataRowTag>[] {
         const data = this.data();
 
         if (data == null) {
@@ -273,17 +228,12 @@ export class Step<%= classify(name) %>Component extends CustomizableComponent im
      * @param description row description
      */
     private _getRowName(data: Entity) {
-        return `\
-<div class="property-row">\
-    ${
-        data
-            ? `\
-    <div class="cmf-truncate">${data.Name}</div>
-    ${data.Description ? `<div class="cmf-truncate">${data.Description}</div>` : ''}`
-            : `\
-    <div class= "cmf-placeholder-alike" >${$localize`:@@cmf-core-controls-wizard-coisas#steps.step-cenas.NEW_ITEM:New Item`}</div>`
-    }
-</div>`;
+        return this._columnViewUtil.buildHTMLForLeaf(
+            data.Name,
+            data.Description,
+            $localize`:@@cmf-core-controls-wizard-coisas#steps.step-cenas.NEW_ITEM:New Item`,
+            null
+        );
     }
 
     /**

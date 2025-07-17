@@ -9,12 +9,12 @@
     [showActionRemove]="true"
     [showColumnsHeader]="true"
     [preSelectFirstRow]="true"
-    [model]="model()"
+    [model]="model"
     (selected)="_onSelectedRow($event)"
     (add)="_onAddRow($event)"
     (remove)="_onRemoveRow($event)">
     <leaf-content>
-        @if (selectedLeaf()) {
+        @if (selectedLeaf) {
         <cmf-core-business-controls-propertyContainer>
             <cmf-core-business-controls-propertyEditor
                 i18n-label
@@ -23,22 +23,22 @@
                 valueReferenceType="EntityType"
                 referenceTypeName="Area"
                 [required]="true"
-                [value]="selectedLeaf()?.tag.data"
+                [value]="selectedLeaf?.tag.data"
                 (valueChange)="_onEntitySelected($event)">
             </cmf-core-business-controls-propertyEditor>
 
-            @if (selectedLeaf()?.tag.data) {
+            @if (selectedLeaf?.tag.data) {
             <cmf-core-business-controls-propertyViewer
                 i18n-label
                 label="Entity Description"
                 valueType="String"
-                [value]="selectedLeaf().tag.data.Description">
+                [value]="selectedLeaf.tag.data.Description">
             </cmf-core-business-controls-propertyViewer>
             }
         </cmf-core-business-controls-propertyContainer>
         } @else {
         <div class="cmf-placeholder-alike align-center" i18n>
-            {{ _leafs().length > 0 ? _messages.noItemSelected : _messages.noItemsFound }}
+            {{ model.rootNode.children.length > 0 ? _messages.noItemSelected : _messages.noItemsFound }}
         </div>
         }
     </leaf-content>
