@@ -50,7 +50,7 @@ describe('Test ng-update', () => {
     );
   });
 
-  describe('- Migrate to v2.0', () => {
+  describe('- Migrate to v11.0.4', () => {
     it('should update configs in the ngsw-config.json', async () => {
       appTree.overwrite(
         '/application/ngsw-config.json',
