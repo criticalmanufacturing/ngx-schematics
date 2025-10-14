@@ -28,8 +28,6 @@ export const THEMES = [
   'cmf.style.contrast.accessibility',
   'cmf.style.dark',
   'cmf.style.dark.accessibility',
-  'cmf.style.gray',
-  'cmf.style.gray.accessibility'
 ];
 
 /**

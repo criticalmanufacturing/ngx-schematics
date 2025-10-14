@@ -46,8 +46,6 @@ export function addConfigJson(options: { project: string }): Rule {
       "cmf.style.blue.accessibility",
       "cmf.style.dark",
       "cmf.style.dark.accessibility",
-      "cmf.style.gray",
-      "cmf.style.gray.accessibility",
       "cmf.style.contrast",
       "cmf.style.contrast.accessibility"
     ]`
