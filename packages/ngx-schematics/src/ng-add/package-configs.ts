@@ -22,12 +22,12 @@ export const METADATA_ROUTING_PROVIDE: [string, string] = ['cmf-core', 'provideM
  * THEMES
  */
 export const THEMES = [
-  'cmf.style.blue',
-  'cmf.style.blue.accessibility',
+  'cmf.style.light',
+  'cmf.style.light.accessibility',
   'cmf.style.contrast',
   'cmf.style.contrast.accessibility',
   'cmf.style.dark',
-  'cmf.style.dark.accessibility',
+  'cmf.style.dark.accessibility'
 ];
 
 /**

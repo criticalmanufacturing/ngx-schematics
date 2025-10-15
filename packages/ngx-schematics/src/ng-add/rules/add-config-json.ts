@@ -28,7 +28,7 @@ export function addConfigJson(options: { project: string }): Rule {
     const templateSource = apply(url('./files'), [
       applyTemplates({
         startupCulture: 'en-US',
-        startupTheme: 'cmf.style.blue',
+        startupTheme: 'cmf.style.light',
         supportedCultures: `[
       "en-US",
       "pt-PT",
@@ -42,8 +42,8 @@ export function addConfigJson(options: { project: string }): Rule {
       "fr-FR"
     ]`,
         supportedThemes: `[
-      "cmf.style.blue",
-      "cmf.style.blue.accessibility",
+      "cmf.style.light",
+      "cmf.style.light.accessibility",
       "cmf.style.dark",
       "cmf.style.dark.accessibility",
       "cmf.style.contrast",
