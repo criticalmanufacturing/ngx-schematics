@@ -1,6 +1,7 @@
 import { join, JsonArray, JsonObject, normalize } from '@angular-devkit/core';
 import { chain, Rule, SchematicsException, Tree } from '@angular-devkit/schematics';
 import {
+  addToJsonArray,
   getDefaultApplicationProject,
   removeFromJsonArray
 } from '@criticalmanufacturing/schematics-devkit';
@@ -9,10 +10,12 @@ import { readWorkspace } from '@schematics/angular/utility';
 /**
  * Update themes in the application's assets/config.json.
  *
- * - Removes deprecated gray themes from "general.supportedThemes".
+ * - Removes deprecated gray and blue themes from "general.supportedThemes".
  * - Replaces deprecated startup themes:
- *   "cmf.style.gray" -> "cmf.style.blue"
- *   "cmf.style.gray.accessibility" -> "cmf.style.blue.accessibility"
+ *   "cmf.style.gray" -> "cmf.style.light"
+ *   "cmf.style.gray.accessibility" -> "cmf.style.light.accessibility"
+ *   "cmf.style.blue" -> "cmf.style.light"
+ *   "cmf.style.blue.accessibility" -> "cmf.style.light.accessibility"
  *
  * @param options The options for the schematic.
  * @returns A Rule that performs the update when applied to a Tree.
@@ -34,10 +37,13 @@ function updateThemesInConfigFile(options: { project: string }): Rule {
     // Read the config.json file
     const config = tree.readJson(configPath) as JsonObject;
 
-    // Remove gray theme from the supportedThemes array
-    removeGrayThemeFromSupportedThemes(config);
+    // Remove gray and blue themes from the supportedThemes array
+    removeGrayAndBlueThemeFromSupportedThemes(config);
 
-    // If the startup theme is gray or gray.accessibility, change it to blue or blue.accessibility respectively
+    // Add the light theme to the supportedThemes array if not already present
+    addLightThemeToSupportedThemes(config);
+
+    // If the startup theme is gray or blue, change it to light theme (including accessibility variants).
     updateStartupThemeInConfig(config);
 
     // Write the updated config back to the file
@@ -46,18 +52,38 @@ function updateThemesInConfigFile(options: { project: string }): Rule {
 }
 
 /**
- * Removes deprecated gray themes from the list of supported themes in the given configuration object.
+ * Removes deprecated gray and blue themes from the list of supported themes in the given configuration object.
  *
  * This function mutates the provided `config` object directly by removing:
  * - "cmf.style.gray"
  * - "cmf.style.gray.accessibility"
+ * - "cmf.style.blue"
+ * - "cmf.style.blue.accessibility"
  *
  * @param config - The configuration object containing the "general.supportedThemes" array.
  */
-function removeGrayThemeFromSupportedThemes(config: JsonObject): void {
+function removeGrayAndBlueThemeFromSupportedThemes(config: JsonObject): void {
   removeFromJsonArray((config?.['general'] as JsonObject)?.['supportedThemes'] as JsonArray, [
     'cmf.style.gray',
-    'cmf.style.gray.accessibility'
+    'cmf.style.gray.accessibility',
+    'cmf.style.blue',
+    'cmf.style.blue.accessibility'
+  ]);
+}
+
+/**
+ * Adds the light theme to the list of supported themes in the given configuration object.
+ *
+ * This function mutates the provided `config` object directly by adding:
+ * - "cmf.style.light"
+ * - "cmf.style.light.accessibility"
+ *
+ * @param config - The configuration object containing the "general.supportedThemes" array.
+ */
+function addLightThemeToSupportedThemes(config: JsonObject): void {
+  addToJsonArray((config?.['general'] as JsonObject)?.['supportedThemes'] as JsonArray, [
+    'cmf.style.light',
+    'cmf.style.light.accessibility'
   ]);
 }
 
@@ -67,8 +93,10 @@ function removeGrayThemeFromSupportedThemes(config: JsonObject): void {
  * object directly.
  *
  * Specifically:
- * - "cmf.style.gray" -> "cmf.style.blue"
- * - "cmf.style.gray.accessibility" -> "cmf.style.blue.accessibility"
+ * - "cmf.style.gray" -> "cmf.style.light"
+ * - "cmf.style.gray.accessibility" -> "cmf.style.light.accessibility"
+ * - "cmf.style.blue" -> "cmf.style.light"
+ * - "cmf.style.blue.accessibility" -> "cmf.style.light.accessibility"
  *
  * @param config - The configuration object containing the "general.startup.startupTheme" property.
  */
@@ -85,8 +113,10 @@ function updateStartupThemeInConfig(config: JsonObject): void {
 
   // Map of old themes to new themes
   const themeMap: Record<string, string> = {
-    'cmf.style.gray': 'cmf.style.blue',
-    'cmf.style.gray.accessibility': 'cmf.style.blue.accessibility'
+    'cmf.style.gray': 'cmf.style.light',
+    'cmf.style.gray.accessibility': 'cmf.style.light.accessibility',
+    'cmf.style.blue': 'cmf.style.light',
+    'cmf.style.blue.accessibility': 'cmf.style.light.accessibility'
   };
 
   if (startupTheme && themeMap[startupTheme]) {
