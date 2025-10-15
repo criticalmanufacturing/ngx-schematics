@@ -2,7 +2,7 @@ import { JsonObject } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 
 /**
- * Mock config.json file with gray theme included
+ * Mock config.json file with blue and gray themes included
  * @param startupTheme The startup theme to be used. Default is "cmf.style.blue"
  * @returns A string representation of the config.json file
  */
@@ -49,6 +49,14 @@ describe('Test ng-update', () => {
 
   let appTree: UnitTestTree;
 
+  // Define test cases for startup theme updates
+  const startupThemeCases = [
+    { input: 'cmf.style.blue', expected: 'cmf.style.light' },
+    { input: 'cmf.style.blue.accessibility', expected: 'cmf.style.light.accessibility' },
+    { input: 'cmf.style.gray', expected: 'cmf.style.light' },
+    { input: 'cmf.style.gray.accessibility', expected: 'cmf.style.light.accessibility' }
+  ];
+
   beforeEach(async () => {
     appTree = await migrationsSchematicRunner.runExternalSchematic(
       '@schematics/angular',
@@ -65,7 +73,7 @@ describe('Test ng-update', () => {
   });
 
   describe('- Migrate to v12.0', () => {
-    it('Should remove gray themes from config.json', async () => {
+    it('Should remove gray and blue themes from config.json and add the light theme', async () => {
       // Add mock config.json to the app tree
       appTree.create('/application/src/assets/config.json', configJsonMock());
 
@@ -75,44 +83,37 @@ describe('Test ng-update', () => {
       // Read the updated config.json file
       const config = tree.readJson('/application/src/assets/config.json') as JsonObject;
 
-      // The gray theme was removed from the supported themes array and should not be in the config anymore
+      // The gray and blue themes were removed from the supported themes array and should not be in the config anymore
       expect((config.general as JsonObject).supportedThemes).not.toContain('cmf.style.gray');
+      expect((config.general as JsonObject).supportedThemes).not.toContain('cmf.style.blue');
       expect((config.general as JsonObject).supportedThemes).not.toContain(
         'cmf.style.gray.accessibility'
       );
-    });
-
-    it('Update startup theme to cmf.style.blue when it was cmf.style.gray', async () => {
-      // Add mock config.json to the app tree with startup theme set to gray
-      appTree.create('/application/src/assets/config.json', configJsonMock('cmf.style.gray'));
-
-      // Run the migration
-      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
-      // Read the updated config.json file
-      const config = tree.readJson('/application/src/assets/config.json') as JsonObject;
-
-      // The startup theme was updated to cmf.style.blue
-      expect(((config.general as JsonObject).startup as JsonObject).startupTheme).toBe(
-        'cmf.style.blue'
-      );
-    });
-
-    it('Update startup theme to cmf.style.blue.accessibility when it was cmf.style.gray.accessibility', async () => {
-      // Add mock config.json to the app tree with startup theme set to gray accessibility
-      appTree.create(
-        '/application/src/assets/config.json',
-        configJsonMock('cmf.style.gray.accessibility')
-      );
-
-      // Run the migration
-      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
-      // Read the updated config.json file
-      const config = tree.readJson('/application/src/assets/config.json') as JsonObject;
-
-      // The startup theme was updated to cmf.style.blue.accessibility
-      expect(((config.general as JsonObject).startup as JsonObject).startupTheme).toBe(
+      expect((config.general as JsonObject).supportedThemes).not.toContain(
         'cmf.style.blue.accessibility'
       );
+
+      // The light theme was added to the supported themes array
+      expect((config.general as JsonObject).supportedThemes).toContain('cmf.style.light');
+      expect((config.general as JsonObject).supportedThemes).toContain(
+        'cmf.style.light.accessibility'
+      );
+    });
+
+    // Test if the startup theme is updated correctly
+    startupThemeCases.forEach(({ input, expected }) => {
+      it(`Update startup theme to ${expected} when it was ${input}`, async () => {
+        // Add mock config.json to the app tree with startup theme set to gray
+        appTree.create('/application/src/assets/config.json', configJsonMock(input));
+
+        // Run the migration
+        const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+        // Read the updated config.json file
+        const config = tree.readJson('/application/src/assets/config.json') as JsonObject;
+
+        // The startup theme was updated
+        expect(((config.general as JsonObject).startup as JsonObject).startupTheme).toBe(expected);
+      });
     });
   });
 });
