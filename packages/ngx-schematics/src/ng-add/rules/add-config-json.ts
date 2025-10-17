@@ -11,7 +11,7 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
-import { removeDirectory } from '@criticalmanufacturing/schematics-devkit/rules';
+import { removeDirectory, removeFile } from '@criticalmanufacturing/schematics-devkit/rules';
 
 export function addConfigJson(options: { project: string }): Rule {
   return async (tree: Tree) => {
@@ -21,9 +21,6 @@ export function addConfigJson(options: { project: string }): Rule {
     if (!project) {
       throw new SchematicsException(`Project is not defined in this workspace.`);
     }
-
-    // Setup sources for the assets files to add to the project
-    const sourcePath = project.sourceRoot ?? join(normalize(project.root), 'src');
 
     const templateSource = apply(url('./files'), [
       applyTemplates({
@@ -50,11 +47,12 @@ export function addConfigJson(options: { project: string }): Rule {
       "cmf.style.contrast.accessibility"
     ]`
       }),
-      move(join(normalize(sourcePath), 'assets'))
+      move(join(normalize(project.root), 'public'))
     ]);
 
     return chain([
-      removeDirectory(join(normalize(sourcePath), 'assets', 'icons')),
+      removeDirectory(join(normalize(project.root), 'public', 'icons')),
+      removeFile(join(normalize(project.root), 'public', 'favicon.ico')),
       mergeWith(templateSource)
     ]);
   };

@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { WidgetModel, WidgetSettingsService, WidgetSettingsDef } from 'cmf-core-dashboards';
 
 /** <%= classify(name) %> Settings Properties */
-export interface <%= classify(name) %>WidgetSettings extends WidgetSettingsDef {
-}
+export interface <%= classify(name) %>WidgetSettings extends WidgetSettingsDef {}
 
 /**
  * <%= classify(name) %> Settings Service

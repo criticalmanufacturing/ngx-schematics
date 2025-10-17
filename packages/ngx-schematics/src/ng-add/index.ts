@@ -7,15 +7,9 @@ import {
   SchematicsException,
   Tree
 } from '@angular-devkit/schematics';
-
 import { readWorkspace } from '@schematics/angular/utility';
-
 import { JsonArray, JsonObject } from '@angular-devkit/core';
-
-import inquirer, { ListQuestion } from 'inquirer';
-
-import { CORE_BASE_MODULE, MES_BASE_MODULE } from './package-configs';
-
+import { select } from '@inquirer/prompts';
 import {
   NodeDependency,
   NodeDependencyType,
@@ -24,18 +18,20 @@ import {
   updateTsConfig,
   installNpmPackages
 } from '@criticalmanufacturing/schematics-devkit/rules';
-
-import { version as pkgVersion, name as pkgName } from '../../package.json';
-import { Schema } from './schema';
-import { updateIndexFiles } from './rules/update-index';
-import { updateBootstrapComponent } from './rules/update-bootstrap-component';
-import { updateMain } from './rules/update-main';
-import { addConfigJson } from './rules/add-config-json';
-import { updateWorkspace } from './rules/update-workspace';
 import { listNpmReleaseTags } from '@criticalmanufacturing/schematics-devkit';
-import { updateAppModule } from './rules/update-app-module';
-import { updateAppConfig } from './rules/update-app-config';
-import { updateNgswConfig } from './rules/update-ngsw-config';
+
+import { CORE_BASE_MODULE, MES_BASE_MODULE } from './package-configs.js';
+import pkg from '../../package.json';
+import { Schema } from './schema.js';
+import { updateIndexFiles } from './rules/update-index.js';
+import { updateBootstrapComponent } from './rules/update-bootstrap-component.js';
+import { updateMain } from './rules/update-main.js';
+import { addConfigJson } from './rules/add-config-json.js';
+import { updateWorkspace } from './rules/update-workspace.js';
+import { updateAppModule } from './rules/update-app-module.js';
+import { updateAppConfig } from './rules/update-app-config.js';
+import { updateNgswConfig } from './rules/update-ngsw-config.js';
+import { updateWebmanifest } from './rules/update-webmanifest.js';
 
 /**
  * Updates main.ts file adding the load config method
@@ -66,8 +62,8 @@ function installSchematics(options: Schema) {
 
     const dependencies: NodeDependency[] = [
       {
-        name: pkgName,
-        version: getInstalledDependency(tree, pkgName)?.version ?? pkgVersion,
+        name: pkg.name,
+        version: getInstalledDependency(tree, pkg.name)?.version ?? pkg.version,
         type: NodeDependencyType.Dev,
         overwrite: true
       },
@@ -90,13 +86,18 @@ function installSchematics(options: Schema) {
           ]
         : [noop()]),
       updateNgswConfig(options as Required<Schema>),
+      updateWebmanifest(options as Required<Schema>),
       updateWorkspace(options),
       installDependencies(dependencies),
       updateTsConfig([
         [['compilerOptions', 'strictFunctionTypes'], false],
         [['compilerOptions', 'noImplicitAny'], false],
         [['compilerOptions', 'strictNullChecks'], false],
-        [['compilerOptions', 'preserveSymlinks'], true]
+        [['compilerOptions', 'preserveSymlinks'], true],
+        [
+          ['compilerOptions', 'types'],
+          ['@angular/localize', 'moment-duration-format', 'cmf.kendoui', 'jquery']
+        ]
       ])
     ]);
   };
@@ -111,7 +112,7 @@ export default function (_options: Schema): Rule {
 
       const [appTags, pkgTags] = await Promise.all([
         listNpmReleaseTags(appPackage),
-        listNpmReleaseTags(pkgName, pkgVersion)
+        listNpmReleaseTags(pkg.name, pkg.version)
       ]);
 
       const valideTags = pkgTags.filter((t) => appTags.includes(t)); // only include matching app package tags
@@ -122,14 +123,10 @@ export default function (_options: Schema): Rule {
         );
       }
 
-      const question: ListQuestion = {
-        type: 'list',
-        name: 'distTag',
+      _options.version = await select({
         message: 'What is the distribution to utilize?',
         choices: valideTags
-      };
-
-      _options.version = (await inquirer.prompt([question])).distTag;
+      });
     }
 
     const packjson = tree.readJson('package.json') as JsonObject;

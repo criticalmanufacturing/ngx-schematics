@@ -22,16 +22,11 @@
     },
     "name": {
       "type": "string",
-      "description": "The name of the wizard-create-edit.",
+      "description": "The name of the entity type to be performed.",
       "$default": {
         "$source": "argv",
         "index": 0
       },
-      "x-prompt": "What name would you like to use for the wizard-create-edit?"
-    },
-    "entityType": {
-      "type": "string",
-      "description": "The name of the entity type to be performed.",
       "x-prompt": "What is the name of the entity type to be performed?"
     },
     "namespace": {
@@ -45,5 +40,5 @@
       "enum": ["css", "scss", "sass", "less", "none"]
     }
   },
-  "required": ["name", "entityType"]
+  "required": ["name"]
 }

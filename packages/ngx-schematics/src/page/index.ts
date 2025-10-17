@@ -19,16 +19,16 @@ import {
   strings
 } from '@criticalmanufacturing/schematics-devkit';
 import { ProjectDefinition, readWorkspace } from '@schematics/angular/utility';
-import inquirer, { InputQuestion } from 'inquirer';
+import { input } from '@inquirer/prompts';
 import {
   getMetadataFilePath,
   insertRoutesMetadata,
   MetadataProperty,
   updateMetadata,
   UpdateMetadataOptions
-} from '../utility/metadata';
-import { updateLibraryAPI } from '../utility/update-library-api';
-import { Schema } from './schema';
+} from '../utility/metadata.js';
+import { updateLibraryAPI } from '../utility/update-library-api.js';
+import { Schema } from './schema.js';
 
 function updateRoutesMetadata(project: ProjectDefinition, options: any) {
   return async (tree: Tree) => {
@@ -44,22 +44,25 @@ function updateRoutesMetadata(project: ProjectDefinition, options: any) {
       return;
     }
 
-    const toInsert = `\
-  {
-      path: '${strings.classify(options.pageId.replace('.', '/'))}',
-      loadChildren: () => import(
-          /* webpackExports: "Page${strings.classify(options.name)}RoutingModule" */
-          '${strings.dasherize(options.project)}').then(m => m.Page${strings.classify(
-            options.name
-          )}RoutingModule),
-      data: {
-        title: $localize\`:@@${strings.dasherize(options.project)}/page-${strings.dasherize(
-          options.name
-        )}#TITLE:${strings.nameify(options.name)}\`,
-        iconClass: '${options.iconClass}',
-        requiredFunctionalities: '${options.pageId}'
-      }
-  }`;
+    const toInsert = `
+{
+    path: '${strings.classify(options.pageId.replace('.', '/'))}',
+    loadComponent: async () => 
+        (
+            await import(
+                /* webpackExports: "Page${strings.classify(options.name)}Component" */
+                '${strings.dasherize(options.project)}'
+            )
+        ).Page${strings.classify(options.name)}Component,
+    data: {
+      title: $localize\`:@@${strings.dasherize(options.project)}/page-${strings.dasherize(
+        options.name
+      )}#TITLE:${strings.nameify(options.name)}\`,
+      iconClass: '${options.iconClass}',
+      requiredFunctionalities: '${options.pageId}'
+    }
+}
+`;
 
     insertRoutesMetadata(source, {}, toInsert);
     tree.overwrite(metadataPath, source.getFullText());
@@ -71,36 +74,36 @@ function getEntrypointMetadata(options: Schema): UpdateMetadataOptions {
     return {
       identifier: MetadataProperty.MenuItem,
       imports: {},
-      toInsert: `\
-      {
-        id: '${options.pageId}',
-        menuGroupId: '${options.menuGroupId}',\
-        ${
-          options.menuSubGroupId!.length > 0 ? `\nmenuSubGroupId: '${options.menuSubGroupId}',` : ''
-        }
-        title: $localize\`:@@${strings.dasherize(options.project)}/page-${strings.dasherize(
-          options.name
-        )}#TITLE:${strings.nameify(options.name)}\`,
-        actionId: '${options.pageId}',
-        position: 1,
-        iconClass: '${options.iconClass}',
-        requiredFunctionalities: '${options.pageId}'
-      }`
+      toInsert: `
+{
+  id: '${options.pageId}',
+  menuGroupId: '${options.menuGroupId}',\
+  ${options.menuSubGroupId!.length > 0 ? `\nmenuSubGroupId: '${options.menuSubGroupId}',` : ''}
+  title: $localize\`:@@${strings.dasherize(options.project)}/page-${strings.dasherize(
+    options.name
+  )}#TITLE:${strings.nameify(options.name)}\`,
+  actionId: '${options.pageId}',
+  position: 1,
+  iconClass: '${options.iconClass}',
+  requiredFunctionalities: '${options.pageId}'
+}
+`
     };
   }
 
   return {
     identifier: MetadataProperty.ActionButton,
     imports: {},
-    toInsert: `\
-    {
-      id: '${options.pageId}',
-      actionId: '${options.pageId}',
-      title: $localize\`:@@${strings.dasherize(options.project)}/page-${strings.dasherize(
-        options.name
-      )}#TITLE:${strings.nameify(options.name)}\`,
-      iconClass: '${options.iconClass}',
-    }`
+    toInsert: `
+{
+  id: '${options.pageId}',
+  actionId: '${options.pageId}',
+  title: $localize\`:@@${strings.dasherize(options.project)}/page-${strings.dasherize(
+    options.name
+  )}#TITLE:${strings.nameify(options.name)}\`,
+  iconClass: '${options.iconClass}',
+}
+`
   };
 }
 
@@ -130,22 +133,10 @@ export default function (_options: Schema): Rule {
     }
 
     if (_options.entrypoint === 'Menu Item' && !_options.menuGroupId) {
-      const questions: InputQuestion[] = [
-        {
-          type: 'input',
-          name: 'menuGroupId',
-          message: 'What is the Menu Group Id?'
-        },
-        {
-          type: 'input',
-          name: 'menuSubGroupId',
-          message: 'What is the Menu Sub Group Id? (ignore if not applicable)'
-        }
-      ];
-
-      const answers = await inquirer.prompt(questions);
-      _options.menuGroupId = answers.menuGroupId;
-      _options.menuSubGroupId = answers.menuSubGroupId;
+      _options.menuGroupId = await input({ message: 'What is the Menu Group Id?' });
+      _options.menuSubGroupId = await input({
+        message: 'What is the Menu Sub Group Id? (ignore if not applicable)'
+      });
     }
 
     const parsedPath = parseName(_options.path, _options.name);
@@ -166,20 +157,21 @@ export default function (_options: Schema): Rule {
     const metadataOptions = {
       identifier: MetadataProperty.Action,
       imports: { ActionData: 'cmf-core', LinkType: 'cmf-core', LinkTarget: 'cmf-core' },
-      toInsert: `\
-  {
-    id: '${_options.pageId}',
-    handler: (context: any): Promise<ActionData> => {
-      return Promise.resolve({
-          route: {
-            type: LinkType.Internal,
-            target: LinkTarget.Self,
-            url: '${strings.classify(_options.pageId.replace('.', '/'))}',
-            alt: ''
-        }
-      });
+      toInsert: `
+{
+  id: '${_options.pageId}',
+  handler: (context: any): Promise<ActionData> => {
+    return Promise.resolve({
+      route: {
+        type: LinkType.Internal,
+        target: LinkTarget.Self,
+        url: '${strings.classify(_options.pageId.replace('.', '/'))}',
+        alt: ''
+      }
+    });
   }
-  }`
+}
+`
     };
 
     return chain([

@@ -1,10 +1,10 @@
 import { chain, Rule, Tree } from '@angular-devkit/schematics';
 import { readWorkspace, ProjectDefinition } from '@schematics/angular/utility';
 import { getDefaultPath, tryGetRoot } from '@criticalmanufacturing/schematics-devkit';
-import { Schema } from './schema';
 import { isAbsolute, join, normalize, relative } from '@angular-devkit/core';
 import { Project } from 'ts-morph';
-import { DependencyDescriptor, PropertyDescriptor, DocData, parseClassDoc } from './doc-parser';
+import { Schema } from './schema.js';
+import { DependencyDescriptor, PropertyDescriptor, DocData, parseClassDoc } from './doc-parser.js';
 
 function getPropsTemplate(props: PropertyDescriptor[]) {
   return props.map((prop) => `* \`${prop.type}\` : **${prop.name}** - ${prop.docs}`).join('\n');

@@ -1,26 +1,11 @@
+import { Component, forwardRef } from '@angular/core';
+import Cmf from 'cmf-lbos';
+import { CustomizableComponent, HOST_VIEW_COMPONENT } from 'cmf-core';
 import {
-    Component,
-    forwardRef,
-    NgModule,
-    ViewContainerRef
-} from '@angular/core';
-
-import {
-    CommonModule
-} from '@angular/common';
-
-import Cmf from "cmf-lbos";
-
-import {
-    CustomizableComponent,
-    HOST_VIEW_COMPONENT
-} from 'cmf-core';
-
-import {
-    EntityPageModule,
-    EntityPageInterface,
-    LevelsToLoad,
-    EntityPageService
+  EntityPageModule,
+  EntityPageInterface,
+  LevelsToLoad,
+  EntityPageService
 } from 'cmf-core-business-controls';
 
 /**
@@ -37,17 +22,10 @@ import {
  *
  * This component is used with the inputs and outputs mentioned below.
  *
- * Besides the description above, please complement it with a meaningful description of this component that answer these questions:
+ * Besides the description above, please complement it with a meaningful description of this
+ * component that answer these questions:
  * * How to use it?
  * * Where and When to use it?
- *
- * ### Inputs
- * `string` : **name** - The name of this component
- * `number` : **value** - The value of this component
- *
- * ### Outputs
- * `string` : **onNameChange** - When the name of the component change, this output emits the new name
- * `number` : **onValueChange** - When the value of the component change, this output emits the new value
  *
  * ### Example
  * To use the component, assume this HTML Template as an example:
@@ -62,57 +40,23 @@ import {
  * @description
  *
  * ## <%= classify(name) %>Component Component
- *
- * ### Dependencies
- *
- * #### Components
- * * ComponentA : `package`
- * * ComponentB : `package`
- *
- * #### Services
- * * ServiceA : `package`
- * * ServiceB : `package`
- *
- * #### Directives
- * * DirectiveA : `package`
- * * DirectiveB : `package`
- *
  */
 @Component({
-    selector: '<%= dasherize(project) %>-page-<%= dasherize(name) %>',
-    providers: [EntityPageService],
-    templateUrl: './page-<%= dasherize(name) %>.component.html',
-    viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Page<%= classify(name) %>Component) }]
+  selector: '<%= dasherize(project) %>-page-<%= dasherize(name) %>',
+  imports: [EntityPageModule],
+  providers: [EntityPageService],
+  templateUrl: './page-<%= dasherize(name) %>.component.html',
+  viewProviders: [
+    { provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Page<%= classify(name) %>Component) }
+  ]
 })
-export class Page<%= classify(name) %>Component extends CustomizableComponent
-    implements EntityPageInterface<Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>>, LevelsToLoad {
+export class Page<%= classify(name) %>Component
+  extends CustomizableComponent
+  implements EntityPageInterface<Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>>, LevelsToLoad
+{
+  /** Levels to load of the entity */
+  epLevelsToLoad = 1;
 
-    /**
-     * Levels to load of the entity
-     */
-    public epLevelsToLoad = 1;
-
-    /**
-     * The entity to be presented in this view
-     */
-    public epEntity: Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>;
-
-    /**
-     * Constructor
-     *
-     * @param viewContainerRef the reference to the component view container
-     */
-    constructor(viewContainerRef: ViewContainerRef) {
-        super(viewContainerRef);
-    }
+  /** The entity to be presented in this view */
+  epEntity: Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
 }
-
-@NgModule({
-    imports: [
-        CommonModule,
-        EntityPageModule
-    ],
-    declarations: [Page<%= classify(name) %>Component],
-    exports: [Page<%= classify(name) %>Component]
-})
-export class Page<%= classify(name) %>Module { }

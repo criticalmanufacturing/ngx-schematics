@@ -57,20 +57,24 @@ describe('Test ng-add', () => {
           '/angular.json',
           '/package.json',
           '/tsconfig.json',
-          '/.eslintrc.json',
+          '/eslint.config.js',
           '/application/tsconfig.app.json',
           '/application/tsconfig.spec.json',
           '/application/ngsw-config.json',
-          '/application/.eslintrc.json',
-          '/application/src/index.html',
+          '/application/eslint.config.js',
           '/application/src/main.ts',
+          '/application/src/index.html',
           '/application/src/styles.css',
-          '/application/src/manifest.webmanifest',
-          '/application/src/assets/config.json',
-          '/application/src/app/app.module.ts',
-          '/application/src/app/app.component.html'
+          '/application/src/app/app-module.ts',
+          '/application/src/app/app.ts',
+          '/application/src/app/app.css',
+          '/application/src/app/app.html',
+          '/application/public/config.json',
+          '/application/public/manifest.webmanifest'
         ])
       );
+      expect(tree.files).not.toEqual(jasmine.arrayContaining(['/application/public/favicon.ico']));
+      expect(tree.files.every((x) => !x.startsWith('/application/public/icons'))).toBeTrue();
     });
 
     describe('- Generate angular.json', () => {
@@ -83,13 +87,17 @@ describe('Test ng-add', () => {
         );
       });
 
-      it('should set service worker', async () => {
+      it('should update service worker config', async () => {
         const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
 
         const ngswConfig = tree.readJson('application/ngsw-config.json') as JsonObject;
 
         const appAssetGroup = (ngswConfig['assetGroups'] as JsonArray).find(
           (assetGroup) => (assetGroup as JsonObject)['name'] === 'app'
+        );
+
+        const assetsAssetGroup = (ngswConfig['assetGroups'] as JsonArray).find(
+          (assetGroup) => (assetGroup as JsonObject)['name'] === 'assets'
         );
 
         const configDataGroup = (ngswConfig['dataGroups'] as JsonArray).find(
@@ -100,24 +108,21 @@ describe('Test ng-add', () => {
           'files'
         ] as JsonArray;
 
+        const assetsAssetFiles = ((assetsAssetGroup as JsonObject)?.['resources'] as JsonObject)?.[
+          'files'
+        ] as JsonArray;
+
         expect(ngswConfig['navigationRequestStrategy']).toBe('freshness');
-
-        expect(appAssetFiles).toContain('/monaco-editor/**/*.js');
-        expect(appAssetFiles).not.toContain('/index.html');
-
+        expect(appAssetFiles).toEqual(
+          jasmine.arrayContaining(['**/*.js', '**/*.css', '!/ngsw-loader-worker.js'])
+        );
+        expect(appAssetFiles).not.toEqual(
+          jasmine.arrayContaining(['/*.css', '/*.js', '/index.html'])
+        );
+        expect(assetsAssetFiles).toEqual(
+          jasmine.arrayContaining(['/assets/**', '!/assets/config.json'])
+        );
         expect(configDataGroup).not.toBeNull();
-      });
-
-      it('should have webmanifest in assets', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
-        expect(angularJsonContent.projects.application.architect.build.options.assets).toContain(
-          'application/src/manifest.webmanifest'
-        );
-        expect(angularJsonContent.projects.application.architect.test.options.assets).toContain(
-          'application/src/manifest.webmanifest'
-        );
       });
 
       it('should have lint architect', async () => {
@@ -250,8 +255,10 @@ describe('Test ng-add', () => {
 
         const mainContent = tree.readContent('/application/src/main.ts');
         expect(mainContent).toContain(`loadApplicationConfig('assets/config.json').then(() => {
-  import(/* webpackMode: "eager" */ './app/app.module').then(({ AppModule }) => {
-    platformBrowserDynamic().bootstrapModule(AppModule)
+  import(/* webpackMode: "eager" */ './app/app-module').then(({ AppModule }) => {
+    platformBrowser().bootstrapModule(AppModule, {
+      ngZoneEventCoalescing: true,
+    })
       .catch(err => console.error(err));
   });
 });`);
@@ -262,14 +269,14 @@ describe('Test ng-add', () => {
       it('should have the router-outlet', async () => {
         const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
 
-        const appComponentHtmlContent = tree.readContent('/application/src/app/app.component.html');
+        const appComponentHtmlContent = tree.readContent('/application/src/app/app.html');
         expect(appComponentHtmlContent).toEqual('<router-outlet></router-outlet>');
       });
 
       it('should import the CoreUIModule and MetadataRoutingModule', async () => {
         const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
 
-        const appModuleContent = tree.readContent('/application/src/app/app.module.ts');
+        const appModuleContent = tree.readContent('/application/src/app/app-module.ts');
         expect(appModuleContent).toContain(`import { CoreUIModule } from 'cmf-core-ui';`);
         expect(appModuleContent).toContain(`import { MetadataRoutingModule } from 'cmf-core';`);
 
@@ -287,7 +294,7 @@ describe('Test ng-add', () => {
 
         const tree = await schematicRunner.runSchematic('ng-add', ngAddMesOptions, appTree);
 
-        const appModuleContent = tree.readContent('/application/src/app/app.module.ts');
+        const appModuleContent = tree.readContent('/application/src/app/app-module.ts');
         expect(appModuleContent).toContain(`import { MesUIModule } from 'cmf-mes-ui';`);
         expect(appModuleContent).toContain(`import { MetadataRoutingModule } from 'cmf-core';`);
 
@@ -333,7 +340,7 @@ describe('Test ng-add', () => {
         const mainContent = tree.readContent('/application/src/main.ts');
         expect(mainContent).toContain(`loadApplicationConfig('assets/config.json').then(() => {
   import(/* webpackMode: "eager" */ './app/app.config').then(({ appConfig }) => {
-    bootstrapApplication(AppComponent, appConfig)
+    bootstrapApplication(App, appConfig)
       .catch((err) => console.error(err));
   });
 });`);
@@ -344,7 +351,7 @@ describe('Test ng-add', () => {
       it('should have the router-outlet', async () => {
         const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
 
-        const appComponentHtmlContent = tree.readContent('/application/src/app/app.component.html');
+        const appComponentHtmlContent = tree.readContent('/application/src/app/app.html');
         expect(appComponentHtmlContent).toEqual('<router-outlet></router-outlet>');
       });
 
@@ -397,6 +404,25 @@ describe('Test ng-add', () => {
         expect(angularJsonContent.projects.application.architect.build.options.outputPath).toEqual({
           base: 'dist/application',
           browser: ''
+        });
+      });
+
+      it('should update the service worker config', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const configContent = JSON.parse(tree.readContent('/application/ngsw-config.json'));
+        expect(
+          configContent.assetGroups.find((x: any) => x.name === 'assets').resources.files
+        ).toContain('!/assets/config.json');
+
+        expect(configContent.dataGroups.find((x: any) => x.name === 'config')).toEqual({
+          name: 'config',
+          urls: ['/assets/config.json'],
+          cacheConfig: {
+            maxSize: 1,
+            maxAge: '30d',
+            strategy: 'freshness'
+          }
         });
       });
     });

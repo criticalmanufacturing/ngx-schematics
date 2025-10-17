@@ -14,7 +14,7 @@ import {
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
 import { getDefaultPath, parseName, strings } from '@criticalmanufacturing/schematics-devkit';
-import { Schema } from './schema';
+import { Schema } from './schema.js';
 
 export default function (_options: Schema): Rule {
   return async (tree: Tree, _context: SchematicContext) => {

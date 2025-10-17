@@ -12,10 +12,9 @@ import {
   schematic,
   url
 } from '@angular-devkit/schematics';
-import { Schema } from './schema';
 import { JsonArray, JsonObject, basename, join, normalize } from '@angular-devkit/core';
 import { readWorkspace } from '@schematics/angular/utility';
-import inquirer, { InputQuestion } from 'inquirer';
+import { input } from '@inquirer/prompts';
 import { JSONFile, relativeToRoot, strings } from '@criticalmanufacturing/schematics-devkit';
 import {
   NodeDependencyType,
@@ -23,6 +22,7 @@ import {
   installDependencies,
   updateNgPackageJson
 } from '@criticalmanufacturing/schematics-devkit/rules';
+import { Schema } from './schema.js';
 
 /**
  * Edits .vscode/settings.json file to ignore compiled output
@@ -186,14 +186,10 @@ export default function (_options: Schema): Rule {
       : _options.namespace;
 
     if (!namespace) {
-      const question: InputQuestion = {
-        type: 'input',
-        name: 'namespace',
+      namespace = await input({
         message: 'What is your package namespace?',
         default: '@criticalmanufacturing'
-      };
-
-      namespace = (await inquirer.prompt([question])).namespace;
+      });
     }
 
     if (namespace != null && !/^(?:@[a-zA-Z0-9-*~][a-zA-Z0-9-*._~]*)$/.test(namespace)) {

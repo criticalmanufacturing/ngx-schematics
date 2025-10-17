@@ -1,20 +1,6 @@
-import {
-    ViewContainerRef,
-    Component
-} from '@angular/core';
-
-import {
-    CommonModule
-} from '@angular/common';
-
-import {
-    CustomizableComponent,
-} from 'cmf-core';
-
-import {
-    DataSourceSettingsDef,
-    DataSourceSettingsModule
-} from 'cmf-core-dashboards';
+import { Component } from '@angular/core';
+import { CustomizableComponent } from 'cmf-core';
+import { DataSourceSettingsDef, DataSourceSettingsModule } from 'cmf-core-dashboards';
 
 /**
  * @whatItDoes
@@ -25,48 +11,22 @@ import {
  * @description
  *
  * ## <%= nameify(name) %> Data Source Settings Component
- *
- * ### Dependencies
- *
- * #### Components
- * * ComponentA : `package`
- * * ComponentB : `package`
- *
- * #### Services
- * * ServiceA : `package`
- * * ServiceB : `package`
- *
- * #### Directives
- * * DirectiveA : `package`
- * * DirectiveB : `package`
- *
  */
 @Component({
-    standalone: true,
-    selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-data-source-settings',
-    imports: [CommonModule, DataSourceSettingsModule],
-    templateUrl: './<%= dasherize(name) %>-data-source-settings.component.html',
-    <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-data-source-settings.component.<%= dasherize(style) %>'<% } %>
+  selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-data-source-settings',
+  imports: [DataSourceSettingsModule],
+  templateUrl: './<%= dasherize(name) %>-data-source-settings.component.html',
+  <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-data-source-settings.component.<%= dasherize(style) %>'<% } %>
 })
 export class <%= classify(name) %>DataSourceSettingsComponent extends CustomizableComponent {
+  /** The settings of the <%= classify(name) %>DataSource */
+  settings: DataSourceSettingsDef;
 
-    /**
-     * The settings of the <%= classify(name) %>DataSource
-     */
-    public settings!: DataSourceSettingsDef;
-
-    /**
-     * Constructor
-     */
-    constructor(viewContainerRef: ViewContainerRef) {
-        super(viewContainerRef);
-    }
-
-    /**
-     * On settings loaded
-     * @param settings the <%= classify(name) %>DataSource settings definition
-     */
-    public onLoadSettings(settings: DataSourceSettingsDef): void {
-        this.settings = settings;
-    }
+  /**
+   * On settings loaded
+   * @param settings the <%= classify(name) %>DataSource settings definition
+   */
+  onLoadSettings(settings: DataSourceSettingsDef): void {
+    this.settings = settings;
+  }
 }

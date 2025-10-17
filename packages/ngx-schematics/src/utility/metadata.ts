@@ -113,15 +113,13 @@ export function insertMetadata(
 /**
  * ${strings.nameify(propertyIdentifier)}
  */
-public override get ${propertyIdentifier}(): ${
-      Object.keys(PROPERTY_REFERENCE[propertyIdentifier])[0]
-    }[] {
-    return [
-        ${toInsert}
-    ];
+override get ${propertyIdentifier}(): ${Object.keys(PROPERTY_REFERENCE[propertyIdentifier])[0]}[] {
+  return [
+    ${toInsert}
+  ];
 }`;
 
-    metadataClass.addMember(memberToInsert).formatText();
+    metadataClass.addMember(memberToInsert).formatText({ indentSize: 2 });
 
     return;
   }
@@ -135,7 +133,8 @@ public override get ${propertyIdentifier}(): ${
     return;
   }
 
-  array.addElement(toInsert).formatText();
+  array.addElement(toInsert);
+  array.formatText({ indentSize: 2 });
 }
 
 /**
@@ -166,13 +165,12 @@ export function insertRoutesMetadata(
     .find((elem) => elem?.getProperty('id')?.getText().endsWith('Page'));
 
   if (!routesAccessor || !pageRoutes) {
-    const routeToInsert = `\
+    const routeToInsert = `
 {
-    id: KnownRoutes.Page,
-    routes: [
-        ${toInsert}
-    ]
-}`;
+  id: KnownRoutes.Page,
+  routes: [${toInsert}]
+}
+`;
 
     return insertMetadata(
       source,
@@ -195,7 +193,8 @@ export function insertRoutesMetadata(
   }
 
   insertImports(source, requiredImports);
-  routes.addElement(toInsert).formatText();
+  routes.addElement(toInsert);
+  routes.formatText({ indentSize: 2 });
 }
 
 /**

@@ -9,7 +9,7 @@ import {
 import { readWorkspace, ProjectDefinition } from '@schematics/angular/utility';
 import { createSourceFile, JSONFile } from '@criticalmanufacturing/schematics-devkit';
 
-import { setPackageInfoMetadata, PackageInfo, getMetadataFilePath } from '../utility/metadata';
+import { setPackageInfoMetadata, PackageInfo, getMetadataFilePath } from '../utility/metadata.js';
 
 function getAllFiles(host: Tree, rootPath: string): string[] {
   if (!host.exists(join(normalize(rootPath), 'ng-package.json'))) {

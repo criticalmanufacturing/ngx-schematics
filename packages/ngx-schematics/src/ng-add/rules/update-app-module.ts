@@ -1,9 +1,9 @@
 import { Rule, Tree } from '@angular-devkit/schematics';
 import { createSourceFile } from '@criticalmanufacturing/schematics-devkit';
-import { CORE_BASE_MODULE, MES_BASE_MODULE, METADATA_ROUTING_MODULE } from '../package-configs';
-import { Schema } from '../schema';
-import { addSymbolToNgModuleMetadata, getAppModulePath } from '../../utility/ng-module';
-import { updateServiceWorker } from '../../migrations/update-1-2-0/update-service-worker';
+import { CORE_BASE_MODULE, MES_BASE_MODULE, METADATA_ROUTING_MODULE } from '../package-configs.js';
+import { Schema } from '../schema.js';
+import { addSymbolToNgModuleMetadata, getAppModulePath } from '../../utility/ng-module.js';
+import { updateServiceWorker } from '../../migrations/update-1-2-0/update-service-worker.js';
 
 /**
  * Updates app module adding the desired package modules

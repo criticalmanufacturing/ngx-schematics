@@ -37,7 +37,6 @@ export interface <%= classify(name) %>TaskSettings extends <%= classify(name) %>
  */
 
 @Component({
-    standalone: true,
     selector: 'connect-iot-controller-engine-core-tasks-<%= name %>-settings',
     imports: [
         TaskSettingsModule,

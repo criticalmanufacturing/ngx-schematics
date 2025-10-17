@@ -37,12 +37,12 @@ export function updateNgswConfig(options: { project: string }): Rule {
     const assetsAssetGroup = getAssetGroup(ngswConfig, 'assets');
 
     if (appAssetGroup) {
-      addAssets(appAssetGroup, ['/monaco-editor/**/*.js']);
-      removeAssets(appAssetGroup, ['/index.html']);
+      addAssets(appAssetGroup, ['**/*.css', '**/*.js', '!/ngsw-loader-worker.js']);
+      removeAssets(appAssetGroup, ['/*.css', '/*.js', '/index.html']);
     }
 
     if (assetsAssetGroup) {
-      addAssets(assetsAssetGroup, ['!/assets/config.json', '/media/**', '!/ngsw-loader-worker.js']);
+      addAssets(assetsAssetGroup, ['/assets/**', '!/assets/config.json']);
     }
 
     ngswConfig['dataGroups'] ??= [];

@@ -52,7 +52,7 @@ describe('Test ng-update', () => {
       );
 
       appTree.overwrite(
-        '/application/src/app/app.module.ts',
+        '/application/src/app/app-module.ts',
         `\
 import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -85,7 +85,7 @@ export class AppModule { }`
 
       await migrationsSchematicRunner.runSchematic('update-1-2-0', {}, tree);
 
-      const appModuleContent = tree.readText('/application/src/app/app.module.ts');
+      const appModuleContent = tree.readText('/application/src/app/app-module.ts');
       expect(appModuleContent).toContain(`ServiceWorkerModule.register('ngsw-loader-worker.js'`);
     });
 

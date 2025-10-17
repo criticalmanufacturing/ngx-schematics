@@ -11,24 +11,24 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace, ProjectDefinition } from '@schematics/angular/utility';
-import inquirer, { ListQuestion, InputQuestion } from 'inquirer';
 import {
+  promptNamespace,
   createSourceFile,
   getDefaultPath,
   parseName,
   strings
 } from '@criticalmanufacturing/schematics-devkit';
-import { Schema } from './schema';
+import { Schema } from './schema.js';
 import {
   insertRoutesMetadata,
   MetadataProperty,
   getMetadataFilePath,
   updateMetadata,
   UpdateMetadataOptions
-} from '../utility/metadata';
-import { updateLibraryAPI } from '../utility/update-library-api';
+} from '../utility/metadata.js';
+import { updateLibraryAPI } from '../utility/update-library-api.js';
 
-function updateRoutesMetadata(project: ProjectDefinition, options: any) {
+function updateRoutesMetadata(project: ProjectDefinition, options: Schema) {
   return async (tree: Tree) => {
     const metadataPath = getMetadataFilePath(tree, project);
 
@@ -42,18 +42,23 @@ function updateRoutesMetadata(project: ProjectDefinition, options: any) {
       return;
     }
 
-    const toInsert = `\
+    const toInsert = `
 {
-    path: 'Entity/${strings.classify(options.name)}/:id',
-    loadChildren: () => import(
-        /* webpackExports: "Page${strings.classify(options.name)}RoutingModule" */
-        '${strings.dasherize(options.project)}').then(m => m.Page${strings.classify(
-          options.name
-        )}RoutingModule)
+  path: 'Entity/${strings.classify(options.name)}/:id',
+  loadChildren: async () =>
+    EntityTypeMetadataService.getRoutes(
+      '${strings.classify(options.name)}',
+      (
+        await import(
+          /* webpackExports: "Page${strings.classify(options.name)}Component" */
+          '${strings.dasherize(options.project)}'
+        )
+      ).Page${strings.classify(options.name)}Component
+    )
 }
 `;
 
-    insertRoutesMetadata(source, {}, toInsert);
+    insertRoutesMetadata(source, { EntityTypeMetadataService: 'cmf-core' }, toInsert);
     tree.overwrite(metadataPath, source.getFullText());
   };
 }
@@ -61,24 +66,7 @@ function updateRoutesMetadata(project: ProjectDefinition, options: any) {
 export default function (_options: Schema): Rule {
   return async (tree: Tree, _context: SchematicContext) => {
     if (!_options.namespace) {
-      const question: ListQuestion = {
-        type: 'list',
-        name: 'namespace',
-        message: 'What is the business objects namespace of the entity type?',
-        choices: ['Foundation', 'Navigo', 'Other (specify)']
-      };
-
-      _options.namespace = (await inquirer.prompt([question])).namespace;
-
-      if (_options.namespace!.startsWith('Other')) {
-        const question: InputQuestion = {
-          type: 'input',
-          name: 'namespace',
-          message: 'Namespace'
-        };
-
-        _options.namespace = (await inquirer.prompt([question])).namespace;
-      }
+      _options.namespace = await promptNamespace();
     }
 
     if (!_options.name) {
@@ -115,20 +103,23 @@ export default function (_options: Schema): Rule {
     const metadataOptions: UpdateMetadataOptions = {
       identifier: MetadataProperty.EntityType,
       imports: { DEFAULT_DETAILS_VIEW_ID: 'cmf-core' },
-      toInsert: `\
+      toInsert: `
 {
   name: '${strings.classify(_options.name)}',
   views: [
     {
         id: DEFAULT_DETAILS_VIEW_ID,
-        loadChildren: () => import(
-            /* webpackExports: "Page${strings.classify(_options.name)}DetailsViewRoutingModule" */
-            '${strings.dasherize(_options.project)}').then(m => m.Page${strings.classify(
-              _options.name
-            )}DetailsViewRoutingModule))
-    },
+        loadComponent: async () =>
+            (
+                await import(
+                    /* webpackExports: "Page${strings.classify(_options.name)}DetailsViewComponent" */
+                    '${strings.dasherize(_options.project)}'
+                )
+            ).Page${strings.classify(_options.name)}DetailsViewComponent
+    }
   ]
-}`
+}
+`
     };
 
     return chain([

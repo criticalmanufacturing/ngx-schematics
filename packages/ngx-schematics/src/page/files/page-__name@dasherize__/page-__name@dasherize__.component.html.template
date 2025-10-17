@@ -1,24 +1,31 @@
-<cmf-core-controls-base-page i18n-mainTitle="@@<%= dasherize(project) %>/page-<%= dasherize(name) %>#TITLE" mainTitle="<%= nameify(name) %>" icon="<%= iconClass %>">
-    <cmf-core-controls-actionBar>
-        <!-- LAYOUT -->
-        <cmf-core-controls-actionGroup group-id="cmf-core-action-group-settings">
-            <!-- Save Layout -->
-            <cmf-core-controls-actionButton
-                *cmfCoreControlsRequiredFunctionalities="'GUI.SaveUserLayout OR GUI.SaveAllUsersLayout OR GUI.SaveRoleLayout'"
-                button-id="Generic.LayoutPersonalization.Save"
-                [lessRelevant]="true"
-                [build-context]="onBuildContextHandlerForSaveLayoutWizard">
-            </cmf-core-controls-actionButton>
-            <!-- Reset Layout -->
-            <cmf-core-controls-actionButton
-                *cmfCoreControlsRequiredFunctionalities="'GUI.ResetUserLayout OR GUI.ResetAllUsersLayout OR GUI.ResetRoleLayout'"
-                button-id="Generic.LayoutPersonalization.Reset"
-                [lessRelevant]="true"
-                [build-context]="onBuildContextHandlerForResetLayoutWizard">
-            </cmf-core-controls-actionButton>
-        </cmf-core-controls-actionGroup>
-    </cmf-core-controls-actionBar>
-    <cmf-core-controls-page-single-section>
-        <p>Page <%= nameify(name) %> works!</p>
-    </cmf-core-controls-page-single-section>
+<cmf-core-controls-base-page
+  i18n-mainTitle="@@<%= dasherize(project) %>/page-<%= dasherize(name) %>#TITLE"
+  mainTitle="<%= nameify(name) %>"
+  icon="<%= iconClass %>">
+  <cmf-core-controls-actionBar actionBar-id="<%= classify(project) %>.Page<%= classify(name) %>.ActionBar">
+    <!-- LAYOUT -->
+    <cmf-core-controls-actionGroup group-id="cmf-core-action-group-settings">
+      <!-- Save Layout -->
+      <cmf-core-controls-actionButton
+        *cmfCoreControlsRequiredFunctionalities="
+          'GUI.SaveUserLayout OR GUI.SaveAllUsersLayout OR GUI.SaveRoleLayout'
+        "
+        button-id="Generic.LayoutPersonalization.Save"
+        [lessRelevant]="true"
+        [build-context]="onBuildContextHandlerForSaveLayoutWizard">
+      </cmf-core-controls-actionButton>
+      <!-- Reset Layout -->
+      <cmf-core-controls-actionButton
+        *cmfCoreControlsRequiredFunctionalities="
+          'GUI.ResetUserLayout OR GUI.ResetAllUsersLayout OR GUI.ResetRoleLayout'
+        "
+        button-id="Generic.LayoutPersonalization.Reset"
+        [lessRelevant]="true"
+        [build-context]="onBuildContextHandlerForResetLayoutWizard">
+      </cmf-core-controls-actionButton>
+    </cmf-core-controls-actionGroup>
+  </cmf-core-controls-actionBar>
+  <cmf-core-controls-page-single-section>
+    <p>Page <%= nameify(name) %> works!</p>
+  </cmf-core-controls-page-single-section>
 </cmf-core-controls-base-page>

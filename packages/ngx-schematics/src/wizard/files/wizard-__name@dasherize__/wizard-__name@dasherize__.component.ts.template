@@ -1,37 +1,16 @@
+import { Component, forwardRef, inject, OnInit, viewChild } from '@angular/core';
+import Cmf from 'cmf-lbos';
 import {
-    Component,
-    forwardRef,
-    inject,
-    OnInit,
-    ViewChild,
-    ViewContainerRef
-} from '@angular/core';
-
-import {
-    CommonModule
-} from '@angular/common';
-
-import {
-    Cmf
-} from 'cmf-lbos';
-
-import {
-    CustomizableComponent,
-    HOST_VIEW_COMPONENT,
-    UtilService,
-    EntityTypeService
+  CustomizableComponent,
+  HOST_VIEW_COMPONENT,
+  UtilService,
+  EntityTypeService
 } from 'cmf-core';
-
+import { PageBag, Wizard, WizardEventArgs } from 'cmf-core-controls';
 import {
-    PageBag,
-    Wizard,
-    WizardEventArgs
-} from 'cmf-core-controls';
-
-import {
-    TransactionWizardModule,
-    TransactionWizard,
-    TransactionEventArgs
+  TransactionWizardModule,
+  TransactionWizard,
+  TransactionEventArgs
 } from 'cmf-core-business-controls';
 
 /**
@@ -48,7 +27,8 @@ import {
  *
  * This component is used with the inputs and outputs mentioned below.
  *
- * Besides the description above, please complement it with a meaningful description of this component that answer these questions:
+ * Besides the description above, please complement it with a meaningful description of this
+ * component that answer these questions:
  * * How to use it?
  * * Where and When to use it?
  *
@@ -68,90 +48,103 @@ import {
  *
  */
 @Component({
-    standalone: true,
-    selector: '<%= dasherize(project) %>-wizard-<%= dasherize(name) %>',
-    imports: [CommonModule, TransactionWizardModule],
-    templateUrl: './wizard-<%= dasherize(name) %>.component.html',
-    <% if (style !== 'none') { %>styleUrl: './wizard-<%= dasherize(name) %>.component.<%= style %>',<% } %>
-    viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Wizard<%= classify(name) %>Component) }]
+  selector: '<%= dasherize(project) %>-wizard-<%= dasherize(name) %>',
+  imports: [TransactionWizardModule],
+  templateUrl: './wizard-<%= dasherize(name) %>.component.html',
+  <% if (style !== 'none') { %>styleUrl: './wizard-<%= dasherize(name) %>.component.<%= style %>',<% } %>
+  viewProviders: [
+    { provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Wizard<%= classify(name) %>Component) }
+  ]
 })
-export class Wizard<%= classify(name) %>Component extends CustomizableComponent implements OnInit, TransactionWizard {
+export class Wizard<%= classify(name) %>Component
+  extends CustomizableComponent
+  implements OnInit, TransactionWizard
+{
+  /** The instance of the wizard */
+  instance: Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>;
 
-    /**
-     * The instance of the wizard
-     */
-    public instance: Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>;
+  /** Dependencies */
+  protected _util = inject(UtilService);
+  protected _entityTypes = inject(EntityTypeService);
+  protected _pageBag = inject(PageBag);
 
-    /** Dependencies */
-    protected util = inject(UtilService);
-    protected entityTypes = inject(EntityTypeService);
-    protected pageBag = inject(PageBag);
+  /** The wizard element */
+  private _nestedWizard = viewChild(Wizard);
 
-    /**
-     * The wizard element
-     */
-    @ViewChild(Wizard, { static: true })
-    protected _nestedWizard!: Wizard;
+  /**
+   * NgOnInit. Sets the basic wizard content according to the pageBag context.
+   */
+  ngOnInit(): void {
+    if (this._pageBag != null && this._pageBag.context != null) {
+      if (
+        this._pageBag.context.instance == null ||
+        !this._util.instanceof(
+          this._pageBag.context.instance,
+          Cmf.TestNamespace.BusinessObjects.TestEntityType
+        )
+      ) {
+        throw new Error(
+          $localize`:@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#NO_INSTANCE_FOUND:No Instance Found`
+        );
+      }
+    } else {
+      throw new Error($localize`:@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#MISSING_CONTEXT:Missing context`);
+    }
+  }
 
-    /**
-     * NgOnInit. Sets the basic wizard content according to the pageBag context.
-     */
-    public ngOnInit(): void {
-        if (this.pageBag != null && this.pageBag.context != null) {
-            if (this.pageBag.context.instance == null
-                || !this.util.instanceof(this.pageBag.context.instance, Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>)) {
-                throw new Error($localize`:@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#NO_INSTANCE_FOUND:No Instance Found`);
-            }
-        } else {
-            throw new Error($localize`:@@<%= dasherize(project) %>/wizard-<%= dasherize(name) %>#MISSING_CONTEXT:Missing context`);
-        }
+  /**
+   * Method that prepares the data for the wizard
+   */
+  prepareDataInput(): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput[]> {
+    const inputs: Cmf.Foundation.BusinessOrchestration.BaseInput[] = [];
+
+    const instanceInput =
+      new Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.GetObjectByIdInput();
+    instanceInput.IgnoreLastServiceId = true;
+    instanceInput.Id = this._pageBag.context.instance.Id;
+    instanceInput.Type = this._entityTypes.getEntityTypeNameFromInstance(
+      this._pageBag.context.instance
+    );
+    inputs.push(instanceInput);
+
+    return Promise.resolve(inputs);
+  }
+
+  /**
+   * Method that receive the data from prepareDataInput
+   */
+  async handleDataOutput(
+    outputs: Cmf.Foundation.BusinessOrchestration.BaseOutput[],
+    wizardArgs?: WizardEventArgs
+  ): Promise<void> {
+    if (outputs != null && outputs.length >= 1) {
+      const loadInstanceOutput =
+        outputs[0] as Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.OutputObjects.GetObjectByIdOutput;
+
+      this.instance = loadInstanceOutput.Instance;
     }
 
-    /**
-     * Method that prepares the data for the wizard
-     */
-    public async prepareDataInput(): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput[]> {
-        const inputs: Cmf.Foundation.BusinessOrchestration.BaseInput[] = [];
+    await this._nestedWizard().reEvaluateContextPreConditions({ instance: this.instance }, true);
+  }
 
-        const instanceInput = new Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.GetObjectByIdInput();
-        instanceInput.IgnoreLastServiceId = true;
-        instanceInput.Id = this.pageBag.context.instance.Id;
-        instanceInput.Type = this.entityTypes.getEntityTypeNameFromInstance(this.pageBag.context.instance);
-        inputs.push(instanceInput);
+  /**
+   * The wizard prepareTransactionInput method where we can append the input for the final wizard
+   * @param args Current inputs where the user can append or simply resolve its own input.
+   */
+  prepareTransactionInput(
+    args: TransactionEventArgs
+  ): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput> {
+    const input = new Cmf.Foundation.BusinessOrchestration.BaseInput();
+    input.IgnoreLastServiceId = true;
 
-        return inputs;
-    }
+    return Promise.resolve(input);
+  }
 
-    /**
-     * Method that receive the data from prepareDataInput
-     */
-    public async handleDataOutput(outputs: Cmf.Foundation.BusinessOrchestration.BaseOutput[], wizardArgs?: WizardEventArgs): Promise<void> {
-        if (outputs != null && outputs.length >= 1) {
-            const loadInstanceOutput =
-                outputs[0] as Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.OutputObjects.GetObjectByIdOutput;
-
-            this.instance = loadInstanceOutput.Instance;
-        }
-
-        await this._nestedWizard.reEvaluateContextPreConditions({ instance: this.instance }, true);
-    }
-
-    /**
-     * The wizard prepareTransactionInput method where we can append the input for the final wizard
-     * @param args Current inputs where the user can append or simply resolve its own input.
-     */
-    public async prepareTransactionInput(args: TransactionEventArgs): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput> {
-        const input = new Cmf.Foundation.BusinessOrchestration.BaseInput();
-        input.IgnoreLastServiceId = true;
-
-        return input;
-    }
-
-    /**
-     * The wizard hook for handling the above service call.
-     * @param output output object, result of the input created in the prepareTransactionInput
-     */
-    public async handleTransactionOutput(output: Cmf.Foundation.BusinessOrchestration.BaseOutput): Promise<void> {
-        return;
-    }
+  /**
+   * The wizard hook for handling the above service call.
+   * @param output output object, result of the input created in the prepareTransactionInput
+   */
+  handleTransactionOutput(output: Cmf.Foundation.BusinessOrchestration.BaseOutput): Promise<void> {
+    return Promise.resolve();
+  }
 }

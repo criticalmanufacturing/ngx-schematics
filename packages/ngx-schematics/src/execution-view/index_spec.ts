@@ -1,5 +1,7 @@
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { strings } from '@criticalmanufacturing/schematics-devkit';
+import { getAllFilesFromDir, normalize } from '@criticalmanufacturing/schematics-devkit/testing';
+import { readFileSync } from 'node:fs';
 
 describe('Generate Execution View', () => {
   const schematicRunner = new SchematicTestRunner(
@@ -23,7 +25,7 @@ describe('Generate Execution View', () => {
   };
 
   const libraryOptions = {
-    name: 'testlib',
+    name: 'test-lib',
     skipPackageJson: false,
     skipTsConfig: false,
     skipInstall: false
@@ -36,9 +38,16 @@ describe('Generate Execution View', () => {
     namespace: 'TestNamespace'
   };
 
-  const executionViewPath = `projects/${libraryOptions.name}/src/lib/wizard-${strings.dasherize(
-    executionViewOptions.name
-  )}`;
+  const fixturesPath = `${__dirname}/fixtures`;
+  const libPath = `projects/${libraryOptions.name}`;
+  const libMainPath = `${libPath}/src/lib`;
+  const libMetadataPath = `${libPath}/metadata/src/lib`;
+  const executionViewName = `wizard-${strings.dasherize(executionViewOptions.name)}`;
+
+  const expectedFiles = {
+    executionView: `${executionViewName}/${executionViewName}.component`,
+    metadata: `${strings.dasherize(libraryOptions.name)}-metadata.service.ts`
+  };
 
   let appTree: UnitTestTree;
 
@@ -65,43 +74,34 @@ describe('Generate Execution View', () => {
       executionViewOptions,
       appTree
     );
+    const files = getAllFilesFromDir(`${libMainPath}/${executionViewName}`, tree);
 
-    const dasherizedExecutionViewName = strings.dasherize(executionViewOptions.name);
-
-    expect(tree.getDir(executionViewPath).subfiles).toEqual(
+    expect(files).toEqual(
       jasmine.arrayContaining([
-        `wizard-${dasherizedExecutionViewName}.component.less`,
-        `wizard-${dasherizedExecutionViewName}.component.html`,
-        `wizard-${dasherizedExecutionViewName}.component.ts`
+        `${libMainPath}/${expectedFiles.executionView}.html`,
+        `${libMainPath}/${expectedFiles.executionView}.ts`,
+        `${libMainPath}/${expectedFiles.executionView}.less`
       ])
     );
   });
 
   it('should create the execution view style file with other extension', async () => {
     const options = { ...executionViewOptions, style: 'css' };
-
     const tree = await schematicRunner.runSchematic('execution-view', options, appTree);
+    const files = getAllFilesFromDir(`${libMainPath}/${executionViewName}`, tree);
 
-    const dasherizedExecutionViewName = strings.dasherize(executionViewOptions.name);
-
-    expect(tree.getDir(executionViewPath).subfiles).toEqual(
-      jasmine.arrayContaining([`wizard-${dasherizedExecutionViewName}.component.css`])
+    expect(files).toEqual(
+      jasmine.arrayContaining([`${libMainPath}/${expectedFiles.executionView}.css`])
     );
   });
 
   it('should not create the execution view style file', async () => {
     const options = { ...executionViewOptions, style: 'none' };
-
     const tree = await schematicRunner.runSchematic('execution-view', options, appTree);
+    const files = getAllFilesFromDir(`${libMainPath}/${executionViewName}`, tree);
 
-    const files = tree.getDir(executionViewPath).subfiles;
-
-    expect(files).toHaveSize(2);
-    expect(files).toEqual(
-      jasmine.arrayContaining([
-        `wizard-${strings.dasherize(executionViewOptions.name)}.component.html`,
-        `wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`
-      ])
+    expect(files).not.toEqual(
+      jasmine.arrayContaining([`${libMainPath}/${expectedFiles.executionView}.less`])
     );
   });
 
@@ -111,140 +111,50 @@ describe('Generate Execution View', () => {
       executionViewOptions,
       appTree
     );
+    const actual = tree.readContent(`${libMainPath}/${expectedFiles.executionView}.less`);
 
-    const dasherizedExecutionViewName = strings.dasherize(executionViewOptions.name);
-
-    const executionViewStyleContent = tree.readContent(
-      `${executionViewPath}/wizard-${dasherizedExecutionViewName}.component.less`
-    );
-    expect(executionViewStyleContent).toEqual('');
+    expect(actual).toEqual('');
   });
 
-  it('should generate the html file with `cmf-core-controls-execution-view` component selector', async () => {
+  it('should generate the execution view html file with the correct content', async () => {
     const tree = await schematicRunner.runSchematic(
       'execution-view',
       executionViewOptions,
       appTree
     );
+    const actual = tree.readContent(`${libMainPath}/${expectedFiles.executionView}.html`);
+    const expected = readFileSync(`${fixturesPath}/${expectedFiles.executionView}.html`, {
+      encoding: 'utf-8'
+    });
 
-    const dasherizedExecutionViewName = strings.dasherize(executionViewOptions.name);
-
-    const templateRegExp = new RegExp(
-      `<cmf-core-controls-execution-view \\[cmf-core-business-controls-transaction-execution-view\\]="instance"\\s*` +
-        `i18n-mainTitle="@@${strings.dasherize(
-          executionViewOptions.project
-        )}/wizard-${dasherizedExecutionViewName}#TITLE" mainTitle="${strings.nameify(
-          executionViewOptions.name
-        )}"\\s*` +
-        `i18n-action-name="@@${strings.dasherize(
-          executionViewOptions.project
-        )}/wizard-${dasherizedExecutionViewName}#ACTION" action-name="Finish">\\s*` +
-        `<!-- Execution View steps -->\\s*` +
-        `<cmf-core-controls-execution-view-tab i18n-mainTitle="@@${strings.dasherize(
-          executionViewOptions.project
-        )}/wizard-${dasherizedExecutionViewName}#DETAILS" mainTitle="Details">\\s*` +
-        `<p>${strings.nameify(executionViewOptions.name)} Wizard works!</p>\\s*` +
-        `</cmf-core-controls-execution-view-tab>\\s*` +
-        `</cmf-core-controls-execution-view>`,
-      'gm'
-    );
-
-    const executionViewTemplateContent = tree.readContent(
-      `${executionViewPath}/wizard-${dasherizedExecutionViewName}.component.html`
-    );
-    expect(executionViewTemplateContent).toMatch(templateRegExp);
+    expect(normalize(actual)).toBe(normalize(expected));
   });
 
-  it('should have the Component decorator with properties selector, templateUrl, styleUrl, and viewProviders', async () => {
+  it('should generate the execution view ts file with the correct content', async () => {
     const tree = await schematicRunner.runSchematic(
       'execution-view',
       executionViewOptions,
       appTree
     );
+    const actual = tree.readContent(`${libMainPath}/${expectedFiles.executionView}.ts`);
+    const expected = readFileSync(`${fixturesPath}/${expectedFiles.executionView}.ts`, {
+      encoding: 'utf-8'
+    });
 
-    const executionViewContent = tree.readContent(
-      `${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`
-    );
-    expect(executionViewContent).toMatch(/@Component\(/);
-    expect(executionViewContent).toContain(`standalone: true`);
-    expect(executionViewContent).toContain(
-      `selector: '${strings.dasherize(executionViewOptions.project)}-wizard-${strings.dasherize(
-        executionViewOptions.name
-      )}'`
-    );
-    expect(executionViewContent).toMatch(
-      /imports: \[\s*((CommonModule|ExecutionViewModule|TransactionExecutionViewModule)\s*,?\s*){3}\]/gm
-    );
-    expect(executionViewContent).toContain(
-      `templateUrl: './wizard-${strings.dasherize(executionViewOptions.name)}.component.html'`
-    );
-    expect(executionViewContent).toContain(
-      `styleUrl: './wizard-${strings.dasherize(executionViewOptions.name)}.component.less'`
-    );
-    expect(executionViewContent).toContain(
-      `viewProviders: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Wizard${strings.classify(
-        executionViewOptions.name
-      )}Component) }]`
-    );
+    expect(normalize(actual)).toBe(normalize(expected));
   });
 
-  it('should extend CustomizableComponent', async () => {
+  it('should update the metadata with a new action', async () => {
     const tree = await schematicRunner.runSchematic(
       'execution-view',
       executionViewOptions,
       appTree
     );
+    const actual = tree.readContent(`${libMetadataPath}/${expectedFiles.metadata}`);
+    const expected = readFileSync(`${fixturesPath}/${expectedFiles.metadata}`, {
+      encoding: 'utf-8'
+    });
 
-    const executionViewContent = tree.readContent(
-      `${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`
-    );
-    expect(executionViewContent).toContain(
-      `export class Wizard${strings.classify(
-        executionViewOptions.name
-      )}Component extends CustomizableComponent`
-    );
-  });
-
-  it('should implement TransactionExecutionView and OnInit', async () => {
-    const tree = await schematicRunner.runSchematic(
-      'execution-view',
-      executionViewOptions,
-      appTree
-    );
-
-    const executionViewContent = tree.readContent(
-      `${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`
-    );
-    expect(executionViewContent).toContain(`implements TransactionExecutionView, OnInit`);
-    expect(executionViewContent).toContain(
-      `public async prepareDataInput(): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput[]> {`
-    );
-    expect(executionViewContent).toContain(
-      `public async handleDataOutput(outputs: Cmf.Foundation.BusinessOrchestration.BaseOutput[], executionViewArgs?: ExecutionViewEventArgs): Promise<void> {`
-    );
-    expect(executionViewContent).toContain(
-      `public async prepareTransactionInput(args: TransactionEventArgs): Promise<Cmf.Foundation.BusinessOrchestration.BaseInput> {`
-    );
-    expect(executionViewContent).toContain(
-      `public async handleTransactionOutput(output: Cmf.Foundation.BusinessOrchestration.BaseOutput): Promise<void> {`
-    );
-    expect(executionViewContent).toContain(`public ngOnInit(): void {`);
-  });
-
-  it('should inject the PageBag, UtilService, and EntityTypeService', async () => {
-    const tree = await schematicRunner.runSchematic(
-      'execution-view',
-      executionViewOptions,
-      appTree
-    );
-
-    const executionViewContent = tree.readContent(
-      `${executionViewPath}/wizard-${strings.dasherize(executionViewOptions.name)}.component.ts`
-    );
-
-    expect(executionViewContent).toContain('protected pageBag = inject(PageBag)');
-    expect(executionViewContent).toContain('protected util = inject(UtilService)');
-    expect(executionViewContent).toContain('protected entityTypes = inject(EntityTypeService)');
-    expect(executionViewContent).not.toContain('constructor');
+    expect(normalize(actual)).toBe(normalize(expected));
   });
 });

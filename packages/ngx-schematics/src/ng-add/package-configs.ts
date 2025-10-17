@@ -65,19 +65,23 @@ export const PROJECT_ALLOWED_COMMONJS_DEPENDENCIES = [
  */
 export const PROJECT_ASSETS = [
   {
+    glob: 'manifest.webmanifest',
+    input: 'public'
+  },
+  {
+    glob: '**/*',
+    input: 'public',
+    output: 'assets',
+    ignore: ['manifest.webmanifest']
+  },
+  {
     glob: 'favicon.ico',
-    input: 'node_modules/cmf-core/assets/img',
-    output: ''
+    input: 'node_modules/cmf-core/assets/img'
   },
   {
     glob: '**/icon-*.png',
     input: 'node_modules/cmf-core/assets/img/icons',
     output: 'assets/icons'
-  },
-  {
-    glob: '**/*',
-    input: 'node_modules/cmf-core/assets/img/flags',
-    output: 'assets/flags'
   },
   {
     glob: '**/*',
@@ -106,12 +110,7 @@ export const PROJECT_ASSETS = [
     output: 'assets/shell'
   },
   {
-    glob: 'artoolkit_wasm.wasm',
-    input: 'node_modules/cmf-artoolkit',
-    output: 'cmf-artoolkit'
-  },
-  {
-    glob: 'camera_para.dat',
+    glob: '{artoolkit_wasm.wasm,camera_para.dat}',
     input: 'node_modules/cmf-artoolkit',
     output: 'cmf-artoolkit'
   },

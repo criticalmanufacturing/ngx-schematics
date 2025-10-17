@@ -1,14 +1,21 @@
 import { Rule, Tree } from '@angular-devkit/schematics';
-import { Schema } from '../schema';
 import { SyntaxKind } from 'ts-morph';
 import {
   addSymbolToArrayLiteral,
   getObjectProperty,
-  insertImport
+  insertImport,
+  removeImport,
+  removeSymbolFromArrayLiteral
 } from '@criticalmanufacturing/schematics-devkit';
-import { CORE_BASE_PROVIDE, MES_BASE_PROVIDE, METADATA_ROUTING_PROVIDE } from '../package-configs';
-import { updateServiceWorker } from '../../migrations/update-1-2-0/update-service-worker';
-import { getAppConfig } from '../../utility/app-config';
+import { join, normalize, dirname } from '@angular-devkit/core';
+import { Schema } from '../schema.js';
+import {
+  CORE_BASE_PROVIDE,
+  MES_BASE_PROVIDE,
+  METADATA_ROUTING_PROVIDE
+} from '../package-configs.js';
+import { getAppConfig } from '../../utility/app-config.js';
+import { updateServiceWorker } from '../../migrations/update-1-2-0/update-service-worker.js';
 
 /**
  * Updates the application config providers base on the provided application type
@@ -33,14 +40,14 @@ export function updateAppConfig(options: {
     }
 
     if (options.application === 'MES') {
-      addSymbolToArrayLiteral(arrLiteral, MES_BASE_PROVIDE[1]);
+      addSymbolToArrayLiteral(arrLiteral, '\n' + MES_BASE_PROVIDE[1]);
       insertImport(
         arrLiteral.getSourceFile(),
         MES_BASE_PROVIDE[1].replace(/\(\)$/, ''),
         MES_BASE_PROVIDE[0]
       );
     } else {
-      addSymbolToArrayLiteral(arrLiteral, CORE_BASE_PROVIDE[1]);
+      addSymbolToArrayLiteral(arrLiteral, '\n' + CORE_BASE_PROVIDE[1]);
       insertImport(
         arrLiteral.getSourceFile(),
         CORE_BASE_PROVIDE[1].replace(/\(\)$/, ''),
@@ -48,16 +55,29 @@ export function updateAppConfig(options: {
       );
     }
 
-    addSymbolToArrayLiteral(arrLiteral, METADATA_ROUTING_PROVIDE[1]);
+    addSymbolToArrayLiteral(arrLiteral, '\n' + METADATA_ROUTING_PROVIDE[1] + '\n');
     insertImport(
       arrLiteral.getSourceFile(),
       METADATA_ROUTING_PROVIDE[1].replace(/\(\)$/, ''),
       METADATA_ROUTING_PROVIDE[0]
     );
 
+    removeImport(arrLiteral.getSourceFile(), 'routes', './app.routes');
+    removeImport(arrLiteral.getSourceFile(), 'provideRouter', '@angular/router');
+    removeSymbolFromArrayLiteral(arrLiteral, 'provideRouter(routes)');
+
+    const routesFile = join(
+      dirname(normalize(arrLiteral.getSourceFile().getFilePath())),
+      'app.routes.ts'
+    );
+
+    if (tree.exists(routesFile)) {
+      tree.delete(routesFile);
+    }
+
     updateServiceWorker(arrLiteral);
 
-    arrLiteral.getSourceFile().formatText();
+    arrLiteral.getSourceFile().formatText({ indentSize: 2 });
     tree.overwrite(
       arrLiteral.getSourceFile().getFilePath(),
       arrLiteral.getSourceFile().getFullText()

@@ -1,12 +1,7 @@
-import { EnvironmentProviders, NgModule } from '@angular/core';
+import { EnvironmentProviders } from '@angular/core';
 import { provideMetadata } from 'cmf-core';
 
 import { <%= classify(name) %>MetadataService } from './<%= dasherize(name) %>-metadata.service';
-
-@NgModule({
-    providers: [provide<%= classify(name) %>()]
-})
-export class <%= classify(name) %>MetadataModule { }
 
 /** Provides <%= nameify(name) %> functionality */
 export function provide<%= classify(name) %>(): EnvironmentProviders {

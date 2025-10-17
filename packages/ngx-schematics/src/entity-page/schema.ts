@@ -16,11 +16,6 @@ export interface Schema {
   name: string;
 
   /**
-   * The name of the entity type.
-   */
-  entityType: string;
-
-  /**
    * The namespace of the entity type.
    */
   namespace?: string;

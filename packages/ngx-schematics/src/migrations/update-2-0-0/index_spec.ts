@@ -92,7 +92,7 @@ describe('Test ng-update', () => {
 
     it('should remove the CoreModule', async () => {
       appTree.overwrite(
-        '/application/src/app/app.module.ts',
+        '/application/src/app/app-module.ts',
         `\
 import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -120,7 +120,7 @@ export class AppModule { }`
       );
 
       const tree = await migrationsSchematicRunner.runSchematic('update-2-0-0', {}, appTree);
-      const appModule = tree.readText('/application/src/app/app.module.ts');
+      const appModule = tree.readText('/application/src/app/app-module.ts');
       expect(appModule).not.toContain('CoreModule');
     });
 

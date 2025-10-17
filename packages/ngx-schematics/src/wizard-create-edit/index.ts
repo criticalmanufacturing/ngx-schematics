@@ -13,58 +13,54 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
-import inquirer, { InputQuestion, ListQuestion } from 'inquirer';
 
-import { getDefaultPath, parseName, strings } from '@criticalmanufacturing/schematics-devkit';
-import { Schema } from './schema';
-import { MetadataProperty, updateMetadata } from '../utility/metadata';
-import { updateLibraryAPI } from '../utility/update-library-api';
+import {
+  promptNamespace,
+  getDefaultPath,
+  parseName,
+  strings
+} from '@criticalmanufacturing/schematics-devkit';
+import { Schema } from './schema.js';
+import { MetadataProperty, updateMetadata } from '../utility/metadata.js';
+import { updateLibraryAPI } from '../utility/update-library-api.js';
 
-function getMetadataActions(project: string, entityTypeName: string) {
-  return `\
+function getMetadataActions(project: string, name: string) {
+  return `
 {
-    id: '${strings.classify(entityTypeName)}.Create',
-    mode: ActionMode.ModalPage,
-    loadComponent: () => import(
-        /* webpackExports: "WizardCreateEdit${strings.classify(entityTypeName)}Component" */
-        '${project}').then(m => m.WizardCreateEdit${strings.classify(entityTypeName)}Component),
-    context: {
-        editMode: 1 // mode: EditMode.Create
-    }
+  id: '${strings.classify(name)}.Create',
+  mode: ActionMode.ModalPage,
+  loadComponent: async () =>
+    (
+      await import(
+        /* webpackExports: "WizardCreateEdit${strings.classify(name)}Component" */
+        '${project}'
+      )
+    ).WizardCreateEdit${strings.classify(name)}Component,
+  context: {
+    editMode: 1 // mode: EditMode.Create
+  }
 },
 {
-    id: '${strings.classify(entityTypeName)}.Edit',
-    mode: ActionMode.ModalPage,
-    loadComponent: () => import(
-        /* webpackExports: "WizardCreateEdit${strings.classify(entityTypeName)}Component" */
-        '${project}').then(m => m.WizardCreateEdit${strings.classify(entityTypeName)}Component),
-    context: {
-        editMode: 3 // mode: EditMode.Edit
-    }
-}`;
+  id: '${strings.classify(name)}.Edit',
+  mode: ActionMode.ModalPage,
+  loadComponent: async () =>
+    (
+      await import(
+        /* webpackExports: "WizardCreateEdit${strings.classify(name)}Component" */
+        '${project}'
+      )
+    ).WizardCreateEdit${strings.classify(name)}Component,
+  context: {
+    editMode: 3 // mode: EditMode.Edit
+  }
+}
+`;
 }
 
 export default function (_options: Schema): Rule {
   return async (tree: Tree, _context: SchematicContext) => {
     if (!_options.namespace) {
-      const question: ListQuestion = {
-        type: 'list',
-        name: 'namespace',
-        message: 'What is the business objects namespace of the entity type?',
-        choices: ['Foundation', 'Navigo', 'Other (specify)']
-      };
-
-      _options.namespace = (await inquirer.prompt([question])).namespace;
-
-      if (_options.namespace!.startsWith('Other')) {
-        const question: InputQuestion = {
-          type: 'input',
-          name: 'namespace',
-          message: 'Namespace'
-        };
-
-        _options.namespace = (await inquirer.prompt([question])).namespace;
-      }
+      _options.namespace = await promptNamespace();
     }
 
     if (!_options.name) {

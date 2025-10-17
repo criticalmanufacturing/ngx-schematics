@@ -1,0 +1,247 @@
+import { Component, forwardRef, input, inject, OnChanges, SimpleChanges } from '@angular/core';
+import Cmf from 'cmf-lbos';
+import {
+  CustomizableComponent,
+  HOST_VIEW_COMPONENT,
+  ResultMessageType,
+  UtilService
+} from 'cmf-core';
+import {
+  ValidatorModule,
+  OnValidateArgs,
+  ColumnViewModule,
+  ColumnViewSelectedArgs,
+  ColumnViewLeaf,
+  ColumnViewModel,
+  ColumnViewAddArgs,
+  ColumnViewRemoveArgs,
+  ColumnViewUtil,
+  Validator
+} from 'cmf-core-controls';
+import {
+  PropertyViewerModule,
+  PropertyEditorModule,
+  PropertyContainerModule
+} from 'cmf-core-business-controls';
+
+import Entity = Cmf.Foundation.BusinessObjects.Entity;
+
+/**
+ * Cenas tag type used in ColumnView elements
+ */
+interface DataRowTag {
+  data: Entity;
+}
+
+/**
+ * @whatItDoes
+ *
+ * Please provide a meaningful description of this component
+ * Try to answer these questions:
+ * * What is it?
+ * * What it does?
+ * * How does it behave with different sizes?
+ * * Does it retrieve data from any external source (server, local database, text file, etc...)?
+ *
+ * @howToUse
+ *
+ * This component is used with the inputs and outputs mentioned below.
+ *
+ * Besides the description above, please complement it with a meaningful description of this
+ * component that answer these questions:
+ * * How to use it?
+ * * Where and When to use it?
+ *
+ * ### Example
+ * To use the component, assume this HTML Template as an example:
+ *
+ * ```HTML
+ * <test-lib-page-test-wizard-step></test-lib-page-test-wizard-step>
+ * ```
+ *
+ * ### _NOTES_
+ * (optional, Provide additional notes here)
+ *
+ * @description
+ *
+ * ## TestWizardStepComponent Component
+ *
+ */
+@Component({
+  selector: 'test-lib-step-test-wizard-step',
+  imports: [
+    ValidatorModule,
+    ColumnViewModule,
+    PropertyViewerModule,
+    PropertyEditorModule,
+    PropertyContainerModule
+  ],
+  hostDirectives: [Validator],
+  templateUrl: './step-test-wizard-step.component.html',
+  styleUrl: './step-test-wizard-step.component.less',
+  providers: [
+    { provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => StepTestWizardStepComponent) }
+  ]
+})
+export class StepTestWizardStepComponent extends CustomizableComponent implements OnChanges {
+  /** Column view initial data */
+  readonly data = input<Entity[]>([]);
+
+  /** Selected Leaf */
+  selectedLeaf: ColumnViewLeaf<DataRowTag> = null;
+
+  /** Model used by the ColumnView component that is shown on the template. */
+  readonly model: ColumnViewModel<DataRowTag> = {
+    rootNode: {
+      id: 'root',
+      name: $localize`Items`,
+      value: $localize`Value`,
+      children: []
+    }
+  };
+
+  /** Services to inject */
+  protected readonly _util = inject(UtilService);
+
+  /** Column View Util */
+  protected readonly _columnViewUtil = inject(ColumnViewUtil);
+
+  /** Messages. */
+  protected readonly _messages = {
+    noItemSelected: $localize`No Item Selected`,
+    noItemsFound: $localize`No Items Found`
+  };
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('data' in changes) {
+      this.model.rootNode.children = this._buildColumnViewModel();
+    }
+  }
+
+  /**
+   * The validation for this component
+   * @param context The validation context.
+   */
+  onValidate(context: OnValidateArgs): Promise<boolean> {
+    context.resultMessages ??= [];
+
+    if (this.getNewData().length === 0) {
+      context.resultMessages.push({
+        type: ResultMessageType.Error,
+        message: $localize`It's necessary to select at least one Entity to perform the operation.`
+      });
+
+      return Promise.resolve(false);
+    }
+
+    return Promise.resolve(true);
+  }
+
+  /**
+   * Fetches the column view data.
+   * @returns the selected entities.
+   */
+  getNewData(): Entity[] {
+    return (this.model.rootNode.children as ColumnViewLeaf<DataRowTag>[])
+      .map((leaf) => leaf.tag.data)
+      .filter((data) => data != null);
+  }
+
+  /**
+   * Callback used for the "selected" sent by the ColumnView component that
+   * is used to display the sub-materials that will be detached by this
+   * Detach wizard.
+   * @param event The payload sent by the "(selected)" event of the ColumnView component.
+   * @returns Nothing.
+   */
+  protected _onSelectedRow(event: ColumnViewSelectedArgs): void {
+    this.selectedLeaf = event?.selectedRow?.rootNode as ColumnViewLeaf<DataRowTag>;
+  }
+
+  /**
+   * Adds a new row to the ColumnView
+   * @param event ColumnViewAddArgs
+   */
+  protected _onAddRow(event: ColumnViewAddArgs<DataRowTag>): void {
+    const newLeaf = this._buildEmptyLeaf();
+    (this.model.rootNode.children as ColumnViewLeaf<DataRowTag>[]).push(newLeaf);
+
+    void event.add(true);
+    this.selectedLeaf = newLeaf;
+  }
+
+  /**
+   * Removes the selected row from the ColumnView
+   * @param event ColumnViewRemoveArgs
+   */
+  protected _onRemoveRow(event: ColumnViewRemoveArgs<DataRowTag>) {
+    event.remove(true);
+    this.selectedLeaf = null;
+  }
+
+  /**
+   * Entity selection change event handler
+   * @param newEntity new value for the entity
+   */
+  protected _onEntitySelected(newEntity: Entity) {
+    if (this.selectedLeaf == null) {
+      return;
+    }
+
+    this.selectedLeaf.tag.data = newEntity;
+    this.selectedLeaf.name = this._getRowName(newEntity);
+  }
+
+  /**
+   * Computes the column view leafs.
+   */
+  private _buildColumnViewModel(): ColumnViewLeaf<DataRowTag>[] {
+    const data = this.data();
+
+    if (data == null) {
+      return [];
+    }
+
+    return data.map(
+      (dataRow) =>
+        ({
+          id: this._util._.uniqueId('leaf_'),
+          name: this._getRowName(dataRow),
+          value: '',
+          tag: {
+            data: dataRow
+          }
+        }) satisfies ColumnViewLeaf<DataRowTag>
+    );
+  }
+
+  /**
+   * Gets the HTML Name for Column View Row
+   * @param name row name
+   * @param description row description
+   */
+  private _getRowName(data: Entity) {
+    return this._columnViewUtil.buildHTMLForLeaf(
+      data.Name,
+      data.Description,
+      $localize`New Item`,
+      null
+    );
+  }
+
+  /**
+   * Build an empty leaf
+   * @returns new leaf
+   */
+  private _buildEmptyLeaf(): ColumnViewLeaf<DataRowTag> {
+    return {
+      id: this._util._.uniqueId('row_'),
+      name: this._getRowName(null),
+      value: null,
+      canRemove: true,
+      tag: {
+        data: null
+      }
+    };
+  }
+}

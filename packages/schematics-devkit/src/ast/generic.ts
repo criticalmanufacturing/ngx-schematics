@@ -63,7 +63,13 @@ export function insertImport(
       return;
     }
 
-    importNode.addNamedImport(symbolName);
+    importNode
+      .addNamedImport({
+        name: symbolName,
+        leadingTrivia: '\n',
+        trailingTrivia: '\n'
+      })
+      .formatText({ indentSize: 2 });
   } else {
     source.addImportDeclaration({
       moduleSpecifier: module,
@@ -109,6 +115,27 @@ export function insertExport(
       moduleSpecifier: module,
       leadingTrivia
     });
+  }
+}
+
+/**
+ * Removes an import declaration in a file
+ * @param source Source File
+ * @param symbolName Import symbol
+ * @param module Import module specifier
+ */
+export function removeImport(source: SourceFile, symbolName: string, module: string): void {
+  const allImports = source.getImportDeclarations();
+  const importNode = allImports.find((node) => node.getModuleSpecifierValue() === module);
+
+  if (importNode) {
+    const namedImports = importNode.getNamedImports();
+
+    if (importNode.getNamedImports().length > 1) {
+      namedImports.find((node) => node.getName() === symbolName)?.remove();
+    } else {
+      importNode.remove();
+    }
   }
 }
 
@@ -161,6 +188,7 @@ export function updateObjectArrayProperty(
     elementsToAdd.map((e) => "'" + e + "'"),
     { useNewLines: true }
   );
+  array.formatText({ indentSize: 2 });
 
   const loader = objectExpression.getProperty('loader');
 
@@ -173,7 +201,7 @@ export function updateObjectArrayProperty(
 
   if (exportsMatch) {
     const insertIndex = exportsMatch.index + exportsMatch[0].length - exportsMatch[2].length;
-    const baseIndentation = loader.getIndentationText().length / loader.getIndentationLevel();
+    const baseIndentation = 2;
     const indentation = loader.getIndentationText() + ' '.repeat(baseIndentation * 2);
     loader.replaceWithText(
       loaderText.slice(0, insertIndex) + // ... webpackExports: [...
@@ -186,7 +214,7 @@ export function updateObjectArrayProperty(
     );
   }
 
-  loader.formatText();
+  loader.formatText({ indentSize: 2 });
 }
 
 /**
@@ -261,7 +289,7 @@ export function addSymbolToArrayLiteral(
   toInsert: string,
   before?: string
 ): void {
-  if (arryaLiteral.getElements().some((elem) => elem.getText() === toInsert)) {
+  if (arryaLiteral.getElements().some((elem) => elem.getText() === toInsert.trim())) {
     return;
   }
 
@@ -276,4 +304,23 @@ export function addSymbolToArrayLiteral(
   }
 
   arryaLiteral.insertElement(index, toInsert);
+}
+
+/**
+ * Removes a symbol from an array literal
+ * @param arryaLiteral the array literal node
+ * @param toInsert the symbol to remove
+ * @returns
+ */
+export function removeSymbolFromArrayLiteral(
+  arryaLiteral: ArrayLiteralExpression,
+  toRemove: string
+): void {
+  const index = arryaLiteral.getElements().findIndex((elem) => elem.getText() === toRemove);
+
+  if (index < 0) {
+    return;
+  }
+
+  arryaLiteral.removeElement(index);
 }

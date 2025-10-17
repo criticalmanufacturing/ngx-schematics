@@ -1,8 +1,8 @@
 import { dirname, join, normalize } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
 import { ProjectDefinition } from '@schematics/angular/utility';
-import { createSourceFile } from '../ast/generic';
-import { JSONFile } from '../parsers/json';
+import { createSourceFile } from '../ast/generic.js';
+import { JSONFile } from '../parsers/json.js';
 
 /**
  * Finds the file path in the public api given the entry point name

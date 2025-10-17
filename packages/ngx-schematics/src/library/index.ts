@@ -26,11 +26,11 @@ import {
   updateNgPackageJson,
   updateTsConfig
 } from '@criticalmanufacturing/schematics-devkit/rules';
-import { Schema } from './schema';
-import { addSymbolToNgModuleMetadata, getAppModulePath } from '../utility/ng-module';
-import { getDefaultAppConfig } from '../utility/app-config';
+import { Schema } from './schema.js';
+import { addSymbolToNgModuleMetadata, getAppModulePath } from '../utility/ng-module.js';
+import { getDefaultAppConfig } from '../utility/app-config.js';
 import { SyntaxKind } from 'ts-morph';
-import { METADATA_ROUTING_PROVIDE } from '../ng-add/package-configs';
+import { METADATA_ROUTING_PROVIDE } from '../ng-add/package-configs.js';
 
 function updateAppConfig(options: { packageName: string; namePrefix: string }): Rule {
   return async (tree: Tree) => {
@@ -50,7 +50,7 @@ function updateAppConfig(options: { packageName: string; namePrefix: string }): 
 
     addSymbolToArrayLiteral(
       arrLiteral,
-      `provide${strings.classify(options.namePrefix)}()`,
+      `\nprovide${strings.classify(options.namePrefix)}()`,
       METADATA_ROUTING_PROVIDE[1]
     );
     insertImport(
@@ -160,6 +160,14 @@ export default function (_options: Schema): Rule {
         lint ? '@angular-eslint/schematics' : '@schematics/angular',
         'library',
         _options
+      ),
+      updateTsConfig(
+        [
+          [['compilerOptions', 'types'], undefined],
+          [['include'], undefined],
+          [['include'], ['**/*.ts']]
+        ],
+        _options.name
       ),
       updateNgPackageJson(_options),
       !skipMetadata ? createMetadataSubEntry(_options) : noop()

@@ -2,6 +2,7 @@ import { Rule, SchematicsException, Tree } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
 import { parse } from 'node-html-parser';
 import { getBuildTargets } from '@criticalmanufacturing/schematics-devkit';
+import { join, normalize } from '@angular-devkit/core';
 
 /**
  * Finds and updates all of the project index.html files
@@ -20,11 +21,15 @@ export function updateIndexFiles(options: { project: string }): Rule {
 
     const buildTargets = getBuildTargets(project);
 
-    const indexFiles: string[] = [];
+    const indexFiles = new Set<string>();
 
     for (const target of buildTargets) {
       if (typeof target.options?.index === 'string') {
-        indexFiles.push(target.options.index);
+        indexFiles.add(target.options.index);
+      } else if (!target.options?.index) {
+        indexFiles.add(
+          join(normalize(project.sourceRoot ?? join(normalize(project.root), 'src')), 'index.html')
+        );
       }
 
       if (!target.configurations) {
@@ -33,7 +38,7 @@ export function updateIndexFiles(options: { project: string }): Rule {
 
       for (const options of Object.values(target.configurations)) {
         if (typeof options?.index === 'string') {
-          indexFiles.push(options.index);
+          indexFiles.add(options.index);
         }
       }
     }
@@ -59,6 +64,11 @@ export function updateIndexFiles(options: { project: string }): Rule {
     </div>
   </div>`
         );
+      }
+
+      const head = index.querySelector('head');
+      if (head) {
+        head.insertAdjacentHTML('beforeend', '  <meta name="theme-color" content="#1976d2">');
       }
 
       tree.overwrite(path, index.toString());

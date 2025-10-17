@@ -1,27 +1,6 @@
-import {
-    Component,
-    ElementRef,
-    ViewContainerRef
-} from '@angular/core';
-
-import {
-    CommonModule
-} from '@angular/common';
-
-import {
-    FeedbackService
-} from 'cmf-core';
-
-import {
-    Widget,
-    WidgetGeneric,
-    WidgetRepresentation,
-    WidgetViewMode
-} from 'cmf-core-dashboards';
-
-import {
-    <%= classify(name) %>WidgetSettingsComponent
-} from './<%= dasherize(name) %>-widget-settings/<%= dasherize(name) %>-widget-settings.component';
+import { Component } from '@angular/core';
+import { Widget, WidgetGeneric, WidgetRepresentation, WidgetViewMode } from 'cmf-core-dashboards';
+import { <%= classify(name) %>WidgetSettingsComponent } from './<%= dasherize(name) %>-widget-settings/<%= dasherize(name) %>-widget-settings.component';
 
 /**
  * @whatItDoes
@@ -39,7 +18,8 @@ import {
  *
  * Also the configurable settings of the widget are referred in Widget Settings Component
  *
- * Besides the description above, please complement it with a meaningful description of this widget that answer these questions:
+ * Besides the description above, please complement it with a meaningful description of this
+ * widget that answer these questions:
  * * How to use it?
  * * Where and When to use it?
  *
@@ -60,51 +40,21 @@ import {
  * @description
  *
  * ## <%= nameify(name) %> Widget Component
- *
- * ### Dependencies
- *
- * #### Components
- * * ComponentA : `package`
- * * ComponentB : `package`
- *
- * #### Services
- * * ServiceA : `package`
- * * ServiceB : `package`
- *
- * #### Directives
- * * DirectiveA : `package` (Ex: `cmf.core.controls`)
- * * DirectiveB : `package` (Ex: `cmf.core.controls`)
- *
  */
 @Widget({
-    name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>-widget#NAME:<%= nameify(name) %> Widget`,
-    iconClass: 'icon-core-st-lg-generic',
-    settingsComponent: {
-        component: <%= classify(name) %>WidgetSettingsComponent
-    }
+  name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>-widget#NAME:<%= nameify(name) %> Widget`,
+  iconClass: 'icon-core-st-lg-generic',
+  settingsComponent: {
+    component: <%= classify(name) %>WidgetSettingsComponent
+  }
 })
 @Component({
-    standalone: true,
-    selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget',
-    imports: [CommonModule],
-    templateUrl: './<%= dasherize(name) %>-widget.component.html',
-    <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-widget.component.<%= style %>'<% } %>
+  selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget',
+  imports: [],
+  templateUrl: './<%= dasherize(name) %>-widget.component.html',
+  <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-widget.component.<%= style %>'<% } %>
 })
 export class <%= classify(name) %>Widget extends WidgetGeneric implements WidgetRepresentation {
-
-    /**
-     * Defines how the widget will be represented
-     */
-    public uiWidgetViewMode: WidgetViewMode = WidgetViewMode.Normal;
-
-    /**
-     * Constructor
-     */
-    constructor(
-        viewContainerRef: ViewContainerRef,
-        elementRef: ElementRef,
-        feedback: FeedbackService
-    ) {
-        super(viewContainerRef, elementRef, feedback);
-    }
+  /** Defines how the widget will be represented */
+  uiWidgetViewMode: WidgetViewMode = WidgetViewMode.Normal;
 }

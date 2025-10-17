@@ -10,6 +10,7 @@ import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 import { PROJECT_POLYFILLS } from '../../ng-add/package-configs';
 import parse from 'node-html-parser';
 import { getAppModulePath, removeSymbolFromNgModuleMetadata } from '../../utility/ng-module';
+import { join, normalize } from '@angular-devkit/core';
 
 export const FULL_CALENDAR = {
   bundleName: 'fullcalendar',
@@ -59,11 +60,15 @@ function updateAppIndex(options: { project: string }): Rule {
 
     const buildTargets = getBuildTargets(project);
 
-    const indexFiles: string[] = [];
+    const indexFiles = new Set<string>();
 
     for (const target of buildTargets) {
       if (typeof target.options?.index === 'string') {
-        indexFiles.push(target.options.index);
+        indexFiles.add(target.options.index);
+      } else if (!target.options?.index) {
+        indexFiles.add(
+          join(normalize(project.sourceRoot ?? join(normalize(project.root), 'src')), 'index.html')
+        );
       }
 
       if (!target.configurations) {
@@ -72,7 +77,7 @@ function updateAppIndex(options: { project: string }): Rule {
 
       for (const options of Object.values(target.configurations)) {
         if (typeof options?.index === 'string') {
-          indexFiles.push(options.index);
+          indexFiles.add(options.index);
         }
       }
     }

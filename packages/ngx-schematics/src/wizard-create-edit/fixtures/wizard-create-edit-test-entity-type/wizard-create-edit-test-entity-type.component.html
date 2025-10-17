@@ -1,0 +1,16 @@
+<cmf-core-business-controls-createEditEntity
+  [editMode]="editMode"
+  [mainTitle]="title"
+  [actionName]="action"
+  [onInitialSetupStart]="onInitialSetupStart"
+  [onInitialSetupFinish]="onInitialSetupFinish"
+  [onBeforeServiceCall]="onBeforeServiceCall"
+  [instance]="instance">
+  <!-- General Data Step -->
+  <cmf-core-business-controls-createEditStepGeneralData
+    i18n-mainTitle="@@test-lib/wizard-create-edit-test-entity-type#GENERAL_DATA"
+    mainTitle="General Data"
+    [instance]="instance"
+    [editMode]="editMode">
+  </cmf-core-business-controls-createEditStepGeneralData>
+</cmf-core-business-controls-createEditEntity>

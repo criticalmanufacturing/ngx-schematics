@@ -19,9 +19,9 @@ import {
   relative,
   strings
 } from '@criticalmanufacturing/schematics-devkit';
-import { updateLibraryMetadata } from '../utility/update-library-metadata';
-import { Schema } from './schema';
-import { updateLibraryAPI } from '../utility/update-library-api';
+import { updateLibraryMetadata } from '../utility/update-library-metadata.js';
+import { Schema } from './schema.js';
+import { updateLibraryAPI } from '../utility/update-library-api.js';
 
 export default function (_options: Schema): Rule {
   return async (tree: Tree) => {

@@ -15,9 +15,9 @@ import {
 import { readWorkspace } from '@schematics/angular/utility';
 
 import { getDefaultPath, parseName, strings } from '@criticalmanufacturing/schematics-devkit';
-import { Schema } from './schema';
-import { updateMetadataPackageInfo } from '../utility/metadata';
-import { updateLibraryAPI } from '../utility/update-library-api';
+import { Schema } from './schema.js';
+import { updateMetadataPackageInfo } from '../utility/metadata.js';
+import { updateLibraryAPI } from '../utility/update-library-api.js';
 
 export default function (_options: Schema): Rule {
   return async (tree: Tree, _context: SchematicContext) => {

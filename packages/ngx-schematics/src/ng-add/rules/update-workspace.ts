@@ -11,8 +11,8 @@ import {
   PROJECT_MES_STYLES,
   PROJECT_POLYFILLS,
   PROJECT_SCRIPTS
-} from '../package-configs';
-import { Schema } from '../schema';
+} from '../package-configs.js';
+import { Schema } from '../schema.js';
 
 /**
  * Adds elements to json array if not already present.
@@ -101,16 +101,8 @@ export function updateWorkspace(options: {
           }
 
           // Add assets
-          target.options.assets ??= [];
+          target.options.assets = [];
           if (target.options.assets instanceof Array) {
-            const index = target.options.assets.indexOf('src/favicon.ico');
-            if (index >= 0) {
-              target.options.assets.splice(index, 1);
-              if (tree.exists('src/favicon.ico')) {
-                tree.delete('src/favicon.ico');
-              }
-            }
-
             addToJsonArray(
               target.options.assets,
               options.application === 'MES' ? PROJECT_MES_ASSETS : PROJECT_CORE_ASSETS
@@ -138,19 +130,13 @@ export function updateWorkspace(options: {
             addToJsonArray(target.options.polyfills, PROJECT_POLYFILLS);
           }
 
-          if (typeof target.options.outputPath === 'string') {
-            target.options.outputPath = {
-              base: target.options.outputPath,
-              browser: ''
-            };
-          }
-
           if (
-            target.builder === '@angular-devkit/build-angular:application' &&
-            typeof target.options.outputPath === 'string'
+            ['@angular-devkit/build-angular:application', '@angular/build:application'].some(
+              (x) => x === target.builder
+            )
           ) {
             target.options.outputPath = {
-              base: target.options.outputPath,
+              base: `dist/${options.project}`,
               browser: ''
             };
           }
