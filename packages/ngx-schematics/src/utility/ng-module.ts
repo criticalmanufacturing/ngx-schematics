@@ -112,7 +112,7 @@ export function addSymbolToNgModuleMetadata(
   addSymbolToArrayLiteral(arrLiteral, symbolName, insertBefore);
 
   if (importPath) {
-    insertImport(source, symbolName.replace(/\..*$/, ''), importPath);
+    insertImport(source, symbolName.replace(/(\.|\().*$/, ''), importPath);
   }
 }
 

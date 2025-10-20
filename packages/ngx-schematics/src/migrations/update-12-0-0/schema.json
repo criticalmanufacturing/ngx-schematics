@@ -1,0 +1,6 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "Migrate1200",
+  "title": "Adds support for angular v20.",
+  "type": "object"
+}

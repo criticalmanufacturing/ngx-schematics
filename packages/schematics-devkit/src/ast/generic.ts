@@ -69,7 +69,7 @@ export function insertImport(
         leadingTrivia: '\n',
         trailingTrivia: '\n'
       })
-      .formatText({ indentSize: 2 });
+      .formatText({ indentSize: getIndentSize(source) });
   } else {
     source.addImportDeclaration({
       moduleSpecifier: module,
@@ -184,11 +184,13 @@ export function updateObjectArrayProperty(
     return;
   }
 
+  const indentSize = getIndentSize(objectExpression.getSourceFile()) ?? 4;
+
   array.addElements(
     elementsToAdd.map((e) => "'" + e + "'"),
     { useNewLines: true }
   );
-  array.formatText({ indentSize: 2 });
+  array.formatText({ indentSize });
 
   const loader = objectExpression.getProperty('loader');
 
@@ -198,23 +200,21 @@ export function updateObjectArrayProperty(
 
   const loaderText = loader.getText();
   const exportsMatch = /webpackExports\s*:\s*\[([^\]]*?)(\s*\])/.exec(loaderText);
+  const indentation =
+    /([\t ]*)(?=\/\*\s*webpackExports)/.exec(loaderText)?.[1] ?? loader.getIndentationText();
 
   if (exportsMatch) {
     const insertIndex = exportsMatch.index + exportsMatch[0].length - exportsMatch[2].length;
-    const baseIndentation = 2;
-    const indentation = loader.getIndentationText() + ' '.repeat(baseIndentation * 2);
     loader.replaceWithText(
       loaderText.slice(0, insertIndex) + // ... webpackExports: [...
         (exportsMatch[1].trim().length > 0 ? ',' : '') +
-        `\n${indentation}"${elementsToAdd.join(`",\n${indentation}"`)}"` +
-        (exportsMatch[2].length === 1
-          ? `\n${loader.getIndentationText() + ' '.repeat(baseIndentation)}`
-          : '') +
+        `\n${indentation + ' '.repeat(indentSize)}"${elementsToAdd.join(`",\n${indentation}"`)}"` +
+        (exportsMatch[2].length === 1 ? `\n${indentation}` : '') +
         loaderText.slice(insertIndex, loaderText.length) // ] ...
     );
   }
 
-  loader.formatText({ indentSize: 2 });
+  loader.formatText({ indentSize });
 }
 
 /**
@@ -323,4 +323,22 @@ export function removeSymbolFromArrayLiteral(
   }
 
   arryaLiteral.removeElement(index);
+}
+
+/**
+ * Determines the indentation size used in the source file.
+ * @param sourceFile The SourceFile to analyze.
+ * @returns The number of spaces used for indentation, or undefined if no indentation is found.
+ */
+export function getIndentSize(sourceFile: SourceFile): number | undefined {
+  const code = sourceFile.getFullText();
+  const lines = code.split(/\r?\n/);
+
+  for (const line of lines) {
+    const match = line.match(/^(\s+)\S/);
+    if (match) {
+      const indent = match[1];
+      return indent.includes('\t') ? 4 : indent.length; // assume tab = 4 spaces
+    }
+  }
 }

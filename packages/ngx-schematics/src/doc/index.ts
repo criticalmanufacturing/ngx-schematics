@@ -1,6 +1,6 @@
 import { chain, Rule, Tree } from '@angular-devkit/schematics';
 import { readWorkspace, ProjectDefinition } from '@schematics/angular/utility';
-import { getDefaultPath, tryGetRoot } from '@criticalmanufacturing/schematics-devkit';
+import { getDefaultPath, ProjectType, tryGetRoot } from '@criticalmanufacturing/schematics-devkit';
 import { isAbsolute, join, normalize, relative } from '@angular-devkit/core';
 import { Project } from 'ts-morph';
 import { Schema } from './schema.js';
@@ -105,7 +105,7 @@ function updateDoc(options: Schema) {
     [projectName, project] =
       Array.from(workspace.projects).find(
         ([, def]) =>
-          def.extensions['projectType'] === 'library' &&
+          def.extensions['projectType'] === ProjectType.Library &&
           relPath.startsWith((def.root ?? getDefaultPath(def)) + '/')
       ) ?? [];
 

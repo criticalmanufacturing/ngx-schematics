@@ -36,7 +36,9 @@ export function updateTsConfig(rules: [string[], any][], project?: string): Rule
 
       file.modify(
         path,
-        Array.isArray(oldValue) && Array.isArray(newValue) ? [...oldValue, ...newValue] : newValue
+        Array.isArray(oldValue) && Array.isArray(newValue)
+          ? Array.from(new Set([...oldValue, ...newValue]))
+          : newValue
       );
     });
   };

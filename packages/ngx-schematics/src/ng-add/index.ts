@@ -8,7 +8,7 @@ import {
   Tree
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
-import { JsonArray, JsonObject } from '@angular-devkit/core';
+import { JsonObject } from '@angular-devkit/core';
 import { select } from '@inquirer/prompts';
 import {
   NodeDependency,
@@ -88,17 +88,13 @@ function installSchematics(options: Schema) {
       updateNgswConfig(options as Required<Schema>),
       updateWebmanifest(options as Required<Schema>),
       updateWorkspace(options),
-      installDependencies(dependencies),
       updateTsConfig([
         [['compilerOptions', 'strictFunctionTypes'], false],
         [['compilerOptions', 'noImplicitAny'], false],
         [['compilerOptions', 'strictNullChecks'], false],
-        [['compilerOptions', 'preserveSymlinks'], true],
-        [
-          ['compilerOptions', 'types'],
-          ['@angular/localize', 'moment-duration-format', 'cmf.kendoui', 'jquery']
-        ]
-      ])
+        [['compilerOptions', 'preserveSymlinks'], true]
+      ]),
+      installDependencies(dependencies)
     ]);
   };
 }
@@ -138,8 +134,8 @@ export default function (_options: Schema): Rule {
     const workspace = await readWorkspace(tree);
     _options.eslint =
       _options.eslint &&
-      !((workspace.extensions.cli as JsonObject)?.schematicCollections as JsonArray)?.includes(
-        '@angular-eslint/schematics'
+      !((workspace.extensions.cli as JsonObject)?.schematicCollections as string[])?.some((x) =>
+        ['@angular-eslint/schematics', 'angular-eslint'].includes(x)
       );
 
     const angularVersion = require('@angular/cli/package.json').version.replace(
@@ -150,7 +146,7 @@ export default function (_options: Schema): Rule {
     await installNpmPackages([
       `@angular/pwa@${angularVersion}`,
       `@angular/localize@${angularVersion}`,
-      _options.eslint ? `@angular-eslint/schematics@${angularVersion}` : ''
+      _options.eslint ? `angular-eslint@${angularVersion}` : ''
     ]);
 
     return chain([
@@ -165,7 +161,7 @@ export default function (_options: Schema): Rule {
             useAtRuntime: true
           })
         : noop(),
-      _options.eslint ? externalSchematic('@angular-eslint/schematics', 'ng-add', {}) : noop(),
+      _options.eslint ? externalSchematic('angular-eslint', 'ng-add', {}) : noop(),
       installSchematics(_options)
     ]);
   };

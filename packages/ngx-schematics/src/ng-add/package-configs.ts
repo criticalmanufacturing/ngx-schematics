@@ -64,16 +64,8 @@ export const PROJECT_ALLOWED_COMMONJS_DEPENDENCIES = [
  * Project Assets
  */
 export const PROJECT_ASSETS = [
-  {
-    glob: 'manifest.webmanifest',
-    input: 'public'
-  },
-  {
-    glob: '**/*',
-    input: 'public',
-    output: 'assets',
-    ignore: ['manifest.webmanifest']
-  },
+  'src/assets',
+  'src/manifest.webmanifest',
   {
     glob: 'favicon.ico',
     input: 'node_modules/cmf-core/assets/img'
@@ -145,8 +137,6 @@ const GENERIC_STYLES = [
   'node_modules/toastr/toastr.less',
   'node_modules/bootstrap/dist/css/bootstrap.css',
   'node_modules/cmf.kendoui/styles/kendo.common.min.css',
-  'node_modules/jquery-ui/themes/base/dialog.css',
-  'node_modules/jquery-ui/themes/base/core.css',
   'node_modules/cmf-core-connect-iot/assets/fonts/coreconnectiot/icon-core-connect-iot-font.less',
   'node_modules/cmf-core-iotevents/assets/fonts/coreiotevents/icon-core-iot-events-font.less',
   'node_modules/@criticalmanufacturing/connect-iot-controller-engine-core-tasks/assets/font/icon-core-tasks-connect-iot-font.less',
@@ -191,21 +181,6 @@ export const PROJECT_MES_STYLES = [
 export const PROJECT_SCRIPTS = [
   'node_modules/jquery/dist/jquery.min.js',
   'node_modules/toastr/toastr.js',
-  'node_modules/jquery-ui/ui/version.js',
-  'node_modules/jquery-ui/ui/data.js',
-  'node_modules/jquery-ui/ui/plugin.js',
-  'node_modules/jquery-ui/ui/scroll-parent.js',
-  'node_modules/jquery-ui/ui/safe-active-element.js',
-  'node_modules/jquery-ui/ui/unique-id.js',
-  'node_modules/jquery-ui/ui/focusable.js',
-  'node_modules/jquery-ui/ui/tabbable.js',
-  'node_modules/jquery-ui/ui/keycode.js',
-  'node_modules/jquery-ui/ui/safe-blur.js',
-  'node_modules/jquery-ui/ui/widget.js',
-  'node_modules/jquery-ui/ui/widgets/button.js',
-  'node_modules/jquery-ui/ui/widgets/mouse.js',
-  'node_modules/jquery-ui/ui/widgets/dialog.js',
-  'node_modules/jquery-ui/ui/widgets/draggable.js',
   'node_modules/bootstrap/js/collapse.js',
   'node_modules/bootstrap/js/transition.js',
   'node_modules/bootstrap/js/dropdown.js',

@@ -7,7 +7,8 @@ import {
   getFilePathFromEntryPoint,
   updateObjectArrayProperty,
   strings,
-  insertImport
+  insertImport,
+  getIndentSize
 } from '@criticalmanufacturing/schematics-devkit';
 
 export enum MetadataProperty {
@@ -119,7 +120,7 @@ override get ${propertyIdentifier}(): ${Object.keys(PROPERTY_REFERENCE[propertyI
   ];
 }`;
 
-    metadataClass.addMember(memberToInsert).formatText({ indentSize: 2 });
+    metadataClass.addMember(memberToInsert).formatText({ indentSize: getIndentSize(source) });
 
     return;
   }
@@ -134,7 +135,7 @@ override get ${propertyIdentifier}(): ${Object.keys(PROPERTY_REFERENCE[propertyI
   }
 
   array.addElement(toInsert);
-  array.formatText({ indentSize: 2 });
+  array.formatText({ indentSize: getIndentSize(source) });
 }
 
 /**
@@ -194,7 +195,7 @@ export function insertRoutesMetadata(
 
   insertImports(source, requiredImports);
   routes.addElement(toInsert);
-  routes.formatText({ indentSize: 2 });
+  routes.formatText({ indentSize: getIndentSize(source) });
 }
 
 /**

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "commonjs",
     "target": "ES6",
     "skipLibCheck": true,
     "types": ["reflect-metadata", "node", "mocha"],

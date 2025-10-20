@@ -94,6 +94,12 @@ function installSchematics(options: Schema) {
     ];
 
     return chain([
+      options.project
+        ? externalSchematic('@angular/localize', 'ng-add', {
+            project: options.project,
+            useAtRuntime: true
+          })
+        : noop(),
       updateWorkspace(),
       installDependencies(dependencies),
       updatePackagejson(),
@@ -101,7 +107,8 @@ function installSchematics(options: Schema) {
         [['compilerOptions', 'strictFunctionTypes'], false],
         [['compilerOptions', 'noImplicitAny'], false],
         [['compilerOptions', 'strictNullChecks'], false],
-        [['compilerOptions', 'preserveSymlinks'], true]
+        [['compilerOptions', 'preserveSymlinks'], true],
+        [['compilerOptions', 'useDefineForClassFields'], false]
       ])
     ]);
   };

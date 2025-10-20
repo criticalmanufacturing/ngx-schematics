@@ -5,7 +5,7 @@ import {
   createSourceFile,
   getDefaultApplicationProject
 } from '@criticalmanufacturing/schematics-devkit';
-import { addApplicationAssets } from '@criticalmanufacturing/schematics-devkit/rules';
+import { updateAppBuildTarget } from '@criticalmanufacturing/schematics-devkit/rules';
 
 /**
  * Updates all aplications that are using the angular service worker to use the custom service worker
@@ -41,7 +41,7 @@ export default function (): Rule {
     }
 
     return chain([
-      addApplicationAssets({ project, assets: SW_ASSETS }),
+      updateAppBuildTarget(project, [[['assets'], SW_ASSETS]]),
       updateAppModuleServiceWorker(project)
     ]);
   };

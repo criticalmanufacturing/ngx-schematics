@@ -41,7 +41,7 @@ export function updateAppModule(options: {
 
     updateServiceWorker(source);
 
-    source.formatText();
+    source.formatText({ indentSize: 2 });
     tree.overwrite(source.getFilePath(), source.getFullText());
 
     return;

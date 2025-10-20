@@ -1,4 +1,4 @@
-import { basename, join, JsonArray, JsonObject, normalize } from '@angular-devkit/core';
+import { basename, join, JsonObject, normalize } from '@angular-devkit/core';
 import {
   apply,
   applyTemplates,
@@ -148,24 +148,20 @@ export default function (_options: Schema): Rule {
 
     const workspace = await readWorkspace(tree);
 
-    const lint = (
-      (workspace.extensions.cli as JsonObject)?.schematicCollections as JsonArray
-    )?.includes('@angular-eslint/schematics');
+    const lint = ((workspace.extensions.cli as JsonObject)?.schematicCollections as string[])?.find(
+      (x) => ['@angular-eslint/schematics', 'angular-eslint'].includes(x)
+    );
 
     const skipMetadata = _options.skipMetadata;
     delete _options.skipMetadata;
 
     return chain([
-      externalSchematic(
-        lint ? '@angular-eslint/schematics' : '@schematics/angular',
-        'library',
-        _options
-      ),
+      externalSchematic(lint ?? '@schematics/angular', 'library', _options),
       updateTsConfig(
         [
-          [['compilerOptions', 'types'], undefined],
           [['include'], undefined],
-          [['include'], ['**/*.ts']]
+          [['include'], ['**/*.ts']],
+          [['compilerOptions', 'types'], ['@angular/localize']]
         ],
         _options.name
       ),

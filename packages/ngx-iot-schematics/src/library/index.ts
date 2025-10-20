@@ -20,7 +20,8 @@ import {
   NodeDependencyType,
   removeDirectory,
   installDependencies,
-  updateNgPackageJson
+  updateNgPackageJson,
+  updateTsConfig
 } from '@criticalmanufacturing/schematics-devkit/rules';
 import { Schema } from './schema.js';
 
@@ -132,18 +133,17 @@ function addIoTLibrary(options: { project: string; skipInstall: boolean; fullnam
     const sourceDir = `${project.root}/src/lib`;
 
     const devDeps = {
-      '@types/chai': '4.3.0',
-      '@types/chai-spies': '1.0.3',
-      '@types/mocha': '9.0.0',
-      '@types/node-cron': '^2.0.5',
-      chai: '4.3.4',
-      'chai-spies': '1.0.0',
-      mocha: '9.1.3',
-      'mocha-junit-reporter': '2.0.2',
+      '@types/chai': '4.3.16',
+      '@types/chai-spies': '1.0.6',
+      '@types/mocha': '10.0.10',
+      chai: '4.4.1',
+      'chai-spies': '1.1.0',
+      mocha: '11.7.1',
+      'mocha-junit-reporter': '2.2.1',
       'mocha-lcov-reporter': '1.3.0',
       'mocha-multi-reporters': '1.5.1',
-      nyc: '15.1.0',
-      concurrently: '^7.6.0'
+      nyc: '17.1.0',
+      concurrently: '8.2.2'
     };
 
     return chain([
@@ -162,6 +162,13 @@ function addIoTLibrary(options: { project: string; skipInstall: boolean; fullnam
         hasOutputs: false,
         isForProtocol: false
       }),
+      updateTsConfig(
+        [
+          [['include'], undefined],
+          [['include'], ['**/*.ts']]
+        ],
+        options.project
+      ),
       options.skipInstall
         ? noop()
         : installDependencies(

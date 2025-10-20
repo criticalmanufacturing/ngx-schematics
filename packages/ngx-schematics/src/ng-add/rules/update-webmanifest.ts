@@ -1,5 +1,6 @@
 import { join, normalize } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
+import { ProjectType } from '@criticalmanufacturing/schematics-devkit';
 import { readWorkspace } from '@schematics/angular/utility';
 
 /**
@@ -10,7 +11,7 @@ export function updateWebmanifest(options: { project: string }): Rule {
     const workspace = await readWorkspace(tree);
     const project = workspace.projects.get(options.project);
 
-    if (!project || project.extensions['projectType'] !== 'application') {
+    if (!project || project.extensions['projectType'] !== ProjectType.Application) {
       return;
     }
 
@@ -32,5 +33,15 @@ export function updateWebmanifest(options: { project: string }): Rule {
     });
 
     tree.overwrite(manifestPath, JSON.stringify(manifest, undefined, 2));
+
+    // move file to src to keep it equal to old projects structure
+    // to ensure existing tooling does not need to be updated
+    tree.rename(
+      manifestPath,
+      join(
+        normalize(project.sourceRoot ?? join(normalize(project.root), 'src')),
+        'manifest.webmanifest'
+      )
+    );
   };
 }

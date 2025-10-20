@@ -5,7 +5,8 @@ import {
   createSourceFile,
   getRelativeImportPath,
   getMainPath,
-  getObjectProperty
+  getObjectProperty,
+  removeImport
 } from '@criticalmanufacturing/schematics-devkit';
 import { getNgModuleBootstrapComponentPath } from '../../utility/ng-module.js';
 
@@ -113,6 +114,8 @@ export function updateBootstrapComponent(options: { project: string }) {
         });
       }
     }
+
+    removeImport(compSource, 'signal', '@angular/core');
 
     const templateNode = getObjectProperty(compMetadata, 'template')
       ?.asKindOrThrow(SyntaxKind.PropertyAssignment)

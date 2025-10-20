@@ -22,6 +22,9 @@ export function addConfigJson(options: { project: string }): Rule {
       throw new SchematicsException(`Project is not defined in this workspace.`);
     }
 
+    // Setup sources for the assets files to add to the project
+    const sourcePath = normalize(project.sourceRoot ?? join(normalize(project.root), 'src'));
+
     const templateSource = apply(url('./files'), [
       applyTemplates({
         startupCulture: 'en-US',
@@ -47,9 +50,11 @@ export function addConfigJson(options: { project: string }): Rule {
       "cmf.style.contrast.accessibility"
     ]`
       }),
-      move(join(normalize(project.root), 'public'))
+      move(join(normalize(sourcePath), 'assets'))
     ]);
 
+    // ensures that the assets folder is src/assets
+    // to keep compatibility with existing tooling
     return chain([
       removeDirectory(join(normalize(project.root), 'public', 'icons')),
       removeFile(join(normalize(project.root), 'public', 'favicon.ico')),

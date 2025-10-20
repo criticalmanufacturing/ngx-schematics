@@ -80,7 +80,7 @@ export class Wizard<%= classify(name) %>Component
         this._pageBag.context.instance == null ||
         !this._util.instanceof(
           this._pageBag.context.instance,
-          Cmf.TestNamespace.BusinessObjects.TestEntityType
+          Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>
         )
       ) {
         throw new Error(

@@ -2,7 +2,7 @@ import { ProjectDefinition, TargetDefinition, readWorkspace } from '@schematics/
 import { Tree } from '@angular-devkit/schematics';
 import { exec } from 'child_process';
 import { JsonArray } from '@angular-devkit/core';
-import { isDeepStrictEqual } from 'util';
+import { isDeepStrictEqual } from 'node:util';
 import { dirname, join, parse } from 'path';
 import { existsSync } from 'fs';
 

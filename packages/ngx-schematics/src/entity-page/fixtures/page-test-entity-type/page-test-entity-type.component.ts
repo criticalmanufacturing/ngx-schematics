@@ -55,7 +55,7 @@ export class PageTestEntityTypeComponent
   implements EntityPageInterface<Cmf.TestNamespace.BusinessObjects.TestEntityType>, LevelsToLoad
 {
   /** Levels to load of the entity */
-  epLevelsToLoad = 1;
+  epLevelsToLoad = 0;
 
   /** The entity to be presented in this view */
   epEntity: Cmf.TestNamespace.BusinessObjects.TestEntityType;

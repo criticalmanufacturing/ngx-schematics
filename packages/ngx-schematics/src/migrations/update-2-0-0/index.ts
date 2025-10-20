@@ -1,6 +1,5 @@
 import { Rule, SchematicsException, Tree, chain } from '@angular-devkit/schematics';
 import {
-  addToJsonArray,
   createSourceFile,
   getBuildTargets,
   getDefaultApplicationProject,
@@ -11,39 +10,13 @@ import { PROJECT_POLYFILLS } from '../../ng-add/package-configs';
 import parse from 'node-html-parser';
 import { getAppModulePath, removeSymbolFromNgModuleMetadata } from '../../utility/ng-module';
 import { join, normalize } from '@angular-devkit/core';
+import { updateAppBuildTarget } from '@criticalmanufacturing/schematics-devkit/rules';
 
 export const FULL_CALENDAR = {
   bundleName: 'fullcalendar',
   inject: false,
   input: 'node_modules/fullcalendar/dist/fullcalendar.min.js'
 };
-
-/**
- * Updates the default project builder polyfills
- */
-function updateAppPolyfills(options: { project: string }): Rule {
-  return async (tree: Tree) => {
-    const workspace = await readWorkspace(tree);
-    const project = workspace.projects.get(options.project);
-
-    // if there is no project defined, we are done.
-    if (!project) {
-      throw new SchematicsException(`Project "${options.project}" does not exist.`);
-    }
-
-    const buildTargets = getBuildTargets(project);
-
-    // Configure project options
-    for (const target of buildTargets) {
-      // Add polyfills
-      if (target.options?.polyfills instanceof Array) {
-        addToJsonArray(target.options?.polyfills, [PROJECT_POLYFILLS[0]]);
-      }
-    }
-
-    await writeWorkspace(tree, workspace);
-  };
-}
 
 /**
  * Removes the themes node from the app index.html file
@@ -147,7 +120,7 @@ export default function (): Rule {
     }
 
     return chain([
-      updateAppPolyfills({ project }),
+      updateAppBuildTarget(project, [[['polyfills'], PROJECT_POLYFILLS]]),
       updateAppIndex({ project }),
       removeCoreModule({ project }),
       updateAppScripts({ project })
