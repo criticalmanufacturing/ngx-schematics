@@ -54,7 +54,11 @@ describe('Test ng-update', () => {
     { input: 'cmf.style.blue', expected: 'cmf.style.light' },
     { input: 'cmf.style.blue.accessibility', expected: 'cmf.style.light.accessibility' },
     { input: 'cmf.style.gray', expected: 'cmf.style.light' },
-    { input: 'cmf.style.gray.accessibility', expected: 'cmf.style.light.accessibility' }
+    { input: 'cmf.style.gray.accessibility', expected: 'cmf.style.light.accessibility' },
+    { input: 'cmf.style.dark', expected: 'cmf.style.dark' },
+    { input: 'cmf.style.dark.accessibility', expected: 'cmf.style.dark.accessibility' },
+    { input: 'cmf.style.contrast', expected: 'cmf.style.contrast' },
+    { input: 'cmf.style.contrast.accessibility', expected: 'cmf.style.contrast.accessibility' }
   ];
 
   beforeEach(async () => {
