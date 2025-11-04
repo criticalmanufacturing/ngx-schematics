@@ -34,13 +34,26 @@ schematics --help
 
 ## **Publishing**
 
-To publish, simply do:
+1. Update the root package.json version
+2. Build the packages:
+   ```bash
+   npm run build
+   ```
+3. Publish:
+   ```bash
+   node ./scripts/publish.js [tag1] [tag2] [...] [--dry-run]
+   ```
 
-Update the root package.json version:
+**Options:**
+- Tags are optional - if omitted, a tag is auto-generated based on version format
+- Use `--dry-run` to test without actually publishing
 
-Run the following:
-
+**Examples:**
 ```bash
-npm run build
-node ./scripts/publish.js [tag]
+node ./scripts/publish.js                    # Auto-generate tag from version
+node ./scripts/publish.js latest             # Publish with 'latest' tag
+node ./scripts/publish.js beta-100 latest    # Multiple tags
+node ./scripts/publish.js --dry-run          # Test run
 ```
+
+**Note:** When publishing via GitHub Actions workflow, a GitHub release is automatically created for final versions (e.g., `1.0.0`), but not for pre-release versions (e.g., `1.0.0-beta`).

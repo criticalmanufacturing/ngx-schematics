@@ -1,22 +1,16 @@
 const concurrently = require("concurrently");
-const { readdirSync, readFileSync, writeFileSync } = require("fs");
+const { readFileSync, writeFileSync } = require("fs");
 const { join } = require("path");
 const { argv } = require("process");
+const { getRootPackageJson, getPackages, getPackagesDir } = require("./utils");
 
-const tags = argv.slice(2);
+const args = argv.slice(2);
+const dryRun = args.includes('--dry-run');
 
-if (tags.length === 0) {
-    console.error('Error: Missing tag argument.');
-    process.exit(1);
-}
-
-const rootDir = join(__dirname, '..');
-const packagesDir = join(rootDir, 'packages');
-const packages = readdirSync(packagesDir);
-const rootPackJson = JSON.parse(readFileSync(join(rootDir, 'package.json'), { encoding: 'utf8' }));
+const rootPackJson = getRootPackageJson();
+const packages = getPackages();
+const packagesDir = getPackagesDir();
 const angularVersion = rootPackJson.dependencies['@schematics/angular'].replace(/^(.\d+)\.\d+\.\d+/, '$1.0.0');
-const packsInfo = [];
-
 packages.forEach(pack => {
     const packJson = JSON.parse(readFileSync(join(packagesDir, pack, 'package.json'), { encoding: 'utf8' }));
 
@@ -39,16 +33,21 @@ packages.forEach(pack => {
         packJson.dependencies[dep] = rootPackJson.dependencies[dep];
     });
 
-    packsInfo.push({ name: packJson.name, version: packJson.version });
     writeFileSync(join(packagesDir, pack, 'package.json'), JSON.stringify(packJson, null, 2));
 });
 
 (async () => {
-    // publish package as latest
-    await concurrently(packages.map(pack => `npm publish ${join(packagesDir, pack)} --registry https://registry.npmjs.org/`), { raw: true }).result;
-
-    // add other dist tags
-    for (const tag of tags) {
-        await concurrently(packsInfo.map(({ name, version }) => `npm dist-tag add ${name}@${version} ${tag} --registry https://registry.npmjs.org/`), { raw: true }).result;
+    // Publish packages
+    const publishCmd = packages.map(pack => 
+        `npm publish ${join(packagesDir, pack)} --registry https://registry.npmjs.org/${dryRun ? ' --dry-run' : ''}`
+    );
+    
+    if (dryRun) {
+        console.log('[DRY RUN] Would publish packages');
     }
+    
+    console.log('Running publish commands:');
+    publishCmd.forEach(cmd => console.log(`  ${cmd}`));
+    
+    await concurrently(publishCmd, { raw: true }).result;
 })();
