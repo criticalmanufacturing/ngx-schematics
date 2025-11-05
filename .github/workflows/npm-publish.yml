@@ -1,1 +1,4 @@
+name: Publish to NPM
 
+on:
+  workflow_dispatch:
