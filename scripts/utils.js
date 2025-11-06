@@ -30,7 +30,7 @@ function getPackageInfo() {
 }
 
 function generateTag(version) {
-    const versionDigits = version.replace(/[^0-9]/g, '');
+    const versionDigits = version.split('-')[0].replace(/[^0-9]/g, '');
     
     if (version.includes('-')) {
         const prefix = version.split('-')[1].replace(/[^a-zA-Z]/g, '');
