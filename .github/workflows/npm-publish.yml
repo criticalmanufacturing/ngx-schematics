@@ -1,0 +1,106 @@
+name: Publish to NPM
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'NPM tag (whitespace-separated for multiple tags, leave empty for auto)'
+        required: false
+        default: ''
+      dry_run:
+        description: 'Dry run (simulate publish without actually publishing)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    environment: npm-publish
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Check version
+        id: check
+        run: |
+          PACKAGE_NAME=$(jq -r '.name' ./packages/ngx-schematics/package.json)
+          VERSION=$(npm pkg get version --workspaces=false | tr -d '"')
+          
+          echo "Checking ${PACKAGE_NAME}@${VERSION}"
+          
+          if npm view ${PACKAGE_NAME}@${VERSION} version 2>/dev/null; then
+            echo "Version exists on NPM"
+            echo "versionExists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Version does not exist on NPM"
+            echo "versionExists=false" >> $GITHUB_OUTPUT
+          fi
+          
+          if [[ $VERSION == *"-"* ]]; then
+            echo "Version is a pre-release"
+            echo "isPreRelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "Version is a release"
+            echo "isPreRelease=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Build
+        if: steps.check.outputs.versionExists == 'false'
+        run: npm run build
+      
+      - name: Run tests
+        if: steps.check.outputs.versionExists == 'false'
+        run: npm run test
+      
+      - name: Publish
+        if: steps.check.outputs.versionExists == 'false'
+        run: |
+          DRY_RUN="${{ inputs.dry_run }}"
+          
+          ARGS=""
+          [ "$DRY_RUN" == "true" ] && ARGS="--dry-run"
+          
+          npm run publish -- $ARGS
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      - name: Add tags
+        run: |
+          TAGS="${{ inputs.tag }}"
+          DRY_RUN="${{ inputs.dry_run }}"
+          
+          ARGS="$TAGS"
+          [ "$DRY_RUN" == "true" ] && ARGS="$ARGS --dry-run"
+          
+          npm run add-tags -- $ARGS
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      - name: Create GitHub Release
+        if: steps.check.outputs.versionExists == 'false' && steps.check.outputs.isPreRelease == 'false' && inputs.dry_run == false
+        run: |
+          VERSION=$(npm pkg get version --workspaces=false | tr -d '"')
+          NOTES=$(cat <<EOF
+          ## NPM Packages on https://www.npmjs.com/
+          
+          * @criticalmanufacturing/ngx-schematics
+          * @criticalmanufacturing/ngx-iot-schematics
+          * @criticalmanufacturing/schematics-devkit
+          EOF
+          )
+          gh release create "v$VERSION" \
+            --title "$VERSION" \
+            --target "${{ github.ref_name }}" \
+            --generate-notes \
+            --notes "$NOTES" \
+            --draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
