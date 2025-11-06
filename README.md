@@ -41,19 +41,20 @@ schematics --help
    ```
 3. Publish:
    ```bash
-   node ./scripts/publish.js [tag1] [tag2] [...] [--dry-run]
+   npm run publish [-- --dry-run]
    ```
-
-**Options:**
-- Tags are optional - if omitted, a tag is auto-generated based on version format
-- Use `--dry-run` to test without actually publishing
+4. Add tags (optional):
+   ```bash
+   npm run add-tags [-- tag1 tag2 ...] [-- --dry-run]
+   ```
 
 **Examples:**
 ```bash
-node ./scripts/publish.js                    # Auto-generate tag from version
-node ./scripts/publish.js latest             # Publish with 'latest' tag
-node ./scripts/publish.js beta-100 latest    # Multiple tags
-node ./scripts/publish.js --dry-run          # Test run
+npm run publish                           # Publish packages
+npm run publish -- --dry-run              # Test without publishing
+npm run add-tags                          # Add auto-generated tag
+npm run add-tags -- latest                # Add 'latest' tag
+npm run add-tags -- latest beta-100       # Add multiple tags
 ```
 
 **Note:** When publishing via GitHub Actions workflow, a GitHub release is automatically created for final versions (e.g., `1.0.0`), but not for pre-release versions (e.g., `1.0.0-beta`).

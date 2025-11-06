@@ -30,14 +30,10 @@ function getPackageInfo() {
 }
 
 function generateTag(version) {
-    const versionDigits = version.split('-')[0].replace(/[^0-9]/g, '');
-    
-    if (version.includes('-')) {
-        const prefix = version.split('-')[1].replace(/[^a-zA-Z]/g, '');
-        return `${prefix}-${versionDigits}`;
-    } else {
-        return `release-${versionDigits}`;
-    }
+    const [baseVersion, prerelease] = version.split('-');
+    const versionDigits = baseVersion.replace(/[^0-9]/g, '');
+    const prefix = prerelease ? prerelease.replace(/[^a-zA-Z]/g, '') : 'release';
+    return `${prefix}-${versionDigits}`;
 }
 
 module.exports = {
