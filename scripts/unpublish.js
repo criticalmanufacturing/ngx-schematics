@@ -3,7 +3,9 @@ const { readdirSync, readFileSync, writeFileSync } = require("fs");
 const { join } = require("path");
 const { argv } = require("process");
 
-const version = argv[2];
+const args = argv.slice(2);
+const dryRun = args.includes('--dry-run');
+const version = args.find(arg => arg !== '--dry-run');
 
 if (!version) {
     console.error('Error: Missing version argument.');
@@ -21,6 +23,14 @@ packages.forEach(pack => {
 });
 
 (async () => {
-    // publish package as latest
-    await concurrently(packsInfo.map(pack => `npm unpublish ${pack.name}@${version}`), { raw: true }).result;
+    const unpublishCmds = packsInfo.map(pack => `npm unpublish ${pack.name}@${version}`);
+    
+    if (dryRun) {
+        console.log('[DRY RUN] Would run unpublish commands:');
+        unpublishCmds.forEach(cmd => console.log(`  ${cmd}`));
+    } else {
+        console.log('Running unpublish commands:');
+        unpublishCmds.forEach(cmd => console.log(`  ${cmd}`));
+        await concurrently(unpublishCmds, { raw: true }).result;
+    }
 })();
