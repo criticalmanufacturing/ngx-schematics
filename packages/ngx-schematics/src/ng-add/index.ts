@@ -89,10 +89,10 @@ function installSchematics(options: Schema) {
       updateWebmanifest(options as Required<Schema>),
       updateWorkspace(options),
       updateTsConfig([
-        [['compilerOptions', 'strictFunctionTypes'], false],
-        [['compilerOptions', 'noImplicitAny'], false],
-        [['compilerOptions', 'strictNullChecks'], false],
-        [['compilerOptions', 'preserveSymlinks'], true]
+        { path: ['compilerOptions', 'strictFunctionTypes'], value: false },
+        { path: ['compilerOptions', 'noImplicitAny'], value: false },
+        { path: ['compilerOptions', 'strictNullChecks'], value: false },
+        { path: ['compilerOptions', 'preserveSymlinks'], value: true }
       ]),
       installDependencies(dependencies)
     ]);

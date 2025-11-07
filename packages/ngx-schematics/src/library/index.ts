@@ -129,7 +129,7 @@ function createMetadataSubEntry(options: { name: string; skipTsConfig?: boolean 
       mergeWith(templateSource),
       options.skipTsConfig
         ? noop()
-        : updateTsConfig([[['compilerOptions', 'paths', packageName], [distRoot]]]),
+        : updateTsConfig([{ path: ['compilerOptions', 'paths', packageName], value: [distRoot] }]),
       updateAppModule({ packageName, namePrefix }),
       updateAppConfig({ packageName, namePrefix })
     ]);
@@ -159,9 +159,8 @@ export default function (_options: Schema): Rule {
       externalSchematic(lint ?? '@schematics/angular', 'library', _options),
       updateTsConfig(
         [
-          [['include'], undefined],
-          [['include'], ['**/*.ts']],
-          [['compilerOptions', 'types'], ['@angular/localize']]
+          { path: ['include'], value: ['**/*.ts'], operation: 'replace' },
+          { path: ['compilerOptions', 'types'], value: ['@angular/localize'] }
         ],
         _options.name
       ),

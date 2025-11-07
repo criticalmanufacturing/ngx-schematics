@@ -163,10 +163,7 @@ function addIoTLibrary(options: { project: string; skipInstall: boolean; fullnam
         isForProtocol: false
       }),
       updateTsConfig(
-        [
-          [['include'], undefined],
-          [['include'], ['**/*.ts']]
-        ],
+        [{ path: ['include'], value: ['**/*.ts'], operation: 'replace' }],
         options.project
       ),
       options.skipInstall

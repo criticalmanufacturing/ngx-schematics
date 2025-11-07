@@ -120,7 +120,7 @@ export default function (): Rule {
     }
 
     return chain([
-      updateAppBuildTarget(project, [[['polyfills'], PROJECT_POLYFILLS]]),
+      updateAppBuildTarget(project, [{ path: ['polyfills'], value: PROJECT_POLYFILLS }]),
       updateAppIndex({ project }),
       removeCoreModule({ project }),
       updateAppScripts({ project })

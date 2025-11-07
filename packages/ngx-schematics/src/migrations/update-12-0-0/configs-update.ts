@@ -47,10 +47,14 @@ export function updateAppSettings(): Rule {
     }
 
     return chain([
-      updateAppBuildTarget(project, [[['scripts'], JQUERY_UI_SCRIPTS, true]]),
-      updateAppBuildTarget(project, [[['assets'], [...JQUERY_UI_ASSETS, ...FLAGS], true]]),
-      updateAppBuildTarget(project, [[['polyfills'], LOCALIZE]]),
-      updateTsConfig([[['compilerOptions', 'skipLibCheck'], true]], project)
+      updateAppBuildTarget(project, [
+        { path: ['scripts'], value: JQUERY_UI_SCRIPTS, operation: 'remove' }
+      ]),
+      updateAppBuildTarget(project, [
+        { path: ['assets'], value: [...JQUERY_UI_ASSETS, ...FLAGS], operation: 'remove' }
+      ]),
+      updateAppBuildTarget(project, [{ path: ['polyfills'], value: LOCALIZE }]),
+      updateTsConfig([{ path: ['compilerOptions', 'skipLibCheck'], value: true }], project)
     ]);
   };
 }

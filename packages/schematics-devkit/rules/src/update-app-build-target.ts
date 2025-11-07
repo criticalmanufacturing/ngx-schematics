@@ -5,14 +5,43 @@ import {
   getBuildTargets,
   removeFromJsonArray
 } from '@criticalmanufacturing/schematics-devkit';
-import { isJsonArray, JsonValue } from '@angular-devkit/core';
+import { isJsonArray, JsonArray, JsonValue } from '@angular-devkit/core';
+
+/**
+ * Updates a record object with a new value for a specified key.
+ */
+function updateRecord(
+  record: Record<string, JsonValue | undefined>,
+  key: string,
+  value: JsonValue | undefined,
+  operation: 'add' | 'remove' | 'replace' = 'replace'
+): void {
+  if (value === undefined) {
+    delete record[key];
+    return;
+  }
+
+  const currValue = record[key];
+
+  if (operation === 'replace' || !(isJsonArray(value) && currValue && isJsonArray(currValue))) {
+    record[key] = value;
+  } else if (operation === 'add') {
+    addToJsonArray(currValue, value);
+  } else {
+    removeFromJsonArray(currValue, value);
+  }
+}
 
 /**
  * Adds the assets to the desired application or to the default application project
  */
 export function updateAppBuildTarget(
   project: string,
-  options: [string[], JsonValue | undefined, boolean?][]
+  options: (
+    | { path: string[]; value: JsonArray; operation?: 'add' | 'remove' | 'replace' }
+    | { path: string[]; value: JsonValue; operation?: 'replace' }
+    | { path: string[]; value: undefined; operation?: 'remove' }
+  )[]
 ): Rule {
   return async (tree: Tree) => {
     const workspace = await readWorkspace(tree);
@@ -30,7 +59,7 @@ export function updateAppBuildTarget(
       // override options
       if (target.options) {
         for (const option of options) {
-          const [path, value, remove] = option;
+          const { path, value, operation } = option;
           const key = path.at(-1);
           if (!key) {
             return;
@@ -52,20 +81,7 @@ export function updateAppBuildTarget(
           }
 
           // update json key
-          if (value !== undefined) {
-            const currValue = record[key];
-            if (currValue && isJsonArray(currValue) && isJsonArray(value)) {
-              if (remove !== true) {
-                addToJsonArray(currValue, value);
-              } else {
-                removeFromJsonArray(currValue, value);
-              }
-            } else {
-              record[key] = value;
-            }
-          } else {
-            delete record[key];
-          }
+          updateRecord(record, key, value, operation);
         }
       }
     }

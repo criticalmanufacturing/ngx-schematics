@@ -74,23 +74,28 @@ export function updateWorkspace(options: {
 
     return updateAppBuildTarget(options.project, [
       // add preserve symlinks to install custom libraries like cutom lbos
-      [['preserveSymlinks'], true],
+      { path: ['preserveSymlinks'], value: true },
       // Add allowedCommonJsDependencies
-      [['allowedCommonJsDependencies'], PROJECT_ALLOWED_COMMONJS_DEPENDENCIES],
+      { path: ['allowedCommonJsDependencies'], value: PROJECT_ALLOWED_COMMONJS_DEPENDENCIES },
       // Add assets
-      [['assets'], undefined],
-      [
-        ['assets'],
-        (options.application === 'MES' ? PROJECT_MES_ASSETS : PROJECT_CORE_ASSETS) as JsonArray
-      ],
+      { path: ['assets'], value: undefined },
+      {
+        path: ['assets'],
+        value: (options.application === 'MES'
+          ? PROJECT_MES_ASSETS
+          : PROJECT_CORE_ASSETS) as JsonArray
+      },
       // Add styles
-      [['styles'], options.application === 'MES' ? PROJECT_MES_STYLES : PROJECT_CORE_STYLES],
+      {
+        path: ['styles'],
+        value: options.application === 'MES' ? PROJECT_MES_STYLES : PROJECT_CORE_STYLES
+      },
       // Add scripts
-      [['scripts'], PROJECT_SCRIPTS],
+      { path: ['scripts'], value: PROJECT_SCRIPTS },
       // Add polyfills
-      [['polyfills'], PROJECT_POLYFILLS],
+      { path: ['polyfills'], value: PROJECT_POLYFILLS },
       // update output path
-      [['outputPath'], { base: `dist/${options.project}`, browser: '' }]
+      { path: ['outputPath'], value: { base: `dist/${options.project}`, browser: '' } }
     ]);
   };
 }

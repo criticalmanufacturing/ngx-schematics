@@ -104,11 +104,11 @@ function installSchematics(options: Schema) {
       installDependencies(dependencies),
       updatePackagejson(),
       updateTsConfig([
-        [['compilerOptions', 'strictFunctionTypes'], false],
-        [['compilerOptions', 'noImplicitAny'], false],
-        [['compilerOptions', 'strictNullChecks'], false],
-        [['compilerOptions', 'preserveSymlinks'], true],
-        [['compilerOptions', 'useDefineForClassFields'], false]
+        { path: ['compilerOptions', 'strictFunctionTypes'], value: false },
+        { path: ['compilerOptions', 'noImplicitAny'], value: false },
+        { path: ['compilerOptions', 'strictNullChecks'], value: false },
+        { path: ['compilerOptions', 'preserveSymlinks'], value: true },
+        { path: ['compilerOptions', 'useDefineForClassFields'], value: false }
       ])
     ]);
   };
