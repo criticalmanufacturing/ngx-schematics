@@ -1,6 +1,10 @@
 import { JsonArray, JsonObject, join, normalize } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
-import { addToJsonArray, removeFromJsonArray } from '@criticalmanufacturing/schematics-devkit';
+import {
+  addToJsonArray,
+  ProjectType,
+  removeFromJsonArray
+} from '@criticalmanufacturing/schematics-devkit';
 import { readWorkspace } from '@schematics/angular/utility';
 
 function getAssetGroup(ngswConfig: JsonObject, name: string): JsonObject | undefined {
@@ -26,7 +30,7 @@ export function updateNgswConfig(options: { project: string }): Rule {
     const workspace = await readWorkspace(tree);
     const project = workspace.projects.get(options.project);
 
-    if (!project || project.extensions['projectType'] !== 'application') {
+    if (!project || project.extensions['projectType'] !== ProjectType.Application) {
       return;
     }
 
@@ -37,12 +41,12 @@ export function updateNgswConfig(options: { project: string }): Rule {
     const assetsAssetGroup = getAssetGroup(ngswConfig, 'assets');
 
     if (appAssetGroup) {
-      addAssets(appAssetGroup, ['/monaco-editor/**/*.js']);
-      removeAssets(appAssetGroup, ['/index.html']);
+      addAssets(appAssetGroup, ['**/*.css', '**/*.js', '!/ngsw-loader-worker.js']);
+      removeAssets(appAssetGroup, ['/*.css', '/*.js', '/index.html']);
     }
 
     if (assetsAssetGroup) {
-      addAssets(assetsAssetGroup, ['!/assets/config.json', '/media/**', '!/ngsw-loader-worker.js']);
+      addAssets(assetsAssetGroup, ['/assets/**', '!/assets/config.json']);
     }
 
     ngswConfig['dataGroups'] ??= [];

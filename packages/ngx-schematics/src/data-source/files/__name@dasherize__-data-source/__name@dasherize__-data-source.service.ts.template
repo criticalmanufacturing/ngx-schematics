@@ -1,22 +1,7 @@
 import { Injectable } from '@angular/core';
-
-import {
-    UtilService
-} from 'cmf-core';
-
-import {
-    TreatTransactionOutput as DataSourceExecutionOutput
-} from 'cmf-core-business-controls';
-
-import {
-    DataSource,
-    DataSourceGeneric,
-    DataSourceSettingsDef
-} from 'cmf-core-dashboards';
-
-import {
-    <%= classify(name) %>DataSourceSettingsComponent
-} from './<%= dasherize(name) %>-data-source-settings/<%= dasherize(name) %>-data-source-settings.component';
+import { TreatTransactionOutput as DataSourceExecutionOutput } from 'cmf-core-business-controls';
+import { DataSource, DataSourceGeneric, DataSourceSettingsDef } from 'cmf-core-dashboards';
+import { <%= classify(name) %>DataSourceSettingsComponent } from './<%= dasherize(name) %>-data-source-settings/<%= dasherize(name) %>-data-source-settings.component';
 
 /**
  * @whatItDoes
@@ -31,7 +16,8 @@ import {
  *
  * The DataSource is used in an UIPage with the inputs and outputs mentioned below.
  *
- * Besides the description above, please complement it with a meaningful description of this component that answer these questions:
+ * Besides the description above, please complement it with a meaningful description of this
+ * component that answer these questions:
  * * How to use it?
  * * Where and When to use it?
  *
@@ -44,27 +30,19 @@ import {
  * ### DataSource Outputs
  * * `string` : **value** _(default)_ - Output description
  */
-@Injectable()
 @DataSource({
-    name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>-data-source#NAME:<%= nameify(name) %>`,
-    settingsComponent: {
-        component: <%= classify(name) %>DataSourceSettingsComponent
-    }
+  name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>-data-source#NAME:<%= nameify(name) %>`,
+  settingsComponent: {
+    component: <%= classify(name) %>DataSourceSettingsComponent
+  }
 })
+@Injectable()
 export class <%= classify(name) %>DataSource extends DataSourceGeneric implements DataSourceSettingsDef {
-
-    /**
-     * Constructor
-     */
-    constructor(util: UtilService) {
-        super(util);
-    }
-
-    /**
-     * This method gathers all the logic to fetch data for this data source
-     */
-    public async execute(): Promise<DataSourceExecutionOutput | void> {
-        // Please change the next line to execute what this data source requires
-        return;
-    }
+  /**
+   * This method gathers all the logic to fetch data for this data source
+   */
+  async execute(): Promise<DataSourceExecutionOutput | void> {
+    // Please change the next line to execute what this data source requires
+    return;
+  }
 }

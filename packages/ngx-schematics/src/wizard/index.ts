@@ -13,33 +13,19 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
-import inquirer, { ListQuestion, InputQuestion } from 'inquirer';
-import { getDefaultPath, parseName, strings } from '@criticalmanufacturing/schematics-devkit';
-import { MetadataProperty, updateMetadata } from '../utility/metadata';
-import { Schema } from './schema';
-import { updateLibraryAPI } from '../utility/update-library-api';
-
+import {
+  promptNamespace,
+  getDefaultPath,
+  parseName,
+  strings
+} from '@criticalmanufacturing/schematics-devkit';
+import { MetadataProperty, updateMetadata } from '../utility/metadata.js';
+import { Schema } from './schema.js';
+import { updateLibraryAPI } from '../utility/update-library-api.js';
 export default function (_options: Schema): Rule {
   return async (tree: Tree, _context: SchematicContext) => {
     if (!_options.namespace) {
-      const question: ListQuestion = {
-        type: 'list',
-        name: 'namespace',
-        message: 'What is the business objects namespace of the entity type?',
-        choices: ['Foundation', 'Navigo', 'Other (specify)']
-      };
-
-      _options.namespace = (await inquirer.prompt([question])).namespace;
-
-      if (_options.namespace!.startsWith('Other')) {
-        const question: InputQuestion = {
-          type: 'input',
-          name: 'namespace',
-          message: 'Namespace'
-        };
-
-        _options.namespace = (await inquirer.prompt([question])).namespace;
-      }
+      _options.namespace = await promptNamespace();
     }
 
     const workspace = await readWorkspace(tree);
@@ -83,16 +69,21 @@ export default function (_options: Schema): Rule {
     const metadataOptions = {
       identifier: MetadataProperty.Action,
       imports: { ActionMode: 'cmf-core' },
-      toInsert: `\
+      toInsert: `
 {
   id: '${strings.classify(_options.entityType)}.${strings
     .classify(_options.name)
     .replace(strings.classify(_options.entityType), '')}',
-  loadComponent: () => import(
-    /* webpackExports: "Wizard${strings.classify(_options.name)}Component" */
-    '${_options.project}').then(m => m.Wizard${strings.classify(_options.name)}Component),
+  loadComponent: async () =>
+    (
+      await import(
+        /* webpackExports: "Wizard${strings.classify(_options.name)}Component" */
+        '${strings.dasherize(_options.project)}'
+      )
+    ).Wizard${strings.classify(_options.name)}Component,
   mode: ActionMode.ModalPage
-}`
+}
+`
     };
 
     return chain([

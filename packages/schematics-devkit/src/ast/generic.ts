@@ -63,7 +63,13 @@ export function insertImport(
       return;
     }
 
-    importNode.addNamedImport(symbolName);
+    importNode
+      .addNamedImport({
+        name: symbolName,
+        leadingTrivia: '\n',
+        trailingTrivia: '\n'
+      })
+      .formatText({ indentSize: getIndentSize(source) });
   } else {
     source.addImportDeclaration({
       moduleSpecifier: module,
@@ -113,6 +119,27 @@ export function insertExport(
 }
 
 /**
+ * Removes an import declaration in a file
+ * @param source Source File
+ * @param symbolName Import symbol
+ * @param module Import module specifier
+ */
+export function removeImport(source: SourceFile, symbolName: string, module: string): void {
+  const allImports = source.getImportDeclarations();
+  const importNode = allImports.find((node) => node.getModuleSpecifierValue() === module);
+
+  if (importNode) {
+    const namedImports = importNode.getNamedImports();
+
+    if (importNode.getNamedImports().length > 1) {
+      namedImports.find((node) => node.getName() === symbolName)?.remove();
+    } else {
+      importNode.remove();
+    }
+  }
+}
+
+/**
  * Updates the package info object property addding new elements
  * @param objectExpression ObjectLiteralExpression
  * @param elements elements to add
@@ -157,10 +184,13 @@ export function updateObjectArrayProperty(
     return;
   }
 
+  const indentSize = getIndentSize(objectExpression.getSourceFile()) ?? 4;
+
   array.addElements(
     elementsToAdd.map((e) => "'" + e + "'"),
     { useNewLines: true }
   );
+  array.formatText({ indentSize });
 
   const loader = objectExpression.getProperty('loader');
 
@@ -170,23 +200,21 @@ export function updateObjectArrayProperty(
 
   const loaderText = loader.getText();
   const exportsMatch = /webpackExports\s*:\s*\[([^\]]*?)(\s*\])/.exec(loaderText);
+  const indentation =
+    /([\t ]*)(?=\/\*\s*webpackExports)/.exec(loaderText)?.[1] ?? loader.getIndentationText();
 
   if (exportsMatch) {
     const insertIndex = exportsMatch.index + exportsMatch[0].length - exportsMatch[2].length;
-    const baseIndentation = loader.getIndentationText().length / loader.getIndentationLevel();
-    const indentation = loader.getIndentationText() + ' '.repeat(baseIndentation * 2);
     loader.replaceWithText(
       loaderText.slice(0, insertIndex) + // ... webpackExports: [...
         (exportsMatch[1].trim().length > 0 ? ',' : '') +
-        `\n${indentation}"${elementsToAdd.join(`",\n${indentation}"`)}"` +
-        (exportsMatch[2].length === 1
-          ? `\n${loader.getIndentationText() + ' '.repeat(baseIndentation)}`
-          : '') +
+        `\n${indentation + ' '.repeat(indentSize)}"${elementsToAdd.join(`",\n${indentation}"`)}"` +
+        (exportsMatch[2].length === 1 ? `\n${indentation}` : '') +
         loaderText.slice(insertIndex, loaderText.length) // ] ...
     );
   }
 
-  loader.formatText();
+  loader.formatText({ indentSize });
 }
 
 /**
@@ -261,7 +289,7 @@ export function addSymbolToArrayLiteral(
   toInsert: string,
   before?: string
 ): void {
-  if (arryaLiteral.getElements().some((elem) => elem.getText() === toInsert)) {
+  if (arryaLiteral.getElements().some((elem) => elem.getText() === toInsert.trim())) {
     return;
   }
 
@@ -276,4 +304,41 @@ export function addSymbolToArrayLiteral(
   }
 
   arryaLiteral.insertElement(index, toInsert);
+}
+
+/**
+ * Removes a symbol from an array literal
+ * @param arryaLiteral the array literal node
+ * @param toInsert the symbol to remove
+ * @returns
+ */
+export function removeSymbolFromArrayLiteral(
+  arryaLiteral: ArrayLiteralExpression,
+  toRemove: string
+): void {
+  const index = arryaLiteral.getElements().findIndex((elem) => elem.getText() === toRemove);
+
+  if (index < 0) {
+    return;
+  }
+
+  arryaLiteral.removeElement(index);
+}
+
+/**
+ * Determines the indentation size used in the source file.
+ * @param sourceFile The SourceFile to analyze.
+ * @returns The number of spaces used for indentation, or undefined if no indentation is found.
+ */
+export function getIndentSize(sourceFile: SourceFile): number | undefined {
+  const code = sourceFile.getFullText();
+  const lines = code.split(/\r?\n/);
+
+  for (const line of lines) {
+    const match = line.match(/^(\s+)\S/);
+    if (match) {
+      const indent = match[1];
+      return indent.includes('\t') ? 4 : indent.length; // assume tab = 4 spaces
+    }
+  }
 }

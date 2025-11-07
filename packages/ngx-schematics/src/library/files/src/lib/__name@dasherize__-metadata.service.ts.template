@@ -1,85 +1,82 @@
+import { Injectable } from '@angular/core';
 import {
-    Injectable
-} from '@angular/core';
-
-import {
-    RouteConfig,
-    PackageMetadata,
-    Action,
-    MenuGroup,
-    MenuItem,
-    ActionButton,
-    ActionButtonGroup,
-    EntityTypeMetadata,
-    PackageInfo
+  RouteConfig,
+  PackageMetadata,
+  Action,
+  MenuGroup,
+  MenuItem,
+  ActionButton,
+  ActionButtonGroup,
+  EntityTypeMetadata,
+  PackageInfo
 } from 'cmf-core';
-
 
 @Injectable()
 export class <%= classify(name) %>MetadataService extends PackageMetadata {
+  /**
+   * Package Info
+   */
+  override get packageInfo(): PackageInfo {
+    return {
+      name: '<%= fullName %>',
+      loader: () =>
+        import(
+          /* webpackExports: [] */
+          '<%= fullName %>'
+        ),
+      converters: [],
+      widgets: [],
+      dataSources: [],
+      components: []
+    };
+  }
 
-    /**
-     * Package Info
-     */
-    public override get packageInfo(): PackageInfo {
-        return {
-            name: '<%= fullName %>',
-            loader: () => import(
-                /* webpackExports: [] */
-                '<%= fullName %>'),
-            converters: [],
-            widgets: [],
-            dataSources: [],
-            components: []
-        };
-    }
+  /**
+   * Action Button Groups
+   */
+  override get actionButtonGroups(): ActionButtonGroup[] {
+    return [];
+  }
 
-    /**
-     * Action Button Groups
-     */
-    public override get actionButtonGroups(): ActionButtonGroup[] {
-        return [];
-    }
+  /**
+   * Action Buttons
+   */
+  override get actionButtons(): ActionButton[] {
+    return [];
+  }
 
-    /**
-     * Action Buttons
-     */
-    public override get actionButtons(): ActionButton[] {
-        return [];
-    }
+  /**
+   * Actions
+   */
+  override get actions(): Action[] {
+    return [];
+  }
 
-    /**
-     * Actions
-     */
-    public override get actions(): Action[] {
-        return [];
-    }
+  /**
+   * Menu Groups
+   */
+  override get menuGroups(): MenuGroup[] {
+    return [];
+  }
 
-    /**
-     * Menu Groups
-     */
-    public override get menuGroups(): MenuGroup[] {
-        return [];
-    }
+  /**
+   * Menu Items
+   */
+  override get menuItems(): MenuItem[] {
+    return [];
+  }
 
-    /**
-     * Menu Items
-     */
-    public override get menuItems(): MenuItem[] {
-        return [];
-    }
+  /**
+   * Entity Types
+   */
+  override get entityTypes(): EntityTypeMetadata[] {
+    return [];
+  }
 
-    /**
-     * Entity Types
-     */
-    public override get entityTypes(): EntityTypeMetadata[] {
-        return [];
-    }
-
-    /**
-     * Routes
-     */
-    public override get routes(): RouteConfig[] {
-        return [];
-    }
+  /**
+   * Routes
+   */
+  override get routes(): RouteConfig[] {
+    return [];
+  }
 }

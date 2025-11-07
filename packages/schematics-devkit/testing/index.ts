@@ -18,3 +18,12 @@ export function getAllFilesFromDir(dir: string, tree: UnitTestTree): string[] {
 
   return files;
 }
+
+/**
+ * Normalizes string line endings
+ */
+export function normalize(str: string) {
+  return str
+    .replace(/\r\n/g, '\n') // normalize line endings
+    .trim(); // trim start/end
+}

@@ -5,9 +5,10 @@ import {
   createSourceFile,
   getRelativeImportPath,
   getMainPath,
-  getObjectProperty
+  getObjectProperty,
+  removeImport
 } from '@criticalmanufacturing/schematics-devkit';
-import { getNgModuleBootstrapComponentPath } from '../../utility/ng-module';
+import { getNgModuleBootstrapComponentPath } from '../../utility/ng-module.js';
 
 /**
  * Gets the bootstrap component file location
@@ -105,6 +106,17 @@ export function updateBootstrapComponent(options: { project: string }) {
       return;
     }
 
+    // Remove all members
+    for (const classNode of compSource.getClasses()) {
+      if (classNode.getDecorator('Component')) {
+        classNode.getMembers().forEach((node) => {
+          node.remove();
+        });
+      }
+    }
+
+    removeImport(compSource, 'signal', '@angular/core');
+
     const templateNode = getObjectProperty(compMetadata, 'template')
       ?.asKindOrThrow(SyntaxKind.PropertyAssignment)
       ?.getInitializer()
@@ -116,11 +128,12 @@ export function updateBootstrapComponent(options: { project: string }) {
 
     if (templateNode) {
       templateNode.replaceWithText('<router-outlet></router-outlet>');
-      tree.overwrite(compPath, compSource.getFullText());
     } else if (templateUrlNode) {
       const templateUrl = templateUrlNode.getLiteralValue();
       const templatePath = join(dirname(normalize(compPath)), templateUrl);
       tree.overwrite(templatePath, '<router-outlet></router-outlet>');
     }
+
+    tree.overwrite(compPath, compSource.getFullText());
   };
 }

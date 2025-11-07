@@ -11,16 +11,16 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
-import { toConverterType, toValueType } from '../utility/iot-value-types';
 import {
   getDefaultPath,
   parseName,
   relative,
   strings
 } from '@criticalmanufacturing/schematics-devkit';
-import { Schema } from './schema';
-import { updateLibraryAPI } from '../utility/update-library-api';
-import { updateLibraryMetadata } from '../utility/update-library-metadata';
+import { toConverterType, toValueType } from '../utility/iot-value-types.js';
+import { Schema } from './schema.js';
+import { updateLibraryAPI } from '../utility/update-library-api.js';
+import { updateLibraryMetadata } from '../utility/update-library-metadata.js';
 
 export default function (_options: Schema): Rule {
   return async (tree: Tree) => {

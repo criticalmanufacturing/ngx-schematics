@@ -68,6 +68,11 @@
       "description": "Generates the documentation for a file.",
       "factory": "./doc",
       "schema": "./doc/schema.json"
+    },
+    "update-12-0-0": {
+      "description": "Updates config.json themes.",
+      "factory": "./migrations/update-12-0-0",
+      "schema": "./migrations/update-12-0-0/schema.json"
     }
   }
 }

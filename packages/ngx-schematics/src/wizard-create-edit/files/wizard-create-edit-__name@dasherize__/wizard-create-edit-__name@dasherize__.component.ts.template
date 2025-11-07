@@ -1,31 +1,11 @@
+import { Component, inject, OnInit } from '@angular/core';
+import Cmf from 'cmf-lbos';
+import { CustomizableComponent, UtilService, EntityTypeService } from 'cmf-core';
+import { PageBag } from 'cmf-core-controls';
 import {
-    Component,
-    OnInit,
-    ViewContainerRef
-} from '@angular/core';
-
-import {
-    CommonModule
-} from '@angular/common';
-
-import {
-    Cmf
-} from 'cmf-lbos';
-
-import {
-    CustomizableComponent,
-    UtilService,
-    EntityTypeService
-} from 'cmf-core';
-
-import {
-    PageBag
-} from 'cmf-core-controls';
-
-import {
-    EditMode,
-    CreateEditEntityModule,
-    CreateEditStepGeneralDataModule
+  EditMode,
+  CreateEditEntityModule,
+  CreateEditStepGeneralDataModule
 } from 'cmf-core-business-controls';
 
 /**
@@ -42,17 +22,10 @@ import {
  *
  * This component is used with the inputs and outputs mentioned below.
  *
- * Besides the description above, please complement it with a meaningful description of this component that answer these questions:
+ * Besides the description above, please complement it with a meaningful description of this
+ * component that answer these questions:
  * * How to use it?
  * * Where and When to use it?
- *
- * ### Inputs
- * `string` : **name** - The name of this component
- * `number` : **value** - The value of this component
- *
- * ### Outputs
- * `string` : **onNameChange** - When the name of the component change, this output emits the new name
- * `number` : **onValueChange** - When the value of the component change, this output emits the new value
  *
  * ### Example
  * To use the component, assume this HTML Template as an example:
@@ -67,125 +40,119 @@ import {
  * @description
  *
  * ## <%= classify(name) %>Component Component
- *
- * ### Dependencies
- *
- * #### Components
- * * ComponentA : `package`
- * * ComponentB : `package`
- *
- * #### Services
- * * ServiceA : `package`
- * * ServiceB : `package`
- *
- * #### Directives
- * * DirectiveA : `package`
- * * DirectiveB : `package`
- *
  */
 @Component({
-    standalone: true,
-    selector: '<%= dasherize(project) %>-wizard-create-edit-<%= dasherize(name) %>',
-    imports: [CommonModule, CreateEditEntityModule, CreateEditStepGeneralDataModule],
-    templateUrl: './wizard-create-edit-<%= dasherize(name) %>.component.html',
-    <% if (style !== 'none') { %>styleUrl: './wizard-create-edit-<%= dasherize(name) %>.component.<%= style %>'<% } %>
+  selector: '<%= dasherize(project) %>-wizard-create-edit-<%= dasherize(name) %>',
+  imports: [CreateEditEntityModule, CreateEditStepGeneralDataModule],
+  templateUrl: './wizard-create-edit-<%= dasherize(name) %>.component.html',
+  <% if (style !== 'none') { %>styleUrl: './wizard-create-edit-<%= dasherize(name) %>.component.<%= style %>'<% } %>
 })
-export class WizardCreateEdit<%= classify(name) %>Component extends CustomizableComponent implements OnInit {
+export class WizardCreateEdit<%= classify(name) %>Component
+  extends CustomizableComponent
+  implements OnInit
+{
+  /** Wizard mode */
+  editMode: EditMode = EditMode.Create;
 
-    /**
-     * Wizard mode
-     */
-    public editMode: EditMode = EditMode.Create;
+  /** Wizard title */
+  title: string;
 
-    /**
-     * Wizard title
-     */
-    public title: string;
+  /** Wizard action name */
+  action: string;
 
-    /**
-     * Wizard action name
-     */
-    public action: string;
+  /** The instance of the wizard */
+  instance: Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
 
-    /**
-     * The instance of the wizard
-     */
-    public instance: Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
+  /** Dependencies */
+  protected _util = inject(UtilService);
+  protected _entityTypes = inject(EntityTypeService);
+  protected _pageBag = inject(PageBag);
 
-    /** Dependencies */
-    protected util = inject(UtilService);
-    protected entityTypes = inject(EntityTypeService);
-    protected pageBag = inject(PageBag);
+  /**
+   * NgOnInit. Sets the basic wizard content according to the pageBag context
+   */
+  ngOnInit(): void {
+    if (this._pageBag != null && this._pageBag.context != null) {
+      if (this._pageBag.context.editMode != null) {
+        this.editMode = this._pageBag.context.editMode;
+      }
 
-    /**
-     * NgOnInit
-     * Sets the basic wizard content according to the pageBag context
-     */
-    public ngOnInit(): void {
-        if (this.pageBag != null && this.pageBag.context != null) {
-            if (this.pageBag.context.editMode != null) {
-                this.editMode = this.pageBag.context.editMode;
-            }
-
-            // edit mode
-            if (this.pageBag.context.editMode === EditMode.Edit) {
-                if (this.pageBag.context.instance == null
-                || !this.util.instanceof(this.pageBag.context.instance, Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>)) {
-                    throw new Error($localize`:@<%= dasherize(project) %>/<%= dasherize(name) %>#NO_INSTANCE_FOUND:No Instance Found`);
-                }
-
-                this.title = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#TITLE_EDIT:Edit <%= nameify(name) %>`;
-                this.action = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#SAVE:Save`;
-            } else {
-                this.title = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#TITLE_CREATE:Create <%= nameify(name) %>`;
-                this.action = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#CREATE:Create`;
-                this.instance = new Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>();
-            }
-        } else {
-            throw new Error($localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#MISSING_CONTEXT:Missing context`);
+      // edit mode
+      if (this._pageBag.context.editMode === EditMode.Edit) {
+        if (
+          this._pageBag.context.instance == null ||
+          !this._util.instanceof(
+            this._pageBag.context.instance,
+            Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>
+          )
+        ) {
+          throw new Error(
+            $localize`:@<%= dasherize(project) %>/<%= dasherize(name) %>#NO_INSTANCE_FOUND:No Instance Found`
+          );
         }
+
+        this.title = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#TITLE_EDIT:Edit <%= nameify(name) %>`;
+        this.action = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#SAVE:Save`;
+      } else {
+        this.title = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#TITLE_CREATE:Create <%= nameify(name) %>`;
+        this.action = $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#CREATE:Create`;
+        this.instance = new Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>();
+      }
+    } else {
+      throw new Error(
+        $localize`:@@<%= dasherize(project) %>/wizard-create-edit-<%= dasherize(name) %>#MISSING_CONTEXT:Missing context`
+      );
+    }
+  }
+
+  /**
+   * On Initial Setup Start from the createEditEntity
+   */
+  onInitialSetupStart = (): Cmf.Foundation.BusinessOrchestration.BaseInput[] => {
+    let inputs: Cmf.Foundation.BusinessOrchestration.BaseInput[] = [];
+
+    if (EditMode.Edit === this.editMode) {
+      const loadInstanceInput =
+        new Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.GetObjectByIdInput();
+      loadInstanceInput.Id = this._pageBag.context.instance.Id;
+      loadInstanceInput.Type = this._entityTypes.getEntityTypeTypeName(
+        this._pageBag.context.instance
+      );
+
+      inputs.push(loadInstanceInput);
     }
 
-    /**
-     * On Initial Setup Start from the createEditEntity
-     */
-    public onInitialSetupStart = (): Cmf.Foundation.BusinessOrchestration.BaseInput[] => {
-        let inputs: Cmf.Foundation.BusinessOrchestration.BaseInput[] = [];
+    return inputs;
+  };
 
-        if (EditMode.Edit === this.editMode) {
-            const loadInstanceInput = new Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.GetObjectByIdInput();
-            loadInstanceInput.Id = this.pageBag.context.instance.Id;
-            loadInstanceInput.Type = this.entityTypes.getEntityTypeTypeName(this.pageBag.context.instance);
+  /**
+   * On Initial Steup Finish from the createEditEntity
+   * @param instance any
+   * @param outputs BaseOutput[]
+   */
+  onInitialSetupFinish = (
+    instance: any,
+    outputs: Cmf.Foundation.BusinessOrchestration.BaseOutput[]
+  ): void => {
+    if (EditMode.Edit === this.editMode) {
+      if (outputs != null && outputs.length >= 1) {
+        const loadInstanceOutput =
+          outputs[0] as Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.OutputObjects.GetObjectByIdOutput;
 
-            inputs.push(loadInstanceInput);
-        }
+        this.instance = loadInstanceOutput.Instance;
+      } else {
+        throw new Error(
+          $localize`:@@<%= project %>/<%= dasherize(name) %>#LOAD_INSTANCE:Error Loading Instance`
+        );
+      }
+    }
+  };
 
-        return inputs;
-    };
-
-    /**
-     * On Initial Steup Finish from the createEditEntity
-     * @param instance any
-     * @param outputs BaseOutput[]
-     */
-    public onInitialSetupFinish = (instance: any, outputs: Cmf.Foundation.BusinessOrchestration.BaseOutput[]): void => {
-        if (EditMode.Edit === this.editMode) {
-            if (outputs != null && outputs.length >= 1) {
-                const loadInstanceOutput =
-                outputs[0] as Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.OutputObjects.GetObjectByIdOutput;
-
-                this.instance = loadInstanceOutput.Instance;
-            } else {
-                throw new Error($localize`:@@<%= project %>/<%= dasherize(name) %>#LOAD_INSTANCE:Error Loading Instance`);
-            }
-        }
-    };
-
-    /**
-     * On Before Service Call from the createEditEntity
-     */
-    public onBeforeServiceCall = (): Cmf.Foundation.BusinessOrchestration.BaseInput => {
-        const input = new Cmf.Foundation.BusinessOrchestration.BaseInput();
-        return input;
-    };
+  /**
+   * On Before Service Call from the createEditEntity
+   */
+  onBeforeServiceCall = (): Cmf.Foundation.BusinessOrchestration.BaseInput => {
+    const input = new Cmf.Foundation.BusinessOrchestration.BaseInput();
+    return input;
+  };
 }

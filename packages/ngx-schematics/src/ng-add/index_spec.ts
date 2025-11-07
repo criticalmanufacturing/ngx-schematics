@@ -1,6 +1,7 @@
-import { JsonArray, JsonObject } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { normalize } from '@criticalmanufacturing/schematics-devkit/testing';
 import { parse } from 'jsonc-parser';
+import { readFileSync } from 'node:fs';
 
 describe('Test ng-add', () => {
   const schematicRunner = new SchematicTestRunner(
@@ -18,6 +19,8 @@ describe('Test ng-add', () => {
     application: 'Core',
     version: 'dev'
   };
+
+  const fixturesPath = `${__dirname}/fixtures`;
 
   let appTree: UnitTestTree;
 
@@ -57,66 +60,248 @@ describe('Test ng-add', () => {
           '/angular.json',
           '/package.json',
           '/tsconfig.json',
-          '/.eslintrc.json',
+          '/eslint.config.js',
           '/application/tsconfig.app.json',
           '/application/tsconfig.spec.json',
           '/application/ngsw-config.json',
-          '/application/.eslintrc.json',
-          '/application/src/index.html',
+          '/application/eslint.config.js',
           '/application/src/main.ts',
+          '/application/src/index.html',
           '/application/src/styles.css',
-          '/application/src/manifest.webmanifest',
+          '/application/src/app/app-module.ts',
+          '/application/src/app/app.ts',
+          '/application/src/app/app.css',
+          '/application/src/app/app.html',
           '/application/src/assets/config.json',
-          '/application/src/app/app.module.ts',
-          '/application/src/app/app.component.html'
+          '/application/src/manifest.webmanifest'
         ])
+      );
+      expect(tree.files.every((x) => !x.startsWith('/application/public'))).toBeTrue();
+    });
+
+    describe('- Generate index.html', () => {
+      it('should have the updated index.html', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const actual = tree.readContent('/application/src/index.html');
+        const expected = readFileSync(`${fixturesPath}/module/index.html`, {
+          encoding: 'utf-8'
+        });
+
+        expect(normalize(actual)).toEqual(normalize(expected));
+      });
+    });
+
+    describe('- Generate app.ts', () => {
+      it('should should update the component template', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const actual = tree.readContent('/application/src/app/app.html');
+        const expected = readFileSync(`${fixturesPath}/module/app/app.html`, {
+          encoding: 'utf-8'
+        });
+
+        expect(normalize(actual)).toEqual(normalize(expected));
+      });
+
+      it('should should update the component class', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const actual = tree.readContent('/application/src/app/app.ts');
+        const expected = readFileSync(`${fixturesPath}/module/app/app.ts`, {
+          encoding: 'utf-8'
+        });
+
+        expect(normalize(actual)).toEqual(normalize(expected));
+      });
+    });
+
+    describe('- Generate main.ts', () => {
+      it('should update the main.ts', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const actual = tree.readContent('/application/src/main.ts');
+        const expected = readFileSync(`${fixturesPath}/module/main.ts`, {
+          encoding: 'utf-8'
+        });
+
+        expect(normalize(actual)).toEqual(normalize(expected));
+      });
+    });
+
+    describe('- Generate app-module.ts', () => {
+      it('should update the app-module.ts for CoreUI', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const actual = tree.readContent('/application/src/app/app-module.ts');
+        const expected = readFileSync(`${fixturesPath}/module/app/core-app-module.ts`, {
+          encoding: 'utf-8'
+        });
+
+        expect(normalize(actual)).toEqual(normalize(expected));
+      });
+
+      it('should update the app-module.ts for MesUI', async () => {
+        const ngAddMesOptions = {
+          ...ngAddOptions,
+          application: 'MES'
+        };
+
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddMesOptions, appTree);
+
+        const actual = tree.readContent('/application/src/app/app-module.ts');
+        const expected = readFileSync(`${fixturesPath}/module/app/mes-app-module.ts`, {
+          encoding: 'utf-8'
+        });
+
+        expect(normalize(actual)).toEqual(normalize(expected));
+      });
+    });
+  });
+
+  describe('with standalone', () => {
+    const appOptions = {
+      name: 'application',
+      inlineStyle: false,
+      inlineTemplate: false,
+      routing: false,
+      skipTests: false,
+      skipPackageJson: false,
+      standalone: true
+    };
+
+    beforeEach(async () => {
+      appTree = await schematicRunner.runExternalSchematic(
+        '@schematics/angular',
+        'application',
+        appOptions,
+        appTree
       );
     });
 
+    it('should have the necessary files', async () => {
+      const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+      expect(tree.files).toEqual(
+        jasmine.arrayContaining([
+          '/angular.json',
+          '/package.json',
+          '/tsconfig.json',
+          '/eslint.config.js',
+          '/application/tsconfig.app.json',
+          '/application/tsconfig.spec.json',
+          '/application/ngsw-config.json',
+          '/application/eslint.config.js',
+          '/application/src/main.ts',
+          '/application/src/index.html',
+          '/application/src/styles.css',
+          '/application/src/app/app.config.ts',
+          '/application/src/app/app.ts',
+          '/application/src/app/app.css',
+          '/application/src/app/app.html',
+          '/application/src/assets/config.json',
+          '/application/src/manifest.webmanifest'
+        ])
+      );
+      expect(tree.files.every((x) => !x.startsWith('/application/public'))).toBeTrue();
+    });
+
+    describe('- Generate index.html', () => {
+      it('should have the updated index.html', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const actual = tree.readContent('/application/src/index.html');
+        const expected = readFileSync(`${fixturesPath}/module/index.html`, {
+          encoding: 'utf-8'
+        });
+
+        expect(normalize(actual)).toEqual(normalize(expected));
+      });
+    });
+
+    describe('- Generate app.ts', () => {
+      it('should should update the component template', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const actual = tree.readContent('/application/src/app/app.html');
+        const expected = readFileSync(`${fixturesPath}/standalone/app/app.html`, {
+          encoding: 'utf-8'
+        });
+
+        expect(normalize(actual)).toEqual(normalize(expected));
+      });
+
+      it('should should update the component class', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const actual = tree.readContent('/application/src/app/app.ts');
+        const expected = readFileSync(`${fixturesPath}/standalone/app/app.ts`, {
+          encoding: 'utf-8'
+        });
+
+        expect(normalize(actual)).toEqual(normalize(expected));
+      });
+    });
+
+    describe('- Generate main.ts', () => {
+      it('should update the main.ts', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const actual = tree.readContent('/application/src/main.ts');
+        const expected = readFileSync(`${fixturesPath}/standalone/main.ts`, {
+          encoding: 'utf-8'
+        });
+
+        expect(normalize(actual)).toEqual(normalize(expected));
+      });
+    });
+
+    describe('- Generate app.config.ts', () => {
+      it('should update the app.config.ts for CoreUI', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const actual = tree.readContent('/application/src/app/app.config.ts');
+        const expected = readFileSync(`${fixturesPath}/standalone/app/core-app.config.ts`, {
+          encoding: 'utf-8'
+        });
+
+        expect(normalize(actual)).toEqual(normalize(expected));
+      });
+
+      it('should update the app.config.ts for MesUI', async () => {
+        const ngAddMesOptions = {
+          ...ngAddOptions,
+          application: 'MES'
+        };
+
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddMesOptions, appTree);
+
+        const actual = tree.readContent('/application/src/app/app.config.ts');
+        const expected = readFileSync(`${fixturesPath}/standalone/app/mes-app.config.ts`, {
+          encoding: 'utf-8'
+        });
+
+        expect(normalize(actual)).toEqual(normalize(expected));
+      });
+    });
+
     describe('- Generate angular.json', () => {
+      it('should update the application builder outputPath', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
+        expect(angularJsonContent.projects.application.architect.build.options.outputPath).toEqual({
+          base: 'dist/application',
+          browser: ''
+        });
+      });
+
       it('should have @criticalmanufacturing/ngx-schematics in schematicCollections', async () => {
         const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
 
         const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
         expect(angularJsonContent.cli.schematicCollections).toContain(
           '@criticalmanufacturing/ngx-schematics'
-        );
-      });
-
-      it('should set service worker', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const ngswConfig = tree.readJson('application/ngsw-config.json') as JsonObject;
-
-        const appAssetGroup = (ngswConfig['assetGroups'] as JsonArray).find(
-          (assetGroup) => (assetGroup as JsonObject)['name'] === 'app'
-        );
-
-        const configDataGroup = (ngswConfig['dataGroups'] as JsonArray).find(
-          (assetGroup) => (assetGroup as JsonObject)['name'] === 'config'
-        );
-
-        const appAssetFiles = ((appAssetGroup as JsonObject)?.['resources'] as JsonObject)?.[
-          'files'
-        ] as JsonArray;
-
-        expect(ngswConfig['navigationRequestStrategy']).toBe('freshness');
-
-        expect(appAssetFiles).toContain('/monaco-editor/**/*.js');
-        expect(appAssetFiles).not.toContain('/index.html');
-
-        expect(configDataGroup).not.toBeNull();
-      });
-
-      it('should have webmanifest in assets', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
-        expect(angularJsonContent.projects.application.architect.build.options.assets).toContain(
-          'application/src/manifest.webmanifest'
-        );
-        expect(angularJsonContent.projects.application.architect.test.options.assets).toContain(
-          'application/src/manifest.webmanifest'
         );
       });
 
@@ -135,14 +320,6 @@ describe('Test ng-add', () => {
     });
 
     describe('- Generate package.json', () => {
-      it('should have the lint script', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const packageJsonContent = JSON.parse(tree.readContent('/package.json'));
-        expect(packageJsonContent.scripts.lint).toBeDefined();
-        expect(packageJsonContent.scripts.lint).toBe('ng lint');
-      });
-
       it('should have cmf-core-ui package in the dependencies', async () => {
         const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
 
@@ -192,212 +369,33 @@ describe('Test ng-add', () => {
         expect(tsConfigJsonContent.compilerOptions.noImplicitAny).toBeFalse();
         expect(tsConfigJsonContent.compilerOptions.strictFunctionTypes).toBeFalse();
         expect(tsConfigJsonContent.compilerOptions.strictNullChecks).toBeFalse();
+        expect(tsConfigJsonContent.compilerOptions.preserveSymlinks).toBeTrue();
       });
     });
 
-    describe('- Generate index.html', () => {
-      it('should have the link for manifest', async () => {
+    describe('- Generate ngsw-config.json', () => {
+      it('should update service worker config', async () => {
         const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
 
-        const indexHtmlContent = tree.readContent('/application/src/index.html');
-        expect(indexHtmlContent).toContain('<link rel="manifest" href="manifest.webmanifest">');
-      });
-
-      it('should have the meta for theme-color', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const indexHtmlContent = tree.readContent('/application/src/index.html');
-        expect(indexHtmlContent).toContain('<meta name="theme-color"');
-      });
-
-      it('should have the loading ', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const styleRegExp = new RegExp(
-          `<div id="loading-container" class="cmf-loading-container">\\s*` +
-            `<div class="cmf-loading-center">\\s*` +
-            `<div class="cmf-loading-cmf-logo"></div>\\s*` +
-            `<div class="cmf-loading-spinner"></div>\\s*` +
-            `</div>\\s*` +
-            `</div>`,
-          'gm'
-        );
-
-        const indexHtmlContent = tree.readContent('/application/src/index.html');
-        expect(indexHtmlContent).toMatch(styleRegExp);
-      });
-
-      it('should have the noscript', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const indexHtmlContent = tree.readContent('/application/src/index.html');
-        expect(indexHtmlContent).toContain(
-          '<noscript>Please enable JavaScript to continue using this application.</noscript>'
-        );
-      });
-    });
-
-    describe('- Generate main.ts', () => {
-      it('should import the loadApplicationConfig from cmf-core', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const mainContent = tree.readContent('/application/src/main.ts');
-        expect(mainContent).toContain(`import { loadApplicationConfig } from 'cmf-core/init';`);
-      });
-
-      it('should call loadApplicationConfig and import AppModule', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const mainContent = tree.readContent('/application/src/main.ts');
-        expect(mainContent).toContain(`loadApplicationConfig('assets/config.json').then(() => {
-  import(/* webpackMode: "eager" */ './app/app.module').then(({ AppModule }) => {
-    platformBrowserDynamic().bootstrapModule(AppModule)
-      .catch(err => console.error(err));
-  });
-});`);
-      });
-    });
-
-    describe('- Generate App component', () => {
-      it('should have the router-outlet', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const appComponentHtmlContent = tree.readContent('/application/src/app/app.component.html');
-        expect(appComponentHtmlContent).toEqual('<router-outlet></router-outlet>');
-      });
-
-      it('should import the CoreUIModule and MetadataRoutingModule', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const appModuleContent = tree.readContent('/application/src/app/app.module.ts');
-        expect(appModuleContent).toContain(`import { CoreUIModule } from 'cmf-core-ui';`);
-        expect(appModuleContent).toContain(`import { MetadataRoutingModule } from 'cmf-core';`);
-
-        const appModuleImports = appModuleContent.match(/imports: \[((\W|\w|\n|\r|\s)*)\]/gm)?.[0];
-        expect(appModuleImports).not.toBeNull();
-        expect(appModuleImports).toContain('CoreUIModule');
-        expect(appModuleImports).toContain('MetadataRoutingModule');
-      });
-
-      it('should import the MesUIModule and MetadataRoutingModule', async () => {
-        const ngAddMesOptions = {
-          ...ngAddOptions,
-          application: 'MES'
-        };
-
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddMesOptions, appTree);
-
-        const appModuleContent = tree.readContent('/application/src/app/app.module.ts');
-        expect(appModuleContent).toContain(`import { MesUIModule } from 'cmf-mes-ui';`);
-        expect(appModuleContent).toContain(`import { MetadataRoutingModule } from 'cmf-core';`);
-
-        const appModuleImports = appModuleContent.match(/imports: \[((\W|\w|\n|\r|\s)*)\]/gm)?.[0];
-        expect(appModuleImports).not.toBeNull();
-        expect(appModuleImports).toContain('MesUIModule');
-        expect(appModuleImports).toContain('MetadataRoutingModule');
-      });
-    });
-  });
-
-  describe('with standalone', () => {
-    const appOptions = {
-      name: 'application',
-      inlineStyle: false,
-      inlineTemplate: false,
-      routing: false,
-      skipTests: false,
-      skipPackageJson: false,
-      standalone: true
-    };
-
-    beforeEach(async () => {
-      appTree = await schematicRunner.runExternalSchematic(
-        '@schematics/angular',
-        'application',
-        appOptions,
-        appTree
-      );
-    });
-
-    describe('- Generate main.ts', () => {
-      it('should import the loadApplicationConfig from cmf-core', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const mainContent = tree.readContent('/application/src/main.ts');
-        expect(mainContent).toContain(`import { loadApplicationConfig } from 'cmf-core/init';`);
-      });
-
-      it('should call loadApplicationConfig and import the app component', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const mainContent = tree.readContent('/application/src/main.ts');
-        expect(mainContent).toContain(`loadApplicationConfig('assets/config.json').then(() => {
-  import(/* webpackMode: "eager" */ './app/app.config').then(({ appConfig }) => {
-    bootstrapApplication(AppComponent, appConfig)
-      .catch((err) => console.error(err));
-  });
-});`);
-      });
-    });
-
-    describe('- Generate App component', () => {
-      it('should have the router-outlet', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const appComponentHtmlContent = tree.readContent('/application/src/app/app.component.html');
-        expect(appComponentHtmlContent).toEqual('<router-outlet></router-outlet>');
-      });
-
-      it('should import provideCoreUI and provideMetadataRouter', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const appModuleContent = tree.readContent('/application/src/app/app.config.ts');
-        expect(appModuleContent).toContain(`import { provideCoreUI } from 'cmf-core-ui';`);
-        expect(appModuleContent).toContain(`import { provideMetadataRouter } from 'cmf-core';`);
-
-        const appModuleImports = appModuleContent.match(
-          /providers: \[((\W|\w|\n|\r|\s)*)\]/gm
-        )?.[0];
-        expect(appModuleImports).not.toBeNull();
-        expect(appModuleImports).toContain('provideCoreUI()');
-        expect(appModuleImports).toContain('provideMetadataRouter()');
-      });
-
-      it('should import provideMESUI and provideMetadataRouter', async () => {
-        const ngAddMesOptions = {
-          ...ngAddOptions,
-          application: 'MES'
-        };
-
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddMesOptions, appTree);
-
-        const appModuleContent = tree.readContent('/application/src/app/app.config.ts');
-        expect(appModuleContent).toContain(`import { provideMesUI } from 'cmf-mes-ui';`);
-        expect(appModuleContent).toContain(`import { provideMetadataRouter } from 'cmf-core';`);
-
-        const appModuleImports = appModuleContent.match(
-          /providers: \[((\W|\w|\n|\r|\s)*)\]/gm
-        )?.[0];
-        expect(appModuleImports).not.toBeNull();
-        expect(appModuleImports).toContain('provideMesUI()');
-        expect(appModuleImports).toContain('provideMetadataRouter()');
-      });
-
-      it('should update the service worker to register', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const appModuleContent = tree.readText('/application/src/app/app.config.ts');
-        expect(appModuleContent).toContain(`provideServiceWorker('ngsw-loader-worker.js'`);
-      });
-
-      it('should update the application builder outputPath', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
-
-        const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
-        expect(angularJsonContent.projects.application.architect.build.options.outputPath).toEqual({
-          base: 'dist/application',
-          browser: ''
+        const actual = tree.readText('application/ngsw-config.json');
+        const expected = readFileSync(`${fixturesPath}/ngsw-config.json`, {
+          encoding: 'utf-8'
         });
+
+        expect(normalize(actual)).toEqual(normalize(expected));
+      });
+    });
+
+    describe('- Generate manifest.webmanifest', () => {
+      it('should update webmanifest', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const actual = tree.readText('application/src/manifest.webmanifest');
+        const expected = readFileSync(`${fixturesPath}/manifest.webmanifest`, {
+          encoding: 'utf-8'
+        });
+
+        expect(normalize(actual)).toEqual(normalize(expected));
       });
     });
   });

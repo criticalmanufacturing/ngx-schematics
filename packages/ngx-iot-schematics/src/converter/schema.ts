@@ -1,4 +1,4 @@
-import { IoTValueType } from '../utility/iot-value-types';
+import { IoTValueType } from '../utility/iot-value-types.js';
 
 export interface Schema {
   /**

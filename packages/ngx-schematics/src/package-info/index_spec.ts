@@ -1,8 +1,5 @@
 import { strings } from '@angular-devkit/core';
-import {
-  SchematicTestRunner,
-  UnitTestTree
-} from '@angular-devkit/schematics/testing';
+import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 
 describe('Generate Package Info', () => {
   const schematicRunner = new SchematicTestRunner(
@@ -54,11 +51,7 @@ describe('Generate Package Info', () => {
       appTree
     );
 
-    appTree = await schematicRunner.runSchematic(
-      'library',
-      libraryOptions,
-      appTree
-    );
+    appTree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
   });
 
   it('should generate the package-info having a Widget', async () => {
@@ -73,18 +66,12 @@ describe('Generate Package Info', () => {
       appTree
     );
 
-    tree = await schematicRunner.runSchematic(
-      'package-info',
-      packageInfoOptions,
-      tree
-    );
+    tree = await schematicRunner.runSchematic('package-info', packageInfoOptions, tree);
 
     const widgetComponentName = `${strings.classify(widgetName)}Widget`;
 
     const metadataContent = tree.readContent(defaultMetadataFilePath);
-    const packageInfoWidgets = metadataContent.match(
-      /widgets: \[(\r*\n*\s*)(\W|\w)+?\]/gm
-    )?.[0];
+    const packageInfoWidgets = metadataContent.match(/widgets: \[(\r*\n*\s*)(\W|\w)+?\]/gm)?.[0];
     expect(packageInfoWidgets).not.toBeNull();
     expect(packageInfoWidgets).toContain(`'${widgetComponentName}'`);
   });
@@ -101,15 +88,9 @@ describe('Generate Package Info', () => {
       appTree
     );
 
-    tree = await schematicRunner.runSchematic(
-      'package-info',
-      packageInfoOptions,
-      tree
-    );
+    tree = await schematicRunner.runSchematic('package-info', packageInfoOptions, tree);
 
-    const dataSourceComponentName = `${strings.classify(
-      dataSourceName
-    )}DataSource`;
+    const dataSourceComponentName = `${strings.classify(dataSourceName)}DataSource`;
 
     const metadataContent = tree.readContent(defaultMetadataFilePath);
     const packageInfoDataSources = metadataContent.match(
@@ -132,15 +113,9 @@ describe('Generate Package Info', () => {
       appTree
     );
 
-    tree = await schematicRunner.runSchematic(
-      'package-info',
-      packageInfoOptions,
-      tree
-    );
+    tree = await schematicRunner.runSchematic('package-info', packageInfoOptions, tree);
 
-    const converterComponentName = `${strings.classify(
-      converterName
-    )}Converter`;
+    const converterComponentName = `${strings.classify(converterName)}Converter`;
 
     const metadataContent = tree.readContent(defaultMetadataFilePath);
     const packageInfoConverters = metadataContent.match(
@@ -164,15 +139,9 @@ describe('Generate Package Info', () => {
       appTree
     );
 
-    tree = await schematicRunner.runSchematic(
-      'package-info',
-      packageInfoOptions,
-      tree
-    );
+    tree = await schematicRunner.runSchematic('package-info', packageInfoOptions, tree);
 
-    const entityPageClassName = `Page${strings.classify(
-      entityPageName
-    )}Component`;
+    const entityPageClassName = `Page${strings.classify(entityPageName)}Component`;
 
     const metadataContent = tree.readContent(defaultMetadataFilePath);
     const packageInfoComponents = metadataContent.match(

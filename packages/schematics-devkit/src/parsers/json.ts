@@ -17,7 +17,10 @@ export type JSONPath = (string | number)[];
 export class JSONFile {
   content: string;
 
-  constructor(private readonly host: Tree, private readonly path: string) {
+  constructor(
+    private readonly host: Tree,
+    private readonly path: string
+  ) {
     this.content = this.host.readText(this.path);
   }
 
@@ -81,7 +84,7 @@ export class JSONFile {
       getInsertionIndex,
       formattingOptions: {
         insertSpaces: true,
-        tabSize: 4
+        tabSize: 2
       }
     });
 

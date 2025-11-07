@@ -1,8 +1,6 @@
-import { Component, Inject, ViewContainerRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { CustomizableComponent } from 'cmf-core';
 import { WidgetSettingsModule, WidgetSettingsService } from 'cmf-core-dashboards';
-
 import { <%= classify(name) %>WidgetSettingsService, <%= classify(name) %>WidgetSettings } from './<%= dasherize(name) %>-widget-settings.service';
 
 /**
@@ -19,60 +17,40 @@ import { <%= classify(name) %>WidgetSettingsService, <%= classify(name) %>Widget
  * @description
  *
  * ## <%= nameify(name) %> Widget Settings Component
- *
- * ### Dependencies
- *
- * #### Components
- * * ComponentA : `package`
- * * ComponentB : `package`
- *
- * #### Services
- * * ServiceA : `package`
- * * ServiceB : `package`
- *
- * #### Directives
- * * DirectiveA : `package`
- * * DirectiveB : `package`
- *
  */
 @Component({
-    standalone: true,
-    selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget-settings',
-    imports: [CommonModule, WidgetSettingsModule],
-    templateUrl: './<%= dasherize(name) %>-widget-settings.component.html',
-    <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-widget-settings.component.<%= style %>'<% } %>,    
-    providers: [
-        { provide: WidgetSettingsService, useClass: <%= classify(name) %>WidgetSettingsService }
-    ]
+  selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-widget-settings',
+  imports: [WidgetSettingsModule],
+  templateUrl: './<%= dasherize(name) %>-widget-settings.component.html',
+  <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-widget-settings.component.<%= style %>'<% } %>,
+  providers: [{ provide: WidgetSettingsService, useClass: <%= classify(name) %>WidgetSettingsService }]
 })
 export class <%= classify(name) %>WidgetSettingsComponent extends CustomizableComponent {
+  /** Widget settings */
+  private _settings = inject(WidgetSettingsService) as <%= classify(name) %>WidgetSettingsService;
 
-    /**
-     * Constructor
-     */
-    constructor(
-        viewContainerRef: ViewContainerRef,
-        @Inject(WidgetSettingsService) settings: <%= classify(name) %>WidgetSettingsService
-    ) {
-        super(viewContainerRef);
+  /**
+   * Constructor
+   */
+  constructor() {
+    super();
 
-        settings.on<%= classify(name) %>SettingsLoaded = this.onLoad.bind(this);
-        settings.on<%= classify(name) %>SaveSettings = this.onSave.bind(this);
-    }
+    this._settings.on<%= classify(name) %>SettingsLoaded = this.onLoad.bind(this);
+    this._settings.on<%= classify(name) %>SaveSettings = this.onSave.bind(this);
+  }
 
-    
-    /**
-     * Loads the widget settings
-     * @returns: A Promise to resolve the settings
-     */
-    public async onLoad(settings: <%= classify(name) %>WidgetSettings): Promise<<%= classify(name) %>WidgetSettings> {
-        return settings;
-    }
+  /**
+   * Loads the widget settings
+   * @returns: A Promise to resolve the settings
+   */
+  onLoad(settings: <%= classify(name) %>WidgetSettings): Promise<<%= classify(name) %>WidgetSettings> {
+    return Promise.resolve(settings);
+  }
 
-    /**
-     * Saves the widget settings
-     */
-    public onSave(settings: <%= classify(name) %>WidgetSettings): <%= classify(name) %>WidgetSettings {
-        return settings;
-    }
+  /**
+   * Saves the widget settings
+   */
+  onSave(settings: <%= classify(name) %>WidgetSettings): <%= classify(name) %>WidgetSettings {
+    return settings;
+  }
 }

@@ -17,8 +17,8 @@
     "@angular-devkit/core": "",
     "@angular-devkit/schematics": "",
     "@criticalmanufacturing/schematics-devkit": "",
+    "@inquirer/prompts": "",
     "@schematics/angular": "",
-    "inquirer": "",
     "ts-morph": ""
   }
 }

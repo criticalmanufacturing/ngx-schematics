@@ -7,9 +7,9 @@ import {
   Tree
 } from '@angular-devkit/schematics';
 import { readWorkspace, ProjectDefinition } from '@schematics/angular/utility';
-import { createSourceFile, JSONFile } from '@criticalmanufacturing/schematics-devkit';
+import { createSourceFile, JSONFile, ProjectType } from '@criticalmanufacturing/schematics-devkit';
 
-import { setPackageInfoMetadata, PackageInfo, getMetadataFilePath } from '../utility/metadata';
+import { setPackageInfoMetadata, PackageInfo, getMetadataFilePath } from '../utility/metadata.js';
 
 function getAllFiles(host: Tree, rootPath: string): string[] {
   if (!host.exists(join(normalize(rootPath), 'ng-package.json'))) {
@@ -87,7 +87,7 @@ export default function (_options: any): Rule {
       throw new SchematicsException(`Project "${_options.project}" does not exist.`);
     }
 
-    if (project.extensions['projectType'] !== 'library' || !project.sourceRoot) {
+    if (project.extensions['projectType'] !== ProjectType.Library || !project.sourceRoot) {
       return;
     }
 

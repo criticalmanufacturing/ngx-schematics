@@ -1,0 +1,48 @@
+import { Injectable } from '@angular/core';
+import { TreatTransactionOutput as DataSourceExecutionOutput } from 'cmf-core-business-controls';
+import { DataSource, DataSourceGeneric, DataSourceSettingsDef } from 'cmf-core-dashboards';
+import { TestDataSourceSettingsComponent } from './test-data-source-settings/test-data-source-settings.component';
+
+/**
+ * @whatItDoes
+ *
+ * Please provide a meaningful description of this DataSource.
+ * Try to answer these questions:
+ * * What is it?
+ * * What it does?
+ * * Does it retrieve data from any external source (server, local database, text file, etc...)?
+ *
+ * @howToUse
+ *
+ * The DataSource is used in an UIPage with the inputs and outputs mentioned below.
+ *
+ * Besides the description above, please complement it with a meaningful description of this
+ * component that answer these questions:
+ * * How to use it?
+ * * Where and When to use it?
+ *
+ * ### DataSource Settings Inputs
+ * * `string` : **value** _(default)_ - Settings Input description
+ *
+ * ### DataSource Inputs
+ * * `string` : **value** _(default)_ - Input description
+ *
+ * ### DataSource Outputs
+ * * `string` : **value** _(default)_ - Output description
+ */
+@DataSource({
+  name: $localize`:@@test-lib/test-data-source#NAME:Test`,
+  settingsComponent: {
+    component: TestDataSourceSettingsComponent
+  }
+})
+@Injectable()
+export class TestDataSource extends DataSourceGeneric implements DataSourceSettingsDef {
+  /**
+   * This method gathers all the logic to fetch data for this data source
+   */
+  async execute(): Promise<DataSourceExecutionOutput | void> {
+    // Please change the next line to execute what this data source requires
+    return;
+  }
+}

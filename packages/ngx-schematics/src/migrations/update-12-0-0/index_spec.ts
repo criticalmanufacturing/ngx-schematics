@@ -1,5 +1,8 @@
-import { JsonObject } from '@angular-devkit/core';
+import { deepCopy, JsonArray, JsonObject } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
+import { getBuildTargets } from '@criticalmanufacturing/schematics-devkit';
+import { NEW_THEMES, OLD_THEMES } from './themes-update';
 
 /**
  * Mock config.json file with blue and gray themes included
@@ -118,6 +121,38 @@ describe('Test ng-update', () => {
         // The startup theme was updated
         expect(((config.general as JsonObject).startup as JsonObject).startupTheme).toBe(expected);
       });
+    });
+
+    it('Should remove gray and blue themes from angular.json and add the light theme', async () => {
+      let workspace = await readWorkspace(appTree);
+      let targets = getBuildTargets(workspace.projects.get('application')!);
+
+      const oldThemes = OLD_THEMES.map((theme) => ({
+        inject: false,
+        bundleName: theme,
+        input: `node_modules/cmf-mes/assets/style/themes/${theme}/${theme}.less`
+      }));
+
+      const newThemes = NEW_THEMES.map((theme) => ({
+        inject: false,
+        bundleName: theme,
+        input: `node_modules/cmf-mes/assets/style/themes/${theme}/${theme}.less`
+      }));
+
+      (targets[0].options!.styles as JsonArray).push(...oldThemes);
+
+      await writeWorkspace(appTree, workspace);
+
+      // Run the migration
+      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+
+      workspace = await readWorkspace(tree);
+      targets = getBuildTargets(workspace.projects.get('application')!);
+
+      const actual = deepCopy(targets[0].options!.styles);
+
+      expect(actual).not.toEqual(jasmine.arrayContaining(oldThemes));
+      expect(actual).toEqual(jasmine.arrayContaining(newThemes));
     });
   });
 });

@@ -1,11 +1,5 @@
-import {
-    Pipe,
-    PipeTransform
-} from '@angular/core';
-
-import {
-    Converter
-} from 'cmf-core-dashboards';
+import { Pipe, PipeTransform } from '@angular/core';
+import { Converter } from 'cmf-core-dashboards';
 
 /**
  * <%= nameify(name) %> Converter
@@ -19,16 +13,15 @@ import {
  * ```
  */
 @Converter({
-    name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>#NAME:<%= nameify(name) %> Converter`,
-    input: [],
-    output: null
+  name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>#NAME:<%= nameify(name) %> Converter`,
+  input: [],
+  output: null
 })
 @Pipe({
-    standalone: true,
-    name: '<%= camelize(name) %>'
+  name: '<%= camelize(name) %>'
 })
 export class <%= classify(name) %>Converter implements PipeTransform {
-    transform(value: any, ...args: any[]): any {
-        return value;
-    }
+  transform(value: any, ...args: any[]): any {
+    return value;
+  }
 }

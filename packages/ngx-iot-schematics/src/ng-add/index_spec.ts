@@ -48,23 +48,21 @@ describe('Test ng-add', () => {
         '/tsconfig.json',
         '/.editorconfig',
         '/.gitignore',
-        '/.eslintrc.json',
+        '/eslint.config.js',
         '/.vscode/extensions.json',
         '/.vscode/launch.json',
         '/.vscode/tasks.json',
         '/application/tsconfig.app.json',
         '/application/tsconfig.spec.json',
-        '/application/.eslintrc.json',
-        '/application/src/favicon.ico',
-        '/application/src/index.html',
+        '/application/eslint.config.js',
         '/application/src/main.ts',
+        '/application/src/index.html',
         '/application/src/styles.css',
-        '/application/src/assets/.gitkeep',
-        '/application/src/app/app.config.ts',
-        '/application/src/app/app.component.html',
-        '/application/src/app/app.component.spec.ts',
-        '/application/src/app/app.component.ts',
-        '/application/src/app/app.component.css'
+        '/application/src/app/app.spec.ts',
+        '/application/src/app/app.ts',
+        '/application/src/app/app.css',
+        '/application/src/app/app.html',
+        '/application/src/app/app.config.ts'
       ])
     );
   });

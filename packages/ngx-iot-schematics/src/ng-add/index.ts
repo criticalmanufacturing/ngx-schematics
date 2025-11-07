@@ -7,11 +7,8 @@ import {
   SchematicsException,
   Tree
 } from '@angular-devkit/schematics';
-
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
-
-import inquirer, { ListQuestion } from 'inquirer';
-
+import { select } from '@inquirer/prompts';
 import {
   updateTsConfig,
   NodeDependency,
@@ -20,12 +17,12 @@ import {
   getInstalledDependency,
   installNpmPackages
 } from '@criticalmanufacturing/schematics-devkit/rules';
-
-import { version as pkgVersion, name as pkgName } from '../../package.json';
-import { Schema } from './schema';
-import { CORE_IOT_PACKAGE, IOT_DEPENDENCIES } from './definition';
 import { JsonArray, JsonObject } from '@angular-devkit/core';
 import { JSONFile, listNpmReleaseTags } from '@criticalmanufacturing/schematics-devkit';
+
+import pkg from '../../package.json';
+import { Schema } from './schema.js';
+import { CORE_IOT_PACKAGE, IOT_DEPENDENCIES } from './definition.js';
 
 /**
  * Updates the angular.json file with all the relevant configuration
@@ -84,8 +81,8 @@ function installSchematics(options: Schema) {
 
     const dependencies: NodeDependency[] = [
       {
-        name: pkgName,
-        version: getInstalledDependency(tree, pkgName)?.version ?? pkgVersion,
+        name: pkg.name,
+        version: getInstalledDependency(tree, pkg.name)?.version ?? pkg.version,
         type: NodeDependencyType.Dev,
         overwrite: true
       },
@@ -97,14 +94,21 @@ function installSchematics(options: Schema) {
     ];
 
     return chain([
+      options.project
+        ? externalSchematic('@angular/localize', 'ng-add', {
+            project: options.project,
+            useAtRuntime: true
+          })
+        : noop(),
       updateWorkspace(),
       installDependencies(dependencies),
       updatePackagejson(),
       updateTsConfig([
-        [['compilerOptions', 'strictFunctionTypes'], false],
-        [['compilerOptions', 'noImplicitAny'], false],
-        [['compilerOptions', 'strictNullChecks'], false],
-        [['compilerOptions', 'preserveSymlinks'], true]
+        { path: ['compilerOptions', 'strictFunctionTypes'], value: false },
+        { path: ['compilerOptions', 'noImplicitAny'], value: false },
+        { path: ['compilerOptions', 'strictNullChecks'], value: false },
+        { path: ['compilerOptions', 'preserveSymlinks'], value: true },
+        { path: ['compilerOptions', 'useDefineForClassFields'], value: false }
       ])
     ]);
   };
@@ -117,7 +121,7 @@ export default function (_options: Schema): Rule {
     if (!_options.version) {
       const [appTags, pkgTags] = await Promise.all([
         listNpmReleaseTags(CORE_IOT_PACKAGE),
-        listNpmReleaseTags(pkgName, pkgVersion)
+        listNpmReleaseTags(pkg.name, pkg.version)
       ]);
 
       const valideTags = pkgTags.filter((t) => appTags.includes(t)); // only include matching app package tags
@@ -128,14 +132,10 @@ export default function (_options: Schema): Rule {
         );
       }
 
-      const question: ListQuestion = {
-        type: 'list',
-        name: 'distTag',
+      _options.version = await select({
         message: 'What is the distribution to utilize?',
         choices: valideTags
-      };
-
-      _options.version = (await inquirer.prompt([question])).distTag;
+      });
     }
 
     if (_options.eslint) {

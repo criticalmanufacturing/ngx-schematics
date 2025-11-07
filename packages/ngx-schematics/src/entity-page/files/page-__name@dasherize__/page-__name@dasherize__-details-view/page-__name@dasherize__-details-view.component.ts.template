@@ -1,25 +1,8 @@
-import {
-    Component,
-    NgModule,
-    OnDestroy,
-    ViewContainerRef
-} from '@angular/core';
-
-import {
-    CommonModule
-} from '@angular/common';
-
-import { Subscription } from 'rxjs';
+import { Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import Cmf from 'cmf-lbos';
-
-import {
-    CustomizableComponent,
-} from 'cmf-core';
-
-import {
-    EntityPageService,
-    DetailsViewModule
-} from 'cmf-core-business-controls';
+import { CustomizableComponent } from 'cmf-core';
+import { EntityPageService, DetailsViewModule } from 'cmf-core-business-controls';
 
 /**
  * @whatItDoes
@@ -35,17 +18,10 @@ import {
  *
  * This component is used with the inputs and outputs mentioned below.
  *
- * Besides the description above, please complement it with a meaningful description of this component that answer these questions:
+ * Besides the description above, please complement it with a meaningful description of this
+ * component that answer these questions:
  * * How to use it?
  * * Where and When to use it?
- *
- * ### Inputs
- * `string` : **name** - The name of this component
- * `number` : **value** - The value of this component
- *
- * ### Outputs
- * `string` : **onNameChange** - When the name of the component change, this output emits the new name
- * `number` : **onValueChange** - When the value of the component change, this output emits the new value
  *
  * ### Example
  * To use the component, assume this HTML Template as an example:
@@ -60,71 +36,35 @@ import {
  * @description
  *
  * ## <%= classify(name) %>Component Component
- *
- * ### Dependencies
- *
- * #### Components
- * * ComponentA : `package`
- * * ComponentB : `package`
- *
- * #### Services
- * * ServiceA : `package`
- * * ServiceB : `package`
- *
- * #### Directives
- * * DirectiveA : `package`
- * * DirectiveB : `package`
- *
  */
 @Component({
-    selector: '<%= dasherize(project) %>-page-<%= dasherize(name) %>-details-view',
-    templateUrl: './page-<%= dasherize(name) %>-details-view.component.html'
+  selector: '<%= dasherize(project) %>-page-<%= dasherize(name) %>-details-view',
+  imports: [DetailsViewModule],
+  templateUrl: './page-<%= dasherize(name) %>-details-view.component.html'
 })
-export class Page<%= classify(name) %>DetailsViewComponent extends CustomizableComponent implements OnDestroy {
+export class Page<%= classify(name) %>DetailsViewComponent extends CustomizableComponent {
+  /** Entity Page service */
+  private _entityPage = inject(EntityPageService);
 
-    /**
-     * Subscription of the ep entity loaded event from the entity page service.
-     */
-    private _epEntityLoadedSubscription: Subscription;
+  /** The entity to be presented in this view */
+  epEntity: Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
 
-    /**
-     * The entity to be presented in this view
-     */
-    public epEntity: Cmf.<%= namespace %>.BusinessObjects.<%= classify(entityType) %>;
+  /**
+   * Constructor
+   */
+  constructor() {
+    super();
 
-    /**
-     * Constructor
-     *
-     * @param viewContainerRef the reference to the component view container
-     */
-    constructor(viewContainerRef: ViewContainerRef, private entityPage: EntityPageService) {
-        super(viewContainerRef);
+    this.epOnEntityLoaded();
+    this._entityPage.epEntityLoaded
+      .pipe(takeUntilDestroyed())
+      .subscribe(this.epOnEntityLoaded.bind(this));
+  }
 
-        this.epOnEntityLoaded();
-        this._epEntityLoadedSubscription = this.entityPage.epEntityLoaded.subscribe(this.epOnEntityLoaded.bind(this));
-    }
-
-    /**
-     * When the entity is loaded by the Entity Page, chooses which properties to display
-     */
-    public epOnEntityLoaded() {
-        this.epEntity = this.entityPage.epEntity as Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
-    }
-
-    /**
-     * Unsubscribes subscriptions
-     */
-    public ngOnDestroy(): void {
-        this._epEntityLoadedSubscription?.unsubscribe();
-    }
+  /**
+   * When the entity is loaded by the Entity Page, chooses which properties to display
+   */
+  epOnEntityLoaded(): void {
+    this.epEntity = this._entityPage.epEntity as Cmf.<%= namespace %>.BusinessObjects.<%= classify(name) %>;
+  }
 }
-
-@NgModule({
-    imports: [
-        CommonModule,
-        DetailsViewModule
-    ],
-    declarations: [Page<%= classify(name) %>DetailsViewComponent],
-    exports: [Page<%= classify(name) %>DetailsViewComponent]
-})
-export class Page<%= classify(name) %>DetailsViewModule { }

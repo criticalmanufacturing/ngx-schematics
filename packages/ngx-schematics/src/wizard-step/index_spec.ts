@@ -1,5 +1,7 @@
 import { strings } from '@criticalmanufacturing/schematics-devkit';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { getAllFilesFromDir, normalize } from '@criticalmanufacturing/schematics-devkit/testing';
+import { readFileSync } from 'node:fs';
 
 describe('Generate Step', () => {
   const schematicRunner = new SchematicTestRunner(
@@ -23,24 +25,26 @@ describe('Generate Step', () => {
   };
 
   const libraryOptions = {
-    name: 'testlib',
+    name: 'test-lib',
     skipPackageJson: false,
     skipTsConfig: false,
     skipInstall: false
   };
 
   const stepOptions = {
-    name: 'ParentMaterials',
-    wizard: 'TransferMaterialsToMultiple',
+    name: 'TestWizardStep',
     stepType: 'Column View',
-    entityType: 'Material',
-    project: libraryOptions.name,
-    namespace: 'Navigo'
+    project: libraryOptions.name
   };
 
-  const stepPath = `projects/${libraryOptions.name}/src/lib/step-${strings.dasherize(
-    stepOptions.name
-  )}`;
+  const fixturesPath = `${__dirname}/fixtures`;
+  const libPath = `projects/${libraryOptions.name}`;
+  const libMainPath = `${libPath}/src/lib`;
+  const stepName = `step-${strings.dasherize(stepOptions.name)}`;
+
+  const expectedFiles = {
+    step: `${stepName}/${stepName}.component`
+  };
 
   let appTree: UnitTestTree;
 
@@ -63,90 +67,62 @@ describe('Generate Step', () => {
 
   it('should create the step files', async () => {
     const tree = await schematicRunner.runSchematic('wizard-step', stepOptions, appTree);
+    const files = getAllFilesFromDir(`${libMainPath}/${stepName}`, tree);
 
-    const dasherizedStepName = strings.dasherize(stepOptions.name);
-
-    expect(tree.getDir(stepPath).subfiles).toEqual(
+    expect(files).toEqual(
       jasmine.arrayContaining([
-        `step-${dasherizedStepName}.component.less`,
-        `step-${dasherizedStepName}.component.html`,
-        `step-${dasherizedStepName}.component.ts`
+        `${libMainPath}/${expectedFiles.step}.less`,
+        `${libMainPath}/${expectedFiles.step}.html`,
+        `${libMainPath}/${expectedFiles.step}.ts`
       ])
     );
   });
 
   it('should create the step style file with other extension', async () => {
     const options = { ...stepOptions, style: 'css' };
-
     const tree = await schematicRunner.runSchematic('wizard-step', options, appTree);
+    const files = getAllFilesFromDir(`${libMainPath}/${stepName}`, tree);
 
-    const dasherizedStepName = strings.dasherize(stepOptions.name);
-
-    expect(tree.getDir(stepPath).subfiles).toEqual(
-      jasmine.arrayContaining([`step-${dasherizedStepName}.component.css`])
-    );
+    expect(files).toEqual(jasmine.arrayContaining([`${libMainPath}/${expectedFiles.step}.css`]));
   });
 
   it('should not create the step style file', async () => {
     const options = { ...stepOptions, style: 'none' };
-
     const tree = await schematicRunner.runSchematic('wizard-step', options, appTree);
+    const files = getAllFilesFromDir(`${libMainPath}/${stepName}`, tree);
 
-    const files = tree.getDir(stepPath).subfiles;
-
-    expect(files).toHaveSize(2);
-    expect(files).toEqual(
-      jasmine.arrayContaining([
-        `step-${strings.dasherize(stepOptions.name)}.component.html`,
-        `step-${strings.dasherize(stepOptions.name)}.component.ts`
-      ])
+    expect(files).not.toEqual(
+      jasmine.arrayContaining([`${libMainPath}/${expectedFiles.step}.less`])
     );
   });
 
-  it('should have the Component decorator with properties selector, templateUrl, styleUrl, and providers', async () => {
+  it('should generate the step less file with the correct content', async () => {
     const tree = await schematicRunner.runSchematic('wizard-step', stepOptions, appTree);
+    const actual = tree.readContent(`${libMainPath}/${expectedFiles.step}.less`);
+    const expected = readFileSync(`${fixturesPath}/${expectedFiles.step}.less`, {
+      encoding: 'utf-8'
+    });
 
-    const stepContent = tree.readContent(
-      `${stepPath}/step-${strings.dasherize(stepOptions.name)}.component.ts`
-    );
-    expect(stepContent).toMatch(/@Component\(/);
-    expect(stepContent).toContain(`standalone: true`);
-    expect(stepContent).toContain(
-      `selector: '${strings.dasherize(stepOptions.project)}-step-${strings.dasherize(stepOptions.name)}'`
-    );
-    expect(stepContent).toContain(
-      `templateUrl: './step-${strings.dasherize(stepOptions.name)}.component.html'`
-    );
-    expect(stepContent).toContain(
-      `styleUrl: './step-${strings.dasherize(stepOptions.name)}.component.less'`
-    );
-    expect(stepContent).toContain(
-      `providers: [{ provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Step${strings.classify(
-        stepOptions.name
-      )}Component) }]`
-    );
+    expect(normalize(actual)).toBe(normalize(expected));
   });
 
-  it('should extend CustomizableComponent', async () => {
+  it('should generate the step ts file with the correct content', async () => {
     const tree = await schematicRunner.runSchematic('wizard-step', stepOptions, appTree);
+    const actual = tree.readContent(`${libMainPath}/${expectedFiles.step}.ts`);
+    const expected = readFileSync(`${fixturesPath}/${expectedFiles.step}.ts`, {
+      encoding: 'utf-8'
+    });
 
-    const stepContent = tree.readContent(
-      `${stepPath}/step-${strings.dasherize(stepOptions.name)}.component.ts`
-    );
-    expect(stepContent).toContain(
-      `export class Step${strings.classify(
-        stepOptions.name
-      )}Component extends CustomizableComponent`
-    );
+    expect(normalize(actual)).toBe(normalize(expected));
   });
 
-  it('should inject the PageBag, UtilService, and EntityTypeService', async () => {
+  it('should generate the step html file with the correct content', async () => {
     const tree = await schematicRunner.runSchematic('wizard-step', stepOptions, appTree);
+    const actual = tree.readContent(`${libMainPath}/${expectedFiles.step}.html`);
+    const expected = readFileSync(`${fixturesPath}/${expectedFiles.step}.html`, {
+      encoding: 'utf-8'
+    });
 
-    const stepContent = tree.readContent(
-      `${stepPath}/step-${strings.dasherize(stepOptions.name)}.component.ts`
-    );
-
-    expect(stepContent).toContain('protected readonly _util = inject(UtilService)');
+    expect(normalize(actual)).toBe(normalize(expected));
   });
 });

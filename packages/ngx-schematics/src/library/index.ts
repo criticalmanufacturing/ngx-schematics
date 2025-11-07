@@ -1,4 +1,4 @@
-import { basename, join, JsonArray, JsonObject, normalize } from '@angular-devkit/core';
+import { basename, join, JsonObject, normalize } from '@angular-devkit/core';
 import {
   apply,
   applyTemplates,
@@ -26,11 +26,11 @@ import {
   updateNgPackageJson,
   updateTsConfig
 } from '@criticalmanufacturing/schematics-devkit/rules';
-import { Schema } from './schema';
-import { addSymbolToNgModuleMetadata, getAppModulePath } from '../utility/ng-module';
-import { getDefaultAppConfig } from '../utility/app-config';
+import { Schema } from './schema.js';
+import { addSymbolToNgModuleMetadata, getAppModulePath } from '../utility/ng-module.js';
+import { getDefaultAppConfig } from '../utility/app-config.js';
 import { SyntaxKind } from 'ts-morph';
-import { METADATA_ROUTING_PROVIDE } from '../ng-add/package-configs';
+import { METADATA_ROUTING_PROVIDE } from '../ng-add/package-configs.js';
 
 function updateAppConfig(options: { packageName: string; namePrefix: string }): Rule {
   return async (tree: Tree) => {
@@ -50,7 +50,7 @@ function updateAppConfig(options: { packageName: string; namePrefix: string }): 
 
     addSymbolToArrayLiteral(
       arrLiteral,
-      `provide${strings.classify(options.namePrefix)}()`,
+      `\nprovide${strings.classify(options.namePrefix)}()`,
       METADATA_ROUTING_PROVIDE[1]
     );
     insertImport(
@@ -129,7 +129,7 @@ function createMetadataSubEntry(options: { name: string; skipTsConfig?: boolean 
       mergeWith(templateSource),
       options.skipTsConfig
         ? noop()
-        : updateTsConfig([[['compilerOptions', 'paths', packageName], [distRoot]]]),
+        : updateTsConfig([{ path: ['compilerOptions', 'paths', packageName], value: [distRoot] }]),
       updateAppModule({ packageName, namePrefix }),
       updateAppConfig({ packageName, namePrefix })
     ]);
@@ -148,18 +148,21 @@ export default function (_options: Schema): Rule {
 
     const workspace = await readWorkspace(tree);
 
-    const lint = (
-      (workspace.extensions.cli as JsonObject)?.schematicCollections as JsonArray
-    )?.includes('@angular-eslint/schematics');
+    const lint = ((workspace.extensions.cli as JsonObject)?.schematicCollections as string[])?.find(
+      (x) => ['@angular-eslint/schematics', 'angular-eslint'].includes(x)
+    );
 
     const skipMetadata = _options.skipMetadata;
     delete _options.skipMetadata;
 
     return chain([
-      externalSchematic(
-        lint ? '@angular-eslint/schematics' : '@schematics/angular',
-        'library',
-        _options
+      externalSchematic(lint ?? '@schematics/angular', 'library', _options),
+      updateTsConfig(
+        [
+          { path: ['include'], value: ['**/*.ts'], operation: 'replace' },
+          { path: ['compilerOptions', 'types'], value: ['@angular/localize'] }
+        ],
+        _options.name
       ),
       updateNgPackageJson(_options),
       !skipMetadata ? createMetadataSubEntry(_options) : noop()

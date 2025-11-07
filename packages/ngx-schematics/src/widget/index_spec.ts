@@ -1,6 +1,7 @@
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import { getAllFilesFromDir } from '@criticalmanufacturing/schematics-devkit/testing';
+import { getAllFilesFromDir, normalize } from '@criticalmanufacturing/schematics-devkit/testing';
 import { strings } from '@criticalmanufacturing/schematics-devkit';
+import { readFileSync } from 'node:fs';
 
 describe('Generate Widget', () => {
   const schematicRunner = new SchematicTestRunner(
@@ -24,7 +25,7 @@ describe('Generate Widget', () => {
   };
 
   const libraryOptions = {
-    name: 'testlib',
+    name: 'test-lib',
     skipPackageJson: false,
     skipTsConfig: false,
     skipInstall: false
@@ -36,9 +37,18 @@ describe('Generate Widget', () => {
     style: 'less'
   };
 
-  const defaultWidgetFilePath = `projects/${libraryOptions.name}/src/lib/${widgetOptions.name}-widget/${widgetOptions.name}-widget.component`;
-  const defaultWidgetSettingsFilePath = `projects/${libraryOptions.name}/src/lib/${widgetOptions.name}-widget/${widgetOptions.name}-widget-settings/${widgetOptions.name}-widget-settings`;
-  const defaultWidgetSettingsComponentFilePath = defaultWidgetSettingsFilePath + `.component`;
+  const fixturesPath = `${__dirname}/fixtures`;
+  const libPath = `projects/${libraryOptions.name}`;
+  const libMainPath = `${libPath}/src/lib`;
+  const libMetadataPath = `${libPath}/metadata/src/lib`;
+  const widgetName = `${strings.dasherize(widgetOptions.name)}-widget`;
+
+  const expectedFiles = {
+    wdiget: `${widgetName}/${widgetName}.component`,
+    widgetSettings: `${widgetName}/${widgetName}-settings/${widgetName}-settings.component`,
+    widgetSettingsService: `${widgetName}/${widgetName}-settings/${widgetName}-settings.service.ts`,
+    metadata: `${strings.dasherize(libraryOptions.name)}-metadata.service.ts`
+  };
 
   let appTree: UnitTestTree;
 
@@ -61,7 +71,6 @@ describe('Generate Widget', () => {
 
   it('should create the widget files', async () => {
     const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
-
     const files = getAllFilesFromDir(
       `projects/${libraryOptions.name}/src/lib/${widgetOptions.name}-widget`,
       tree
@@ -69,212 +78,124 @@ describe('Generate Widget', () => {
 
     expect(files).toEqual(
       jasmine.arrayContaining([
-        `${defaultWidgetSettingsComponentFilePath}.html`,
-        `${defaultWidgetSettingsComponentFilePath}.ts`,
-        `${defaultWidgetSettingsComponentFilePath}.less`,
-        `${defaultWidgetFilePath}.html`,
-        `${defaultWidgetFilePath}.ts`,
-        `${defaultWidgetFilePath}.less`
+        `${libMainPath}/${expectedFiles.wdiget}.html`,
+        `${libMainPath}/${expectedFiles.wdiget}.ts`,
+        `${libMainPath}/${expectedFiles.wdiget}.less`,
+        `${libMainPath}/${expectedFiles.widgetSettings}.html`,
+        `${libMainPath}/${expectedFiles.widgetSettings}.ts`,
+        `${libMainPath}/${expectedFiles.widgetSettings}.less`,
+        `${libMainPath}/${expectedFiles.widgetSettingsService}`
       ])
     );
   });
 
   it('should create the widget style file with other extension', async () => {
     const options = { ...widgetOptions, style: 'css' };
-
     const tree = await schematicRunner.runSchematic('widget', options, appTree);
-
-    const files = getAllFilesFromDir(
-      `projects/${libraryOptions.name}/src/lib/${widgetOptions.name}-widget/${widgetOptions.name}-widget-settings`,
-      tree
-    );
+    const files = getAllFilesFromDir(`${libMainPath}/${widgetName}/${widgetName}-settings`, tree);
 
     expect(files).toEqual(
-      jasmine.arrayContaining([`${defaultWidgetSettingsComponentFilePath}.css`])
+      jasmine.arrayContaining([`${libMainPath}/${expectedFiles.widgetSettings}.css`])
     );
   });
 
   it('should not create the widget style file', async () => {
     const options = { ...widgetOptions, style: 'none' };
-
     const tree = await schematicRunner.runSchematic('widget', options, appTree);
+    const files = getAllFilesFromDir(`${libMainPath}/${widgetName}`, tree);
 
-    const files = getAllFilesFromDir(
-      `projects/${libraryOptions.name}/src/lib/${widgetOptions.name}-widget`,
-      tree
-    );
-    expect(files).toHaveSize(5);
-    expect(files).toEqual(
+    expect(files).not.toEqual(
       jasmine.arrayContaining([
-        `${defaultWidgetSettingsComponentFilePath}.html`,
-        `${defaultWidgetSettingsComponentFilePath}.ts`,
-        `${defaultWidgetSettingsFilePath}.service.ts`,
-        `${defaultWidgetFilePath}.html`,
-        `${defaultWidgetFilePath}.ts`
+        `${libMainPath}/${expectedFiles.wdiget}.less`,
+        `${libMainPath}/${expectedFiles.widgetSettings}.less`
       ])
     );
   });
 
-  it('should have the Component and Widget decorators', async () => {
+  it('should generate the widget ts file with the correct content', async () => {
     const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
+    const actual = tree.readContent(`${libMainPath}/${expectedFiles.wdiget}.ts`);
+    const expected = readFileSync(`${fixturesPath}/${expectedFiles.wdiget}.ts`, {
+      encoding: 'utf-8'
+    });
 
-    const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
-    expect(widgetContent).toMatch(/@Widget\(/);
-    expect(widgetContent).toMatch(/@Component\(/);
+    expect(normalize(actual)).toBe(normalize(expected));
   });
 
-  it('should have the name, iconClass, and settingsComponent properties in the Widget decorator', async () => {
+  it('should generate the widget html file with the correct content', async () => {
     const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
+    const actual = tree.readContent(`${libMainPath}/${expectedFiles.wdiget}.html`);
+    const expected = readFileSync(`${fixturesPath}/${expectedFiles.wdiget}.html`, {
+      encoding: 'utf-8'
+    });
 
-    const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
-    expect(widgetContent).toContain(
-      `name: $localize\`:@@${strings.dasherize(widgetOptions.project)}/${strings.dasherize(
-        widgetOptions.name
-      )}-widget#NAME:${strings.nameify(widgetOptions.name)} Widget\``
-    );
-    expect(widgetContent).toContain(`iconClass: 'icon-core-st-lg-generic'`);
-    expect(widgetContent).toMatch(
-      new RegExp(
-        `settingsComponent: {\\s*component: ${strings.classify(
-          widgetOptions.name
-        )}WidgetSettingsComponent\\s*}`,
-        'gm'
-      )
-    );
+    expect(normalize(actual)).toBe(normalize(expected));
   });
 
   it('should have the Component decorator having a different extension for the style file', async () => {
     const options = { ...widgetOptions, style: 'css' };
-
     const tree = await schematicRunner.runSchematic('widget', options, appTree);
 
-    const widgetSettingsContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
-    expect(widgetSettingsContent).toContain(
+    const actual = tree.readContent(`${libMainPath}/${expectedFiles.wdiget}.ts`);
+    expect(actual).toContain(
       `styleUrl: './${strings.dasherize(widgetOptions.name)}-widget.component.${options.style}'`
     );
   });
 
   it('should have the Component decorator without property styleUrl', async () => {
     const options = { ...widgetOptions, style: 'none' };
-
     const tree = await schematicRunner.runSchematic('widget', options, appTree);
 
-    const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
-    expect(widgetContent)
+    const actual = tree.readContent(`${libMainPath}/${expectedFiles.wdiget}.ts`);
+    expect(actual)
       .withContext('The styleUrl should not be fulfilled')
       .not.toMatch(/styleUrl: '.\/(\w*-*)+-widget.component.\w*'/);
   });
 
-  it('should have the selector, templateUrl, and styleUrl properties in the Component decorator', async () => {
+  it('should update the metadata with a new action', async () => {
     const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
+    const actual = tree.readContent(`${libMetadataPath}/${expectedFiles.metadata}`);
+    const expected = readFileSync(`${fixturesPath}/${expectedFiles.metadata}`, {
+      encoding: 'utf-8'
+    });
 
-    const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
-    expect(widgetContent).toContain(
-      `selector: '${strings.dasherize(widgetOptions.project)}-${strings.dasherize(
-        widgetOptions.name
-      )}-widget'`
-    );
-    expect(widgetContent).toContain(
-      `templateUrl: './${strings.dasherize(widgetOptions.name)}-widget.component.html'`
-    );
-    expect(widgetContent).toContain(
-      `styleUrl: './${strings.dasherize(widgetOptions.name)}-widget.component.less'`
-    );
-  });
-
-  it('should extend WidgetGeneric and implement WidgetRepresentation', async () => {
-    const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
-
-    const widgetClassName = `${strings.classify(widgetOptions.name)}Widget`;
-
-    const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
-    expect(widgetContent).toContain(
-      `export class ${widgetClassName} extends WidgetGeneric implements WidgetRepresentation {`
-    );
-  });
-
-  it('should have the constructor receiving the ViewContainerRef, ElementRef and FeedbackService.', async () => {
-    const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
-
-    const widgetContent = tree.readContent(`${defaultWidgetFilePath}.ts`);
-    expect(widgetContent).toMatch(
-      /constructor\(\s*((viewContainerRef: ViewContainerRef|elementRef: ElementRef|feedback: FeedbackService)\s*,?\s*){3}\)/gm
-    );
-    expect(widgetContent).toContain('super(viewContainerRef, elementRef, feedback);');
+    expect(normalize(actual)).toBe(normalize(expected));
   });
 
   describe('- Generate Widget Settings', () => {
-    it('should create the widget settings file', async () => {
+    it('should generate the html file with the correct content', async () => {
       const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
+      const actual = tree.readContent(`${libMainPath}/${expectedFiles.widgetSettings}.html`);
+      const expected = readFileSync(`${fixturesPath}/${expectedFiles.widgetSettings}.html`, {
+        encoding: 'utf-8'
+      });
 
-      const files = getAllFilesFromDir(
-        `projects/${libraryOptions.name}/src/lib/${widgetOptions.name}-widget/${widgetOptions.name}-widget-settings`,
-        tree
-      );
-
-      expect(files).toEqual(
-        jasmine.arrayContaining([
-          `${defaultWidgetSettingsComponentFilePath}.html`,
-          `${defaultWidgetSettingsComponentFilePath}.ts`,
-          `${defaultWidgetSettingsComponentFilePath}.less`
-        ])
-      );
+      expect(normalize(actual)).toBe(normalize(expected));
     });
 
-    it('should generate the html file with `cmf-core-dashboards-widgetSettings` component selector', async () => {
+    it('should generate the ts file with the correct content', async () => {
       const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
+      const actual = tree.readContent(`${libMainPath}/${expectedFiles.widgetSettings}.ts`);
+      const expected = readFileSync(`${fixturesPath}/${expectedFiles.widgetSettings}.ts`, {
+        encoding: 'utf-8'
+      });
 
-      const templateRegExp = new RegExp(
-        `<cmf-core-dashboards-widgetSettings>\\s*\\` + `<\/cmf-core-dashboards-widgetSettings>`,
-        'gm'
-      );
-
-      const widgetSettingsTemplateContent = tree.readContent(
-        `${defaultWidgetSettingsComponentFilePath}.html`
-      );
-      expect(widgetSettingsTemplateContent).toMatch(templateRegExp);
+      expect(normalize(actual)).toBe(normalize(expected));
     });
 
     it('should generate the style file empty', async () => {
       const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
+      const actual = tree.readContent(`${libMainPath}/${expectedFiles.widgetSettings}.less`);
 
-      const widgetSettingsStyleContent = tree.readContent(
-        `${defaultWidgetSettingsComponentFilePath}.less`
-      );
-      expect(widgetSettingsStyleContent).toEqual('');
-    });
-
-    it('should have the Component decorator with properties selector, templateUrl, and styleUrl', async () => {
-      const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
-
-      const widgetSettingsContent = tree.readContent(
-        `${defaultWidgetSettingsComponentFilePath}.ts`
-      );
-      expect(widgetSettingsContent).toMatch(/@Component\(/);
-      expect(widgetSettingsContent).toContain('standalone: true');
-      expect(widgetSettingsContent).toContain(
-        `selector: '${strings.dasherize(widgetOptions.project)}-${strings.dasherize(
-          widgetOptions.name
-        )}-widget-settings'`
-      );
-      expect(widgetSettingsContent).toContain('imports: [CommonModule, WidgetSettingsModule]');
-      expect(widgetSettingsContent).toContain(
-        `templateUrl: './${strings.dasherize(widgetOptions.name)}-widget-settings.component.html'`
-      );
-      expect(widgetSettingsContent).toContain(
-        `styleUrl: './${strings.dasherize(widgetOptions.name)}-widget-settings.component.less'`
-      );
+      expect(actual).toEqual('');
     });
 
     it('should have the Component decorator having a different extension for the style file', async () => {
       const options = { ...widgetOptions, style: 'css' };
-
       const tree = await schematicRunner.runSchematic('widget', options, appTree);
+      const actual = tree.readContent(`${libMainPath}/${expectedFiles.widgetSettings}.ts`);
 
-      const widgetSettingsContent = tree.readContent(
-        `${defaultWidgetSettingsComponentFilePath}.ts`
-      );
-      expect(widgetSettingsContent).toContain(
+      expect(actual).toContain(
         `styleUrl: './${strings.dasherize(widgetOptions.name)}-widget-settings.component.${
           options.style
         }'`
@@ -283,41 +204,12 @@ describe('Generate Widget', () => {
 
     it('should have the Component decorator without property styleUrl', async () => {
       const options = { ...widgetOptions, style: 'none' };
-
       const tree = await schematicRunner.runSchematic('widget', options, appTree);
+      const actual = tree.readContent(`${libMainPath}/${expectedFiles.widgetSettings}.ts`);
 
-      const widgetSettingsContent = tree.readContent(
-        `${defaultWidgetSettingsComponentFilePath}.ts`
-      );
-      expect(widgetSettingsContent)
+      expect(actual)
         .withContext('The styleUrl should not be fulfilled')
         .not.toMatch(/styleUrl: '.\/(\w*-*)+.component.\w*'/);
-    });
-
-    it('should extend CustomizableComponent', async () => {
-      const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
-
-      const widgetSettingsClassName = `${strings.classify(
-        widgetOptions.name
-      )}WidgetSettingsComponent`;
-
-      const widgetSettingsContent = tree.readContent(
-        `${defaultWidgetSettingsComponentFilePath}.ts`
-      );
-      expect(widgetSettingsContent).toContain(
-        `export class ${widgetSettingsClassName} extends CustomizableComponent {`
-      );
-    });
-
-    it('should have the constructor receiving the ViewContainerRef and providing it to the super', async () => {
-      const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
-
-      const widgetSettingsContent = tree.readContent(
-        `${defaultWidgetSettingsComponentFilePath}.ts`
-      );
-      expect(widgetSettingsContent).toMatch(
-        /constructor\(\s*viewContainerRef: ViewContainerRef,\s*@Inject\(WidgetSettingsService\) settings: TestWidgetSettingsService\s*\) {\s*super\(viewContainerRef\);/gm
-      );
     });
   });
 });

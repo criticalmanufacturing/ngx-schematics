@@ -11,14 +11,9 @@ export interface Schema {
   project: string;
 
   /**
-   * The name of the wizard-create-edit.
-   */
-  name: string;
-
-  /**
    * The name of the entity type to be performed.
    */
-  entityType: string;
+  name: string;
 
   /**
    * The namespace of the entity type.

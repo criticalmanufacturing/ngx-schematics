@@ -2,7 +2,7 @@ import { ProjectDefinition, TargetDefinition, readWorkspace } from '@schematics/
 import { Tree } from '@angular-devkit/schematics';
 import { exec } from 'child_process';
 import { JsonArray } from '@angular-devkit/core';
-import { isDeepStrictEqual } from 'util';
+import { isDeepStrictEqual } from 'node:util';
 import { dirname, join, parse } from 'path';
 import { existsSync } from 'fs';
 
@@ -24,7 +24,8 @@ export function getBuildTargets(project: ProjectDefinition): TargetDefinition[] 
   for (const target of project.targets.values()) {
     if (
       target.builder === '@angular-devkit/build-angular:browser' ||
-      target.builder === '@angular-devkit/build-angular:application'
+      target.builder === '@angular-devkit/build-angular:application' ||
+      target.builder === '@angular/build:application'
     ) {
       targets.push(target);
     }
@@ -60,7 +61,12 @@ export async function getMainPath(tree: Tree, project: string): Promise<string |
 
   const builder = appProject.targets.get('build');
 
-  if (builder?.builder.endsWith('@angular-devkit/build-angular:application')) {
+  if (
+    builder &&
+    ['@angular/build:application', '@angular-devkit/build-angular:application'].some((x) =>
+      builder.builder.endsWith(x)
+    )
+  ) {
     return builder.options?.browser as string | undefined;
   }
 
