@@ -13,6 +13,9 @@
   "author": "Critical Manufacturing",
   "license": "BSD-3-Clause",
   "schematics": "./src/collection.json",
+  "ng-update": {
+    "migrations": "./src/migrations.json"
+  },
   "dependencies": {
     "@angular-devkit/core": "",
     "@angular-devkit/schematics": "",

@@ -23,6 +23,11 @@
       "description": "Generates a new IoT converter.",
       "factory": "./converter",
       "schema": "./converter/schema.json"
+    },
+    "update-12-0-0": {
+      "description": "Updates super expressions in classes extended by cmf packages.",
+      "factory": "./migrations/update-12-0-0",
+      "schema": "./migrations/update-12-0-0/schema.json"
     }
   }
 }

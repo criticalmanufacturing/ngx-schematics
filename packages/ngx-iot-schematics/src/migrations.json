@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "update-12-0-0": {
+      "version": "12.0.0",
+      "description": "Updates schematics to version 12.",
+      "factory": "./migrations/update-12-0-0"
+    }
+  }
+}

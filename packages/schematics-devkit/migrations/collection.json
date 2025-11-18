@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "update-super": {
+      "description": "Updates super expressions in classes extended by cmf packages.",
+      "factory": "./update-12-0-0-super#migrate",
+      "schema": "./update-12-0-0-super/schema.json"
+    }
+  }
+}
