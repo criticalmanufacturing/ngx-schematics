@@ -23,7 +23,7 @@
     },
     "update-12-0-0": {
       "version": "12.0.0",
-      "description": "Adds support for angular v20. Updates libraries tsconfigs.",
+      "description": "Updates schematics to version 12.",
       "factory": "./migrations/update-12-0-0"
     }
   }

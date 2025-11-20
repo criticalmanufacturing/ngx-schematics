@@ -2,6 +2,7 @@ import { dirname, isAbsolute, join, normalize } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
 import {
   ArrayLiteralExpression,
+  Identifier,
   ImportSpecifier,
   Node,
   ObjectLiteralElementLike,
@@ -10,8 +11,33 @@ import {
   QuoteKind,
   SourceFile,
   StructureKind,
-  SyntaxKind
+  SyntaxKind,
+  TypeNode
 } from 'ts-morph';
+
+/**
+ * Finds all references to a given identifier within a specified root node.
+ *
+ * @param identifier - The identifier to search for references.
+ * @param root - The root node to search within.
+ * @returns An array of Identifier nodes that reference the given identifier.
+ */
+export function findReferences(node: Identifier | TypeNode, root: Node): Identifier[] {
+  const nodeText = node.getText();
+
+  return root.getDescendantsOfKind(SyntaxKind.Identifier).filter((n) => {
+    if (n === node || n.getText() !== nodeText) {
+      return false;
+    }
+
+    const parentExp = n.getParentWhileKind(SyntaxKind.PropertyAccessExpression);
+    if (parentExp && parentExp.getExpression() !== n) {
+      return false;
+    }
+
+    return true;
+  });
+}
 
 /**
  * Gets the a ts source file
