@@ -4,7 +4,9 @@
   "description": "Critical Manufacturing Angular Schematics Devkit",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "watch": "tsc -w -p tsconfig.json"
+    "watch": "tsc -w -p tsconfig.json",
+    "test": "jasmine **/*_spec.js",
+    "build-test": "npm run build && npm run test"
   },
   "keywords": [
     "schematics"
@@ -23,6 +25,7 @@
     "./package.json": "./package.json",
     "./utility": "./utility/index.js",
     "./rules": "./rules/index.js",
+    "./migrations/*": "./migrations/*/index.js",
     "./testing": "./testing/index.js"
   }
 }
