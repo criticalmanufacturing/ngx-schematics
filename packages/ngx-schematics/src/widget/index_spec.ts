@@ -119,7 +119,7 @@ describe('Generate Widget', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 
   it('should generate the widget html file with the correct content', async () => {
@@ -129,7 +129,7 @@ describe('Generate Widget', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 
   it('should have the Component decorator having a different extension for the style file', async () => {
@@ -159,7 +159,7 @@ describe('Generate Widget', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 
   describe('- Generate Widget Settings', () => {
@@ -170,7 +170,7 @@ describe('Generate Widget', () => {
         encoding: 'utf-8'
       });
 
-      expect(normalize(actual)).toBe(normalize(expected));
+      expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
     });
 
     it('should generate the ts file with the correct content', async () => {
@@ -180,7 +180,7 @@ describe('Generate Widget', () => {
         encoding: 'utf-8'
       });
 
-      expect(normalize(actual)).toBe(normalize(expected));
+      expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
     });
 
     it('should generate the style file empty', async () => {

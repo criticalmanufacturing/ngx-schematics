@@ -2,11 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import Cmf from 'cmf-lbos';
 import { CustomizableComponent, UtilService, EntityTypeService } from 'cmf-core';
 import { PageBag } from 'cmf-core-controls';
-import {
-  EditMode,
-  CreateEditEntityModule,
-  CreateEditStepGeneralDataModule
-} from 'cmf-core-business-controls';
+import { EditMode, CreateEditEntity, CreateEditStepGeneralData } from 'cmf-core-business-controls';
 
 /**
  * @whatItDoes
@@ -43,14 +39,13 @@ import {
  */
 @Component({
   selector: '<%= dasherize(project) %>-wizard-create-edit-<%= dasherize(name) %>',
-  imports: [CreateEditEntityModule, CreateEditStepGeneralDataModule],
+  imports: [CreateEditEntity, CreateEditStepGeneralData],
   templateUrl: './wizard-create-edit-<%= dasherize(name) %>.component.html',
   <% if (style !== 'none') { %>styleUrl: './wizard-create-edit-<%= dasherize(name) %>.component.<%= style %>'<% } %>
 })
 export class WizardCreateEdit<%= classify(name) %>Component
   extends CustomizableComponent
-  implements OnInit
-{
+  implements OnInit {
   /** Wizard mode */
   editMode: EditMode = EditMode.Create;
 

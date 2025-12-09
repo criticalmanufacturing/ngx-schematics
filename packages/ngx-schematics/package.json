@@ -21,8 +21,8 @@
     "@angular-devkit/core": "",
     "@angular-devkit/schematics": "",
     "@criticalmanufacturing/schematics-devkit": "",
-    "@schematics/angular": "",
     "@inquirer/prompts": "",
+    "@schematics/angular": "",
     "node-html-parser": "",
     "ora": "",
     "ts-morph": ""

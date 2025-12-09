@@ -7,22 +7,18 @@ import {
   UtilService
 } from 'cmf-core';
 import {
-  ValidatorModule,
+  Validator,
   OnValidateArgs,
-  ColumnViewModule,
+  ColumnView,
   ColumnViewSelectedArgs,
   ColumnViewLeaf,
   ColumnViewModel,
   ColumnViewAddArgs,
   ColumnViewRemoveArgs,
   ColumnViewUtil,
-  Validator
+  LeafContent
 } from 'cmf-core-controls';
-import {
-  PropertyViewerModule,
-  PropertyEditorModule,
-  PropertyContainerModule
-} from 'cmf-core-business-controls';
+import { PropertyViewer, PropertyEditor, PropertyContainer } from 'cmf-core-business-controls';
 
 import Entity = Cmf.Foundation.BusinessObjects.Entity;
 
@@ -70,11 +66,11 @@ interface DataRowTag {
 @Component({
   selector: '<%= dasherize(project) %>-step-<%= dasherize(name) %>',
   imports: [
-    ValidatorModule,
-    ColumnViewModule,
-    PropertyViewerModule,
-    PropertyEditorModule,
-    PropertyContainerModule
+    ColumnView,
+    LeafContent,
+    PropertyViewer,
+    PropertyEditor,
+    PropertyContainer
   ],
   hostDirectives: [Validator],
   templateUrl: './step-<%= dasherize(name) %>.component.html',
