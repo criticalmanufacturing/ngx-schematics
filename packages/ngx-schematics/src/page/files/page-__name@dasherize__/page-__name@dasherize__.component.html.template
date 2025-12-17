@@ -1,5 +1,5 @@
 <cmf-core-controls-base-page i18n-mainTitle="@@<%= dasherize(project) %>/page-<%= dasherize(name) %>#TITLE" mainTitle="<%= nameify(name) %>" icon="<%= iconClass %>">
-    <cmf-core-controls-actionBar>
+    <cmf-core-controls-actionBar actionBar-id="<%= classify(project) %>.Page<%= classify(name) %>.ActionBar">
         <!-- LAYOUT -->
         <cmf-core-controls-actionGroup group-id="cmf-core-action-group-settings">
             <!-- Save Layout -->
