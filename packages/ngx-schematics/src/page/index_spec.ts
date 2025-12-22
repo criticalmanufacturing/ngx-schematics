@@ -89,7 +89,7 @@ describe('Generate Page', () => {
         )}#TITLE"\\s*` +
         `mainTitle="${strings.nameify(pageOptions.name)}"\\s*` +
         `icon="${pageOptions.iconClass}">\\s*` +
-        `<cmf-core-controls-actionBar>\\s*` +
+        `<cmf-core-controls-actionBar\\s+actionBar-id="${strings.classify(pageOptions.project)}\\.Page${strings.classify(pageOptions.name)}\\.ActionBar">\\s*` +
         `<!-- LAYOUT -->\\s*` +
         `<cmf-core-controls-actionGroup group-id="cmf-core-action-group-settings">\\s*` +
         `<!-- Save Layout -->\\s*` +
