@@ -25,7 +25,7 @@ export function addConfigJson(options: { project: string }): Rule {
     // Setup sources for the assets files to add to the project
     const sourcePath = normalize(project.sourceRoot ?? join(normalize(project.root), 'src'));
 
-    const templateSource = apply(url('./files'), [
+    const templateSource = apply(url(join(normalize(__dirname), '../files/assets')), [
       applyTemplates({
         startupCulture: 'en-US',
         startupTheme: 'cmf.style.light',

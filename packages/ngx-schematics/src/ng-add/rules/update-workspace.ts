@@ -6,9 +6,9 @@ import {
   PROJECT_ALLOWED_COMMONJS_DEPENDENCIES,
   PROJECT_CORE_ASSETS,
   PROJECT_CORE_STYLES,
+  PROJECT_LOADER,
   PROJECT_MES_ASSETS,
   PROJECT_MES_STYLES,
-  PROJECT_POLYFILLS,
   PROJECT_SCRIPTS
 } from '../package-configs.js';
 import { Schema } from '../schema.js';
@@ -92,10 +92,10 @@ export function updateWorkspace(options: {
       },
       // Add scripts
       { path: ['scripts'], value: PROJECT_SCRIPTS },
-      // Add polyfills
-      { path: ['polyfills'], value: PROJECT_POLYFILLS },
       // update output path
-      { path: ['outputPath'], value: { base: `dist/${options.project}`, browser: '' } }
+      { path: ['outputPath'], value: { base: `dist/${options.project}`, browser: '' } },
+      // Add loader
+      { path: ['loader'], value: PROJECT_LOADER }
     ]);
   };
 }

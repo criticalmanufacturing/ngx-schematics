@@ -3,6 +3,7 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 import { getBuildTargets } from '@criticalmanufacturing/schematics-devkit';
 import { NEW_THEMES, OLD_THEMES } from './themes-update';
+import { PROJECT_LOADER } from '../../ng-add/package-configs';
 
 /**
  * Mock config.json file with blue and gray themes included
@@ -153,6 +154,21 @@ describe('Test ng-update', () => {
 
       expect(actual).not.toEqual(jasmine.arrayContaining(oldThemes));
       expect(actual).toEqual(jasmine.arrayContaining(newThemes));
+    });
+
+    it('should update the application builder outputPath', async () => {
+      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+
+      const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
+      expect(angularJsonContent.projects.application.architect.build.options.loader).toEqual(
+        PROJECT_LOADER
+      );
+    });
+
+    it('should have the necessary files', async () => {
+      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+
+      expect(tree.files).toEqual(jasmine.arrayContaining(['/application/src/app/app.workers.ts']));
     });
   });
 });

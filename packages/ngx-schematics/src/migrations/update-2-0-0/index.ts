@@ -6,7 +6,6 @@ import {
   removeFromJsonArray
 } from '@criticalmanufacturing/schematics-devkit';
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
-import { PROJECT_POLYFILLS } from '../../ng-add/package-configs';
 import parse from 'node-html-parser';
 import { getAppModulePath, removeSymbolFromNgModuleMetadata } from '../../utility/ng-module';
 import { join, normalize } from '@angular-devkit/core';
@@ -17,6 +16,8 @@ export const FULL_CALENDAR = {
   inject: false,
   input: 'node_modules/fullcalendar/dist/fullcalendar.min.js'
 };
+
+export const PROJECT_POLYFILLS = ['reflect-metadata'];
 
 /**
  * Removes the themes node from the app index.html file
