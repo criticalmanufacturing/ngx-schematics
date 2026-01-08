@@ -66,12 +66,16 @@ export function createSourceFile(tree: Tree, path: string): SourceFile | undefin
  * @param symbolName Import symbol
  * @param module Import module specifier
  * @param isDefault Is default import
+ * @param leadingTrivia Leading trivia to add before the import
+ * @param trailingTrivia Trailing trivia to add after the import
  */
 export function insertImport(
   source: SourceFile,
   symbolName: string,
   module: string,
-  isDefault = false
+  isDefault = false,
+  leadingTrivia = '\n',
+  trailingTrivia = '\n'
 ): void {
   const allImports = source.getImportDeclarations();
   const importNode = allImports.find((node) => node.getModuleSpecifierValue() === module);
@@ -92,8 +96,8 @@ export function insertImport(
     importNode
       .addNamedImport({
         name: symbolName,
-        leadingTrivia: '\n',
-        trailingTrivia: '\n'
+        leadingTrivia,
+        trailingTrivia
       })
       .formatText({ indentSize: getIndentSize(source) });
   } else {
@@ -305,50 +309,50 @@ export function getObjectProperty(
 
 /**
  * Adds a symbol to an array literal
- * @param arryaLiteral the array literal node
+ * @param arrayLiteral the array literal node
  * @param toInsert the symbol to insert
  * @param before the symbol to insert before
  * @returns
  */
 export function addSymbolToArrayLiteral(
-  arryaLiteral: ArrayLiteralExpression,
+  arrayLiteral: ArrayLiteralExpression,
   toInsert: string,
   before?: string
 ): void {
-  if (arryaLiteral.getElements().some((elem) => elem.getText() === toInsert.trim())) {
+  if (arrayLiteral.getElements().some((elem) => elem.getText() === toInsert.trim())) {
     return;
   }
 
-  let index = arryaLiteral.getElements().length;
+  let index = arrayLiteral.getElements().length;
 
   if (before) {
-    const beforeIndex = arryaLiteral.getElements().findIndex((elem) => elem.getText() === before);
+    const beforeIndex = arrayLiteral.getElements().findIndex((elem) => elem.getText() === before);
 
     if (beforeIndex >= 0) {
       index = beforeIndex;
     }
   }
 
-  arryaLiteral.insertElement(index, toInsert);
+  arrayLiteral.insertElement(index, toInsert);
 }
 
 /**
  * Removes a symbol from an array literal
- * @param arryaLiteral the array literal node
+ * @param arrayLiteral the array literal node
  * @param toInsert the symbol to remove
  * @returns
  */
 export function removeSymbolFromArrayLiteral(
-  arryaLiteral: ArrayLiteralExpression,
+  arrayLiteral: ArrayLiteralExpression,
   toRemove: string
 ): void {
-  const index = arryaLiteral.getElements().findIndex((elem) => elem.getText() === toRemove);
+  const index = arrayLiteral.getElements().findIndex((elem) => elem.getText() === toRemove);
 
   if (index < 0) {
     return;
   }
 
-  arryaLiteral.removeElement(index);
+  arrayLiteral.removeElement(index);
 }
 
 /**

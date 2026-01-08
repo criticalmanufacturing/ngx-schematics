@@ -39,4 +39,6 @@ export function updateServiceWorker(source: Node<ts.Node>): void {
   }
 
   swPathNode.replaceWithText(`'ngsw-loader-worker.js'`);
+
+  callExp.getPreviousSiblingIfKind(SyntaxKind.CommaToken)?.appendWhitespace('\n');
 }

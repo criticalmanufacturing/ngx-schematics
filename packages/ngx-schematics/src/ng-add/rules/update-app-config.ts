@@ -39,6 +39,21 @@ export function updateAppConfig(options: {
       return;
     }
 
+    // we're forcing zone change detection, because Angular 21 no longer does it by default
+    insertImport(
+      arrLiteral.getSourceFile(),
+      'provideZoneChangeDetection',
+      '@angular/core',
+      false,
+      ' ',
+      ' '
+    );
+
+    addSymbolToArrayLiteral(
+      arrLiteral,
+      '\n' + `provideZoneChangeDetection({ eventCoalescing: true })`
+    );
+
     if (options.application === 'MES') {
       addSymbolToArrayLiteral(arrLiteral, '\n' + MES_BASE_PROVIDE[1]);
       insertImport(

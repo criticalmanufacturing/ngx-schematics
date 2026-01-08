@@ -23,7 +23,7 @@ export async function getDefaultAppConfig(
 }
 
 /**
- * Reatrives the application config object literal
+ * Retrieves the application config object literal
  */
 export async function getAppConfig(
   tree: Tree,
