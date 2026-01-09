@@ -54,11 +54,15 @@ export function updateAppSettings({ project }: { project: string }): Rule {
       updateAppBuildTarget(project, [
         {
           path: ['scripts'],
-          value: [...JQUERY_UI_SCRIPTS, ...MONACO_SCRIPTS],
+          value: [...JQUERY_UI_SCRIPTS],
           operation: 'remove'
         },
-        { path: ['assets'], value: [...JQUERY_UI_ASSETS, ...FLAGS], operation: 'remove' },
-        { path: ['polyfills'], value: LOCALIZE },
+        {
+          path: ['assets'],
+          value: [...JQUERY_UI_ASSETS, ...FLAGS, ...MONACO_SCRIPTS],
+          operation: 'remove'
+        },
+        { path: ['polyfills'], value: LOCALIZE, operation: 'add' },
         { path: ['polyfills'], value: REFLECT, operation: 'remove' },
         { path: ['loader'], value: PROJECT_LOADER, operation: 'add' }
       ]),

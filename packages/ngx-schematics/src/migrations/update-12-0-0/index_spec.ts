@@ -165,6 +165,44 @@ describe('Test ng-update', () => {
       );
     });
 
+    it('should update the application assets', async () => {
+      const angularJsonContent = JSON.parse(appTree.readContent('/angular.json'));
+
+      angularJsonContent.projects.application.architect.build.options.assets ??= [];
+      angularJsonContent.projects.application.architect.build.options.assets.push({
+        glob: '**/*',
+        input: 'node_modules/monaco-editor/min/vs',
+        output: 'monaco-editor/vs'
+      });
+
+      appTree.overwrite('/angular.json', JSON.stringify(angularJsonContent));
+
+      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+
+      const updatedAngularJsonContent = JSON.parse(tree.readContent('/angular.json'));
+
+      expect(
+        updatedAngularJsonContent.projects.application.architect.build.options.assets
+      ).not.toEqual(
+        jasmine.arrayContaining([
+          {
+            glob: '**/*',
+            input: 'node_modules/monaco-editor/min/vs',
+            output: 'monaco-editor/vs'
+          }
+        ])
+      );
+    });
+
+    it('should update the application polyfills', async () => {
+      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+
+      const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
+      expect(angularJsonContent.projects.application.architect.build.options.polyfills).toEqual(
+        jasmine.arrayContaining(['zone.js', '@angular/localize/init'])
+      );
+    });
+
     it('should have the necessary files', async () => {
       const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
 

@@ -121,7 +121,9 @@ export default function (): Rule {
     }
 
     return chain([
-      updateAppBuildTarget(project, [{ path: ['polyfills'], value: PROJECT_POLYFILLS }]),
+      updateAppBuildTarget(project, [
+        { path: ['polyfills'], value: PROJECT_POLYFILLS, operation: 'add' }
+      ]),
       updateAppIndex({ project }),
       removeCoreModule({ project }),
       updateAppScripts({ project })
