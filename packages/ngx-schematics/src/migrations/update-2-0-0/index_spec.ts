@@ -42,9 +42,9 @@ describe('Test ng-update', () => {
   describe('- Migrate to v2.0', () => {
     it('should update the default project builder polyfills', async () => {
       const workspace = JSON.parse(appTree.readContent('angular.json'));
-      expect(workspace.projects.application.architect.build.options.polyfills).not.toContain(
-        'reflect-metadata'
-      );
+
+      const polyfills = workspace.projects.application.architect.build.options.polyfills;
+      expect(polyfills === undefined || !polyfills.includes('reflect-metadata')).toBe(true);
 
       const tree = await migrationsSchematicRunner.runSchematic('update-2-0-0', {}, appTree);
 
@@ -132,9 +132,9 @@ export class AppModule { }`
       const tree = await migrationsSchematicRunner.runSchematic('update-2-0-0', {}, appTree);
 
       const updatedWorkspace = JSON.parse(tree.readContent('angular.json'));
-      expect(updatedWorkspace.projects.application.architect.build.options.scripts).not.toContain(
-        FULL_CALENDAR
-      );
+
+      const scripts = updatedWorkspace.projects.application.architect.build.options.scripts;
+      expect(scripts === undefined || !scripts.includes(FULL_CALENDAR)).toBe(true);
     });
   });
 });
