@@ -3,6 +3,7 @@ import { getDefaultApplicationProject } from '@criticalmanufacturing/schematics-
 import { migrate as migrateSuperExpressions } from '@criticalmanufacturing/schematics-devkit/migrations/update-12-0-0-super';
 import { updateThemesInConfigFile } from './themes-update';
 import { updateAppSettings } from './configs-update';
+import { addZoneChangeDetection } from './add-zone-change-detection';
 
 export default function (): Rule {
   return async (tree: Tree) => {
@@ -15,7 +16,8 @@ export default function (): Rule {
     return chain([
       updateThemesInConfigFile({ project }),
       updateAppSettings(),
-      migrateSuperExpressions({ path: './' })
+      migrateSuperExpressions({ path: './' }),
+      addZoneChangeDetection(project)
     ]);
   };
 }
