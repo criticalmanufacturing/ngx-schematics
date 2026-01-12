@@ -3,6 +3,7 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 import { getBuildTargets } from '@criticalmanufacturing/schematics-devkit';
 import { NEW_THEMES, OLD_THEMES } from './themes-update';
+import { Project, SyntaxKind } from 'ts-morph';
 
 /**
  * Mock config.json file with blue and gray themes included
@@ -27,6 +28,38 @@ const configJsonMock = (startupTheme = 'cmf.style.blue') => `\
     }
   }
 }
+`;
+
+const mainMock = `/// <reference types="@angular/localize" />
+
+import { bootstrapApplication } from '@angular/platform-browser';
+import { App } from './app/app';
+import { loadApplicationConfig } from 'cmf-core/init';
+
+loadApplicationConfig('assets/config.json').then(() => {
+  import(/* webpackMode: "eager" */ './app/app.config').then(({ appConfig }) => {
+    bootstrapApplication(App, appConfig)
+      .catch((err) => console.error(err));
+  });
+});
+`;
+
+const appConfigMock = `import { ApplicationConfig, provideBrowserGlobalErrorListeners, isDevMode } from '@angular/core';
+import { provideServiceWorker } from '@angular/service-worker';
+import { provideCoreUI } from 'cmf-core-ui';
+import { provideMetadataRouter } from 'cmf-core';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideServiceWorker('ngsw-loader-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
+    provideCoreUI(),
+    provideMetadataRouter()
+  ]
+};
 `;
 
 describe('Test ng-update', () => {
@@ -153,6 +186,60 @@ describe('Test ng-update', () => {
 
       expect(actual).not.toEqual(jasmine.arrayContaining(oldThemes));
       expect(actual).toEqual(jasmine.arrayContaining(newThemes));
+    });
+
+    it('Should add the zone-based change detection provider to the app.config.ts file', async () => {
+      appTree.overwrite('/application/src/main.ts', mainMock);
+      appTree.create('/application/src/app/app.config.ts', appConfigMock);
+
+      // Run the migration
+      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+
+      // Read the updated config.json file
+      const config = tree.readText('/application/src/app/app.config.ts');
+
+      const project = new Project();
+      const appConfigSource = project.createSourceFile(
+        '/application/src/app/app.config.ts',
+        config
+      );
+
+      expect(appConfigSource).withContext('App config source file should be defined').toBeDefined();
+      expect(appConfigSource.getFullText()?.length ?? -1).not.toEqual(-1);
+
+      const angularCoreImport = appConfigSource
+        .getImportDeclarations()
+        .find((imp) => imp?.getModuleSpecifier().getText() === "'@angular/core'");
+
+      expect(angularCoreImport).withContext('Angular core import should be defined').toBeDefined();
+
+      const zoneChangeDetectionImport = angularCoreImport
+        ?.getNamedImports()
+        .find((imp) => imp.getName() === 'provideZoneChangeDetection');
+
+      expect(zoneChangeDetectionImport)
+        .withContext('provideZoneChangeDetection import should be defined')
+        .toBeDefined();
+
+      const appConfigExport = appConfigSource.getExportedDeclarations()?.get('appConfig')?.[0];
+
+      expect(appConfigExport)
+        .withContext('appConfig export declaration should be defined')
+        .toBeDefined();
+
+      const providers = appConfigExport
+        ?.asKindOrThrow(SyntaxKind.VariableDeclaration)
+        .getInitializerIfKindOrThrow(SyntaxKind.ObjectLiteralExpression)
+        .getPropertyOrThrow('providers')
+        .asKindOrThrow(SyntaxKind.PropertyAssignment)
+        .getInitializerIfKindOrThrow(SyntaxKind.ArrayLiteralExpression)
+        .getElements();
+
+      expect(providers?.length).toBeGreaterThan(0);
+
+      expect(providers?.map((provider) => provider.getText())).toContain(
+        'provideZoneChangeDetection({ eventCoalescing: true })'
+      );
     });
   });
 });
