@@ -25,6 +25,5 @@ export function getAllFilesFromDir(dir: string, tree: UnitTestTree): string[] {
 export function normalize(str: string) {
   return str
     .replace(/\r\n/g, '\n') // normalize line endings
-    .replace(/\s+/g, ' ') // normalize spaces
     .trim(); // trim start/end
 }
