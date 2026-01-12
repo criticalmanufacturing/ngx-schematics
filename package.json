@@ -18,13 +18,12 @@
   "devDependencies": {
     "@angular-devkit/schematics-cli": "^21.0.4",
     "@angular/cli": "^21.0.4",
-    "@types/jasmine": "^5.1.13",
     "@types/node": "^24.10.0",
     "angular-eslint": "^21.1.0",
     "concurrently": "^9.2.1",
-    "jasmine": "^5.13.0",
     "prettier": "^3.7.4",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.17"
   },
   "scripts": {
     "build": "npm run build -w ./packages/schematics-devkit && concurrently \"npm run build -w ./packages/ngx-schematics\" \"npm run build -w ./packages/ngx-iot-schematics\" -r",

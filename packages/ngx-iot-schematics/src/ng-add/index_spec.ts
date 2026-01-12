@@ -41,7 +41,7 @@ describe('Test ng-add', () => {
     const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
 
     expect(tree.files).toEqual(
-      jasmine.arrayContaining([
+      expect.arrayContaining([
         '/angular.json',
         '/package.json',
         '/README.md',
@@ -87,7 +87,7 @@ describe('Test ng-add', () => {
       );
       expect(
         angularJsonContent.projects.application.architect.lint.options.lintFilePatterns
-      ).toEqual(jasmine.arrayContaining(['application/**/*.ts', 'application/**/*.html']));
+      ).toEqual(expect.arrayContaining(['application/**/*.ts', 'application/**/*.html']));
     });
   });
 
@@ -106,9 +106,9 @@ describe('Test ng-add', () => {
       const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
 
       const tsConfigJsonContent = parse(tree.readContent('/tsconfig.json'));
-      expect(tsConfigJsonContent.compilerOptions.noImplicitAny).toBeFalse();
-      expect(tsConfigJsonContent.compilerOptions.strictFunctionTypes).toBeFalse();
-      expect(tsConfigJsonContent.compilerOptions.strictNullChecks).toBeFalse();
+      expect(tsConfigJsonContent.compilerOptions.noImplicitAny).toBeFalsy();
+      expect(tsConfigJsonContent.compilerOptions.strictFunctionTypes).toBeFalsy();
+      expect(tsConfigJsonContent.compilerOptions.strictNullChecks).toBeFalsy();
     });
   });
 });

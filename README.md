@@ -30,7 +30,7 @@ schematics --help
 
 ## **Unit Testing**
 
-`npm run test` will run the unit tests, using Jasmine as a runner and test framework.
+`npm run test` will run the unit tests, using Vitest as a runner and test framework.
 
 ## **Publishing**
 
@@ -49,6 +49,7 @@ schematics --help
    ```
 
 **Examples:**
+
 ```bash
 npm run publish                           # Publish packages
 npm run publish -- --dry-run              # Test without publishing

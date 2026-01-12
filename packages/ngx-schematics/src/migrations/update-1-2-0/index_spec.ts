@@ -93,7 +93,7 @@ export class AppModule { }`
       await migrationsSchematicRunner.runSchematic('update-1-2-0', {}, appTree);
 
       const workspace = JSON.parse(appTree.readContent('angular.json'));
-      expect(workspace.projects.application.architect.build.options.assets).toContain({
+      expect(workspace.projects.application.architect.build.options.assets).toContainEqual({
         glob: '**/*',
         input: 'node_modules/cmf-core/assets/js',
         output: ''

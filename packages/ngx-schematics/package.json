@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "watch": "tsc -w -p tsconfig.json",
-    "test": "jasmine src/**/*_spec.js",
+    "test": "vitest",
     "build-test": "npm run build && npm run test"
   },
   "keywords": [
@@ -21,8 +21,8 @@
     "@angular-devkit/core": "",
     "@angular-devkit/schematics": "",
     "@criticalmanufacturing/schematics-devkit": "",
-    "@schematics/angular": "",
     "@inquirer/prompts": "",
+    "@schematics/angular": "",
     "node-html-parser": "",
     "ora": "",
     "ts-morph": ""

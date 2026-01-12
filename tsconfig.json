@@ -17,6 +17,6 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "types": ["jasmine", "node"]
+    "types": ["vitest/globals", "node"]
   }
 }

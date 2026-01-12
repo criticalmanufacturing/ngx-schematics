@@ -72,7 +72,7 @@ describe('Generate Data Source', () => {
     const tree = await schematicRunner.runSchematic('data-source', dataSourceOptions, appTree);
     const files = getAllFilesFromDir(`${libMainPath}/${dataSourceName}`, tree);
 
-    expect(files).toEqual(jasmine.arrayContaining([`${libMainPath}/${expectedFiles.dataSource}`]));
+    expect(files).toEqual(expect.arrayContaining([`${libMainPath}/${expectedFiles.dataSource}`]));
   });
 
   it('should create the data source style file with other extension', async () => {
@@ -81,7 +81,7 @@ describe('Generate Data Source', () => {
     const files = getAllFilesFromDir(`${libMainPath}/${dataSourceName}`, tree);
 
     expect(files).toEqual(
-      jasmine.arrayContaining([`${libMainPath}/${expectedFiles.dataSourceSettings}.css`])
+      expect.arrayContaining([`${libMainPath}/${expectedFiles.dataSourceSettings}.css`])
     );
   });
 
@@ -94,7 +94,7 @@ describe('Generate Data Source', () => {
     );
 
     expect(files).not.toEqual(
-      jasmine.arrayContaining([`${libMainPath}/${expectedFiles.dataSourceSettings}.less`])
+      expect.arrayContaining([`${libMainPath}/${expectedFiles.dataSourceSettings}.less`])
     );
   });
 
@@ -126,7 +126,7 @@ describe('Generate Data Source', () => {
       );
 
       expect(files).toEqual(
-        jasmine.arrayContaining([
+        expect.arrayContaining([
           `${libMainPath}/${expectedFiles.dataSourceSettings}.html`,
           `${libMainPath}/${expectedFiles.dataSourceSettings}.less`,
           `${libMainPath}/${expectedFiles.dataSourceSettings}.ts`
@@ -186,9 +186,9 @@ describe('Generate Data Source', () => {
       const dataSourceSettingsContent = tree.readContent(
         `${libMainPath}/${expectedFiles.dataSourceSettings}.ts`
       );
-      expect(dataSourceSettingsContent)
-        .withContext('The styleUrl should not be fulfilled')
-        .not.toMatch(/styleUrl: '.\/(\w*-*)+.component.\w*'/);
+      expect(dataSourceSettingsContent, 'The styleUrl should not be fulfilled').not.toMatch(
+        /styleUrl: '.\/(\w*-*)+.component.\w*'/
+      );
     });
   });
 });

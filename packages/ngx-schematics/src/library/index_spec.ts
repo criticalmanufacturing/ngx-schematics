@@ -77,7 +77,7 @@ describe('Generate Library', () => {
       const tree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
       const fileContent = getFileContent(tree, `${libPath}/tsconfig.lib.json`);
       expect(fileContent).toBeDefined();
-      expect(fileContent.include).toEqual(jasmine.arrayWithExactContents(['**/*.ts']));
+      expect(fileContent.include).toEqual(['**/*.ts']);
     });
 
     describe('should create the metadata secundary entry point', () => {
@@ -86,7 +86,7 @@ describe('Generate Library', () => {
         const files = getAllFilesFromDir(`${libPath}/metadata`, tree);
 
         expect(files).toEqual(
-          jasmine.arrayContaining([
+          expect.arrayContaining([
             `${libPath}/metadata/ng-package.json`,
             `${libPath}/metadata/src/public-api.ts`,
             `${libPath}/metadata/src/lib/${libraryOptions.name}-metadata.module.ts`,
@@ -178,7 +178,7 @@ describe('Generate Library', () => {
         const tree = await schematicRunner.runSchematic('library', options, appTree);
         const files = getAllFilesFromDir(`projects/${libraryOptions.name}`, tree);
         expect(files).not.toEqual(
-          jasmine.arrayContaining([
+          expect.arrayContaining([
             `projects/${libraryOptions.name}/metadata/ng-package.json`,
             `projects/${libraryOptions.name}/metadata/src/public-api.ts`,
             `projects/${libraryOptions.name}/metadata/src/lib/${libraryOptions.name}-metadata.module.ts`,

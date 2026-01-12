@@ -75,7 +75,7 @@ describe('Generate Page', () => {
     const files = getAllFilesFromDir(`${libMainPath}/${pageName}`, tree);
 
     expect(files).toEqual(
-      jasmine.arrayContaining([
+      expect.arrayContaining([
         `${libMainPath}/${expectedFiles.page}.html`,
         `${libMainPath}/${expectedFiles.page}.ts`,
         `${libMainPath}/${expectedFiles.page}.less`

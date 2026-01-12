@@ -55,7 +55,7 @@ describe('Generate Library', () => {
     const files = getAllFilesFromDir(`projects/${libraryOptions.name}`, tree);
 
     expect(files).toEqual(
-      jasmine.arrayContaining([
+      expect.arrayContaining([
         `projects/${libraryOptions.name}/src/lib/tasks/${libraryOptions.name}/${libraryOptions.name}-settings.component.html`,
         `projects/${libraryOptions.name}/src/lib/tasks/${libraryOptions.name}/${libraryOptions.name}-settings.component.ts`,
         `projects/${libraryOptions.name}/src/lib/tasks/${libraryOptions.name}/${libraryOptions.name}-settings.component.less`,

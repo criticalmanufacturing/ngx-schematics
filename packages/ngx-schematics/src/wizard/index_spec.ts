@@ -73,7 +73,7 @@ describe('Generate Wizard', () => {
     const files = getAllFilesFromDir(`${libMainPath}/${wizardName}`, tree);
 
     expect(files).toEqual(
-      jasmine.arrayContaining([
+      expect.arrayContaining([
         `${libMainPath}/${expectedFiles.wizard}.less`,
         `${libMainPath}/${expectedFiles.wizard}.html`,
         `${libMainPath}/${expectedFiles.wizard}.ts`
@@ -86,7 +86,7 @@ describe('Generate Wizard', () => {
     const tree = await schematicRunner.runSchematic('wizard', options, appTree);
     const files = getAllFilesFromDir(`${libMainPath}/${wizardName}`, tree);
 
-    expect(files).toEqual(jasmine.arrayContaining([`${libMainPath}/${expectedFiles.wizard}.css`]));
+    expect(files).toEqual(expect.arrayContaining([`${libMainPath}/${expectedFiles.wizard}.css`]));
   });
 
   it('should not create the wizard style file', async () => {
@@ -95,7 +95,7 @@ describe('Generate Wizard', () => {
     const files = getAllFilesFromDir(`${libMainPath}/${wizardName}`, tree);
 
     expect(files).not.toEqual(
-      jasmine.arrayContaining([`${libMainPath}/${expectedFiles.wizard}.less`])
+      expect.arrayContaining([`${libMainPath}/${expectedFiles.wizard}.less`])
     );
   });
 

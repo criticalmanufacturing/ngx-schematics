@@ -56,7 +56,7 @@ describe('Test ng-add', () => {
       const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
 
       expect(tree.files).toEqual(
-        jasmine.arrayContaining([
+        expect.arrayContaining([
           '/angular.json',
           '/package.json',
           '/tsconfig.json',
@@ -76,7 +76,7 @@ describe('Test ng-add', () => {
           '/application/src/manifest.webmanifest'
         ])
       );
-      expect(tree.files.every((x) => !x.startsWith('/application/public'))).toBeTrue();
+      expect(tree.files.every((x) => !x.startsWith('/application/public'))).toBeTruthy();
     });
 
     describe('- Generate index.html', () => {
@@ -183,7 +183,7 @@ describe('Test ng-add', () => {
       const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
 
       expect(tree.files).toEqual(
-        jasmine.arrayContaining([
+        expect.arrayContaining([
           '/angular.json',
           '/package.json',
           '/tsconfig.json',
@@ -203,7 +203,7 @@ describe('Test ng-add', () => {
           '/application/src/manifest.webmanifest'
         ])
       );
-      expect(tree.files.every((x) => !x.startsWith('/application/public'))).toBeTrue();
+      expect(tree.files.every((x) => !x.startsWith('/application/public'))).toBeTruthy();
     });
 
     describe('- Generate index.html', () => {
@@ -315,7 +315,7 @@ describe('Test ng-add', () => {
         );
         expect(
           angularJsonContent.projects.application.architect.lint.options.lintFilePatterns
-        ).toEqual(jasmine.arrayContaining(['application/**/*.ts', 'application/**/*.html']));
+        ).toEqual(expect.arrayContaining(['application/**/*.ts', 'application/**/*.html']));
       });
     });
 
@@ -325,7 +325,7 @@ describe('Test ng-add', () => {
 
         const packageJsonContent = JSON.parse(tree.readContent('/package.json'));
         expect(Object.getOwnPropertyNames(packageJsonContent.dependencies)).toEqual(
-          jasmine.arrayContaining(['cmf-core-ui'])
+          expect.arrayContaining(['cmf-core-ui'])
         );
       });
 
@@ -356,7 +356,7 @@ describe('Test ng-add', () => {
 
         const packageJsonContent = JSON.parse(tree.readContent('/package.json'));
         expect(Object.getOwnPropertyNames(packageJsonContent.dependencies)).toEqual(
-          jasmine.arrayContaining(['cmf-mes-ui'])
+          expect.arrayContaining(['cmf-mes-ui'])
         );
       });
     });
@@ -366,10 +366,10 @@ describe('Test ng-add', () => {
         const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
 
         const tsConfigJsonContent = parse(tree.readContent('/tsconfig.json'));
-        expect(tsConfigJsonContent.compilerOptions.noImplicitAny).toBeFalse();
-        expect(tsConfigJsonContent.compilerOptions.strictFunctionTypes).toBeFalse();
-        expect(tsConfigJsonContent.compilerOptions.strictNullChecks).toBeFalse();
-        expect(tsConfigJsonContent.compilerOptions.preserveSymlinks).toBeTrue();
+        expect(tsConfigJsonContent.compilerOptions.noImplicitAny).toBeFalsy();
+        expect(tsConfigJsonContent.compilerOptions.strictFunctionTypes).toBeFalsy();
+        expect(tsConfigJsonContent.compilerOptions.strictNullChecks).toBeFalsy();
+        expect(tsConfigJsonContent.compilerOptions.preserveSymlinks).toBeTruthy();
       });
     });
 
