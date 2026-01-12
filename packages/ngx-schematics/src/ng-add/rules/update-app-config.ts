@@ -90,7 +90,9 @@ export function updateAppConfig(options: {
       tree.delete(routesFile);
     }
 
-    updateServiceWorker(arrLiteral);
+    updateServiceWorker(arrLiteral)
+      ?.getPreviousSiblingIfKind(SyntaxKind.CommaToken)
+      ?.appendWhitespace('\n');
 
     arrLiteral.getSourceFile().formatText({ indentSize: 2 });
     tree.overwrite(

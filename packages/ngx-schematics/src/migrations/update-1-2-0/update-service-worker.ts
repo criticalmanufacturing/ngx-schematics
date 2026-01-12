@@ -1,4 +1,4 @@
-import { Node, SyntaxKind, ts } from 'ts-morph';
+import { CallExpression, Node, SyntaxKind, ts } from 'ts-morph';
 
 export const SW_ASSETS = [
   {
@@ -12,7 +12,9 @@ export const SW_ASSETS = [
  * Updates the service worker module register value to use our custom service worker.
  * @param file source file to edit
  */
-export function updateServiceWorker(source: Node<ts.Node>): void {
+export function updateServiceWorker(
+  source: Node<ts.Node>
+): CallExpression<ts.CallExpression> | undefined {
   const callExp = source
     .getFirstDescendant((node) => {
       if (!node.isKind(SyntaxKind.CallExpression)) {
@@ -40,5 +42,5 @@ export function updateServiceWorker(source: Node<ts.Node>): void {
 
   swPathNode.replaceWithText(`'ngsw-loader-worker.js'`);
 
-  callExp.getPreviousSiblingIfKind(SyntaxKind.CommaToken)?.appendWhitespace('\n');
+  return callExp;
 }

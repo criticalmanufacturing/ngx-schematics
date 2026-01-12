@@ -22,7 +22,7 @@ import { MetadataRoutingModule } from 'cmf-core';
     MetadataRoutingModule
   ],
   providers: [
-    provideBrowserGlobalErrorListeners()
+    provideBrowserGlobalErrorListeners(),
   ],
   bootstrap: [App]
 })

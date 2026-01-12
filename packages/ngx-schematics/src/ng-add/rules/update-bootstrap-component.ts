@@ -40,26 +40,35 @@ async function getBootstrapComponentPath(tree: Tree, project: string): Promise<s
     .getDescendantsOfKind(SyntaxKind.CallExpression)
     .find((descNode) => descNode.getExpression().getText().endsWith('bootstrapModule'));
 
-  if (bootstrapModuleCall) {
-    const appModulePath = getRelativeImportPath(mainSource, bootstrapModuleCall.getArguments()[0]);
-    if (!appModulePath) {
-      return;
-    }
-
-    const appModule = createSourceFile(tree, appModulePath);
-
-    if (!appModule) {
-      return;
-    }
-
-    const relCompPath = getNgModuleBootstrapComponentPath(appModule);
-
-    if (!relCompPath) {
-      return;
-    }
-
-    return join(dirname(normalize(appModulePath)), relCompPath);
+  if (!bootstrapModuleCall) {
+    return;
   }
+
+  const bootstrapModuleCallArgs = bootstrapModuleCall.getArguments();
+  const appModulePath = getRelativeImportPath(mainSource, bootstrapModuleCallArgs[0]);
+  if (!appModulePath) {
+    return;
+  }
+
+  bootstrapModuleCallArgs[1].asKind(SyntaxKind.ObjectLiteralExpression)?.addPropertyAssignment({
+    name: 'ngZoneEventCoalescing',
+    initializer: 'true',
+    trailingTrivia: ','
+  });
+
+  const appModule = createSourceFile(tree, appModulePath);
+
+  if (!appModule) {
+    return;
+  }
+
+  const relCompPath = getNgModuleBootstrapComponentPath(appModule);
+
+  if (!relCompPath) {
+    return;
+  }
+
+  return join(dirname(normalize(appModulePath)), relCompPath);
 }
 
 /**
