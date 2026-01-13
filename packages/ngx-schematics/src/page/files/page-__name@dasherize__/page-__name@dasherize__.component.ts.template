@@ -7,11 +7,11 @@ import {
 } from 'cmf-core';
 import {
   BasePage,
-  BasePageModule,
-  ActionBarModule,
-  ActionGroupModule,
-  ActionButtonModule,
-  RequiredFunctionalitiesModule
+  BasePageSingleSection,
+  ActionBar,
+  ActionGroup,
+  ActionButton,
+  RequiredFunctionalities
 } from 'cmf-core-controls';
 
 /**
@@ -50,11 +50,12 @@ import {
 @Component({
   selector: '<%= dasherize(project) %>-page-<%= dasherize(name) %>',
   imports: [
-    BasePageModule,
-    ActionBarModule,
-    ActionButtonModule,
-    ActionGroupModule,
-    RequiredFunctionalitiesModule
+    BasePage,
+    BasePageSingleSection,
+    ActionBar,
+    ActionButton,
+    ActionGroup,
+    RequiredFunctionalities
   ],
   templateUrl: './page-<%= dasherize(name) %>.component.html',
   <% if (style !== 'none') { %>styleUrl: './page-<%= dasherize(name) %>.component.<%= style %>',<% } %>

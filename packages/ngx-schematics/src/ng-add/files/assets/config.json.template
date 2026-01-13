@@ -1,4 +1,5 @@
 {
+  "$schema": "<%= root %>/node_modules/cmf-core/assets/config/schema.json",
   "host": {
     "rest": {
       "enableSsl": false,

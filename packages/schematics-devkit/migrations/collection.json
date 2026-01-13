@@ -5,6 +5,11 @@
       "description": "Updates super expressions in classes extended by cmf packages.",
       "factory": "./update-12-0-0-super#migrate",
       "schema": "./update-12-0-0-super/schema.json"
+    },
+    "update-standalone": {
+      "description": "Updates NgModules and stadnalone components to use standalone components.",
+      "factory": "./update-12-0-0-standalone#migrate",
+      "schema": "./update-12-0-0-standalone/schema.json"
     }
   }
 }

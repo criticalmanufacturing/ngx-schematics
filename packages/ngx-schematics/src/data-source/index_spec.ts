@@ -105,7 +105,7 @@ describe('Generate Data Source', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 
   it('should add the data source to the metadata', async () => {
@@ -115,7 +115,7 @@ describe('Generate Data Source', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
   describe('- Generate Data Source Settings', () => {
     it('should create the data source settings file', async () => {
@@ -141,7 +141,7 @@ describe('Generate Data Source', () => {
         encoding: 'utf-8'
       });
 
-      expect(normalize(actual)).toBe(normalize(expected));
+      expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
     });
 
     it('should generate the html file with the correct content', async () => {
@@ -151,7 +151,7 @@ describe('Generate Data Source', () => {
         encoding: 'utf-8'
       });
 
-      expect(normalize(actual)).toBe(normalize(expected));
+      expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
     });
 
     it('should generate the style file empty', async () => {

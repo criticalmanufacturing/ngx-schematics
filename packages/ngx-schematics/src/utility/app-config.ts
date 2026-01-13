@@ -69,3 +69,10 @@ export async function getAppConfig(
     )
     ?.getInitializerIfKind(SyntaxKind.ObjectLiteralExpression);
 }
+
+/**
+ * Reatrives the file path of the application config
+ */
+export async function getAppConfigPath(tree: Tree, project: string): Promise<string | undefined> {
+  return (await getAppConfig(tree, project))?.getSourceFile().getFilePath();
+}

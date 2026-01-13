@@ -2,11 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import Cmf from 'cmf-lbos';
 import { CustomizableComponent, UtilService, EntityTypeService } from 'cmf-core';
 import { PageBag } from 'cmf-core-controls';
-import {
-  EditMode,
-  CreateEditEntityModule,
-  CreateEditStepGeneralDataModule
-} from 'cmf-core-business-controls';
+import { EditMode, CreateEditEntity, CreateEditStepGeneralData } from 'cmf-core-business-controls';
 
 /**
  * @whatItDoes
@@ -43,14 +39,13 @@ import {
  */
 @Component({
   selector: 'test-lib-wizard-create-edit-test-entity-type',
-  imports: [CreateEditEntityModule, CreateEditStepGeneralDataModule],
+  imports: [CreateEditEntity, CreateEditStepGeneralData],
   templateUrl: './wizard-create-edit-test-entity-type.component.html',
   styleUrl: './wizard-create-edit-test-entity-type.component.less'
 })
 export class WizardCreateEditTestEntityTypeComponent
   extends CustomizableComponent
-  implements OnInit
-{
+  implements OnInit {
   /** Wizard mode */
   editMode: EditMode = EditMode.Create;
 
