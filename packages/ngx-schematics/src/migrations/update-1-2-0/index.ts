@@ -41,7 +41,7 @@ export default function (): Rule {
     }
 
     return chain([
-      updateAppBuildTarget(project, [{ path: ['assets'], value: SW_ASSETS }]),
+      updateAppBuildTarget(project, [{ path: ['assets'], value: SW_ASSETS, operation: 'add' }]),
       updateAppModuleServiceWorker(project)
     ]);
   };

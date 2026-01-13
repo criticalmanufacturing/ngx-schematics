@@ -83,11 +83,6 @@ export const PROJECT_ASSETS = [
   ...SW_ASSETS,
   {
     glob: '**/*',
-    input: 'node_modules/monaco-editor/min/vs',
-    output: 'monaco-editor/vs'
-  },
-  {
-    glob: '**/*',
     input: 'node_modules/cmf-core-fablive/assets',
     output: 'assets/fablive'
   },
@@ -231,4 +226,6 @@ export const PROJECT_SCRIPTS = [
   }
 ];
 
-export const PROJECT_POLYFILLS = ['reflect-metadata'];
+export const PROJECT_LOADER = {
+  '.ttf': 'file'
+};

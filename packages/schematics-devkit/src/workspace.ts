@@ -1,7 +1,7 @@
 import { ProjectDefinition, TargetDefinition, readWorkspace } from '@schematics/angular/utility';
 import { Tree } from '@angular-devkit/schematics';
 import { exec } from 'child_process';
-import { JsonArray } from '@angular-devkit/core';
+import { JsonArray, JsonObject, JsonValue } from '@angular-devkit/core';
 import { isDeepStrictEqual } from 'node:util';
 import { dirname, join, parse } from 'path';
 import { existsSync } from 'fs';
@@ -127,6 +127,36 @@ export function removeFromJsonArray(array: JsonArray, elementsToRemove: any[]): 
 
     if (indexToRemove >= 0) {
       array.splice(indexToRemove, 1);
+    }
+  });
+}
+
+/**
+ * Adds key/value pairs to json object.
+ * @param object json object
+ * @param elementsToAdd elements to add to the json object
+ */
+export function addToJsonObject(
+  object: JsonObject,
+  elementsToAdd: Record<string, JsonValue>
+): void {
+  Object.entries(elementsToAdd).forEach(([key, toAdd]) => {
+    object[key] = toAdd;
+  });
+}
+
+/**
+ * Removes key/value pairs from json object.
+ * @param object json object
+ * @param elementsToRemove elements to remove from the json object
+ */
+export function removeFromJsonObject(
+  object: JsonObject,
+  elementsToRemove: Record<string, JsonValue>
+): void {
+  Object.entries(elementsToRemove).forEach(([key, toRemove]) => {
+    if (isDeepStrictEqual(object[key], toRemove)) {
+      delete object[key];
     }
   });
 }
