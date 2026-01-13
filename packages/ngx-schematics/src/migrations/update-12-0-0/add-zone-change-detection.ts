@@ -25,14 +25,7 @@ export function injectZoneDetectionOnAppConfig(appConfig: ObjectLiteralExpressio
   }
 
   // we're forcing zone change detection, because Angular 21 no longer does it by default
-  insertImport(
-    appConfig.getSourceFile(),
-    'provideZoneChangeDetection',
-    '@angular/core',
-    false,
-    ' ',
-    ' '
-  );
+  insertImport(appConfig.getSourceFile(), 'provideZoneChangeDetection', '@angular/core', false);
 
   addSymbolToArrayLiteral(
     arrLiteral,

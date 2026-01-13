@@ -44,7 +44,7 @@ const MONACO_SCRIPTS = [
   }
 ];
 
-const LOCALIZE = ['@angular/localize/init'];
+const POLYFILLS_TO_ADD = ['zone.js', '@angular/localize/init'];
 
 const REFLECT = ['reflect-metadata'];
 
@@ -62,7 +62,7 @@ export function updateAppSettings({ project }: { project: string }): Rule {
           value: [...JQUERY_UI_ASSETS, ...FLAGS, ...MONACO_SCRIPTS],
           operation: 'remove'
         },
-        { path: ['polyfills'], value: LOCALIZE, operation: 'add' },
+        { path: ['polyfills'], value: POLYFILLS_TO_ADD, operation: 'add' },
         { path: ['polyfills'], value: REFLECT, operation: 'remove' },
         { path: ['loader'], value: PROJECT_LOADER, operation: 'add' }
       ]),

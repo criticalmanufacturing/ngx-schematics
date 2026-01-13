@@ -67,16 +67,12 @@ export function createSourceFile(tree: Tree, path: string): SourceFile | undefin
  * @param symbolName Import symbol
  * @param module Import module specifier
  * @param isDefault Is default import
- * @param leadingTrivia Leading trivia to add before the import
- * @param trailingTrivia Trailing trivia to add after the import
  */
 export function insertImport(
   source: SourceFile,
   symbolName: string,
   module: string,
-  isDefault = false,
-  leadingTrivia = '\n',
-  trailingTrivia = '\n'
+  isDefault = false
 ): void {
   insertImports(source, [symbolName], module, isDefault);
 }
