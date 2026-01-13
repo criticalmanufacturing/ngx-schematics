@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CustomizableComponent } from 'cmf-core';
-import { WidgetSettingsModule, WidgetSettingsService } from 'cmf-core-dashboards';
+import { WidgetSettings, WidgetSettingsService } from 'cmf-core-dashboards';
 import { TestWidgetSettingsService, TestWidgetSettings } from './test-widget-settings.service';
 
 /**
@@ -20,7 +20,7 @@ import { TestWidgetSettingsService, TestWidgetSettings } from './test-widget-set
  */
 @Component({
   selector: 'test-lib-test-widget-settings',
-  imports: [WidgetSettingsModule],
+  imports: [WidgetSettings],
   templateUrl: './test-widget-settings.component.html',
   styleUrl: './test-widget-settings.component.less',
   providers: [{ provide: WidgetSettingsService, useClass: TestWidgetSettingsService }]

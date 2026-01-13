@@ -81,7 +81,7 @@ describe('Generate Converter', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 
   it('should add the converter to the metadata', async () => {
@@ -91,6 +91,6 @@ describe('Generate Converter', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 });

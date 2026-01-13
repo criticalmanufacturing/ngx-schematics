@@ -27,7 +27,7 @@
   },
   "scripts": {
     "build": "npm run build -w ./packages/schematics-devkit && concurrently \"npm run build -w ./packages/ngx-schematics\" \"npm run build -w ./packages/ngx-iot-schematics\" -r",
-    "test": "npm run test -ws",
+    "test": "npm run test --workspaces",
     "publish": "node ./scripts/publish.js",
     "add-tags": "node ./scripts/add-tags.js"
   },

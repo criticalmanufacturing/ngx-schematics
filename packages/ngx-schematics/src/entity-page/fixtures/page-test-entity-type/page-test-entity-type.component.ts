@@ -2,7 +2,7 @@ import { Component, forwardRef } from '@angular/core';
 import Cmf from 'cmf-lbos';
 import { CustomizableComponent, HOST_VIEW_COMPONENT } from 'cmf-core';
 import {
-  EntityPageModule,
+  EntityPage,
   EntityPageInterface,
   LevelsToLoad,
   EntityPageService
@@ -43,7 +43,7 @@ import {
  */
 @Component({
   selector: 'test-lib-page-test-entity-type',
-  imports: [EntityPageModule],
+  imports: [EntityPage],
   providers: [EntityPageService],
   templateUrl: './page-test-entity-type.component.html',
   viewProviders: [

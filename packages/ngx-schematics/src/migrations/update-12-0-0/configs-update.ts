@@ -1,9 +1,9 @@
-import { chain, Rule, Tree } from '@angular-devkit/schematics';
-import { getDefaultApplicationProject } from '@criticalmanufacturing/schematics-devkit';
+import { chain, Rule } from '@angular-devkit/schematics';
 import {
   updateAppBuildTarget,
   updateTsConfig
 } from '@criticalmanufacturing/schematics-devkit/rules';
+import { PROJECT_LOADER } from '../../ng-add/package-configs';
 
 const JQUERY_UI_SCRIPTS = [
   'node_modules/jquery-ui/ui/version.js',
@@ -36,24 +36,36 @@ const FLAGS = [
   }
 ];
 
-const LOCALIZE = ['@angular/localize/init'];
+const MONACO_SCRIPTS = [
+  {
+    glob: '**/*',
+    input: 'node_modules/monaco-editor/min/vs',
+    output: 'monaco-editor/vs'
+  }
+];
 
-export function updateAppSettings(): Rule {
-  return async (tree: Tree) => {
-    const project = await getDefaultApplicationProject(tree);
+const POLYFILLS_TO_ADD = ['zone.js', '@angular/localize/init'];
 
-    if (!project) {
-      return;
-    }
+const REFLECT = ['reflect-metadata'];
 
+export function updateAppSettings({ project }: { project: string }): Rule {
+  return async () => {
     return chain([
       updateAppBuildTarget(project, [
-        { path: ['scripts'], value: JQUERY_UI_SCRIPTS, operation: 'remove' }
+        {
+          path: ['scripts'],
+          value: [...JQUERY_UI_SCRIPTS],
+          operation: 'remove'
+        },
+        {
+          path: ['assets'],
+          value: [...JQUERY_UI_ASSETS, ...FLAGS, ...MONACO_SCRIPTS],
+          operation: 'remove'
+        },
+        { path: ['polyfills'], value: POLYFILLS_TO_ADD, operation: 'add' },
+        { path: ['polyfills'], value: REFLECT, operation: 'remove' },
+        { path: ['loader'], value: PROJECT_LOADER, operation: 'add' }
       ]),
-      updateAppBuildTarget(project, [
-        { path: ['assets'], value: [...JQUERY_UI_ASSETS, ...FLAGS], operation: 'remove' }
-      ]),
-      updateAppBuildTarget(project, [{ path: ['polyfills'], value: LOCALIZE }]),
       updateTsConfig([{ path: ['compilerOptions', 'skipLibCheck'], value: true }], project)
     ]);
   };

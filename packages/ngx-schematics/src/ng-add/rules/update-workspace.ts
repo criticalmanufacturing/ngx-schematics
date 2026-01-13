@@ -6,9 +6,9 @@ import {
   PROJECT_ALLOWED_COMMONJS_DEPENDENCIES,
   PROJECT_CORE_ASSETS,
   PROJECT_CORE_STYLES,
+  PROJECT_LOADER,
   PROJECT_MES_ASSETS,
   PROJECT_MES_STYLES,
-  PROJECT_POLYFILLS,
   PROJECT_SCRIPTS
 } from '../package-configs.js';
 import { Schema } from '../schema.js';
@@ -76,26 +76,30 @@ export function updateWorkspace(options: {
       // add preserve symlinks to install custom libraries like cutom lbos
       { path: ['preserveSymlinks'], value: true },
       // Add allowedCommonJsDependencies
-      { path: ['allowedCommonJsDependencies'], value: PROJECT_ALLOWED_COMMONJS_DEPENDENCIES },
-      // Add assets
-      { path: ['assets'], value: undefined },
+      {
+        path: ['allowedCommonJsDependencies'],
+        value: PROJECT_ALLOWED_COMMONJS_DEPENDENCIES,
+        operation: 'add'
+      },
       {
         path: ['assets'],
         value: (options.application === 'MES'
           ? PROJECT_MES_ASSETS
-          : PROJECT_CORE_ASSETS) as JsonArray
+          : PROJECT_CORE_ASSETS) as JsonArray,
+        operation: 'add'
       },
       // Add styles
       {
         path: ['styles'],
-        value: options.application === 'MES' ? PROJECT_MES_STYLES : PROJECT_CORE_STYLES
+        value: options.application === 'MES' ? PROJECT_MES_STYLES : PROJECT_CORE_STYLES,
+        operation: 'add'
       },
       // Add scripts
-      { path: ['scripts'], value: PROJECT_SCRIPTS },
-      // Add polyfills
-      { path: ['polyfills'], value: PROJECT_POLYFILLS },
+      { path: ['scripts'], value: PROJECT_SCRIPTS, operation: 'add' },
       // update output path
-      { path: ['outputPath'], value: { base: `dist/${options.project}`, browser: '' } }
+      { path: ['outputPath'], value: { base: `dist/${options.project}`, browser: '' } },
+      // Add loader
+      { path: ['loader'], value: PROJECT_LOADER, operation: 'add' }
     ]);
   };
 }

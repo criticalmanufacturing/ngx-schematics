@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CustomizableComponent } from 'cmf-core';
-import { DataSourceSettingsDef, DataSourceSettingsModule } from 'cmf-core-dashboards';
+import { DataSourceSettingsDef, DataSourceSettings } from 'cmf-core-dashboards';
 
 /**
  * @whatItDoes
@@ -14,7 +14,7 @@ import { DataSourceSettingsDef, DataSourceSettingsModule } from 'cmf-core-dashbo
  */
 @Component({
   selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-data-source-settings',
-  imports: [DataSourceSettingsModule],
+  imports: [DataSourceSettings],
   templateUrl: './<%= dasherize(name) %>-data-source-settings.component.html',
   <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-data-source-settings.component.<%= dasherize(style) %>'<% } %>
 })

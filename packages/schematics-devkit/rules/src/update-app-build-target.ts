@@ -2,10 +2,12 @@ import { Rule, SchematicsException, Tree } from '@angular-devkit/schematics';
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 import {
   addToJsonArray,
+  addToJsonObject,
   getBuildTargets,
-  removeFromJsonArray
+  removeFromJsonArray,
+  removeFromJsonObject
 } from '@criticalmanufacturing/schematics-devkit';
-import { isJsonArray, JsonArray, JsonValue } from '@angular-devkit/core';
+import { isJsonArray, isJsonObject, JsonArray, JsonObject, JsonValue } from '@angular-devkit/core';
 
 /**
  * Updates a record object with a new value for a specified key.
@@ -23,13 +25,27 @@ function updateRecord(
 
   const currValue = record[key];
 
-  if (operation === 'replace' || !(isJsonArray(value) && currValue && isJsonArray(currValue))) {
-    record[key] = value;
-  } else if (operation === 'add') {
-    addToJsonArray(currValue, value);
-  } else {
-    removeFromJsonArray(currValue, value);
+  if (currValue != null && isJsonArray(currValue) && isJsonArray(value)) {
+    if (operation === 'add') {
+      addToJsonArray(currValue, value);
+      return;
+    } else if (operation === 'remove') {
+      removeFromJsonArray(currValue, value);
+      return;
+    }
   }
+
+  if (currValue != null && isJsonObject(currValue) && isJsonObject(value)) {
+    if (operation === 'add') {
+      addToJsonObject(currValue, value);
+      return;
+    } else if (operation === 'remove') {
+      removeFromJsonObject(currValue, value);
+      return;
+    }
+  }
+
+  record[key] = value;
 }
 
 /**
@@ -38,7 +54,7 @@ function updateRecord(
 export function updateAppBuildTarget(
   project: string,
   options: (
-    | { path: string[]; value: JsonArray; operation?: 'add' | 'remove' | 'replace' }
+    | { path: string[]; value: JsonArray | JsonObject; operation?: 'add' | 'remove' | 'replace' }
     | { path: string[]; value: JsonValue; operation?: 'replace' }
     | { path: string[]; value: undefined; operation?: 'remove' }
   )[]

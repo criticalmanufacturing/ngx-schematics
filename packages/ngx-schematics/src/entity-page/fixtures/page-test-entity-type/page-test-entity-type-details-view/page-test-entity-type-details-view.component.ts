@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import Cmf from 'cmf-lbos';
 import { CustomizableComponent } from 'cmf-core';
-import { EntityPageService, DetailsViewModule } from 'cmf-core-business-controls';
+import { EntityPageService, DetailsView } from 'cmf-core-business-controls';
 
 /**
  * @whatItDoes
@@ -39,7 +39,7 @@ import { EntityPageService, DetailsViewModule } from 'cmf-core-business-controls
  */
 @Component({
   selector: 'test-lib-page-test-entity-type-details-view',
-  imports: [DetailsViewModule],
+  imports: [DetailsView],
   templateUrl: './page-test-entity-type-details-view.component.html'
 })
 export class PageTestEntityTypeDetailsViewComponent extends CustomizableComponent {

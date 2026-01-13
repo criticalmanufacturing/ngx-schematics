@@ -7,11 +7,11 @@ import {
 } from 'cmf-core';
 import {
   BasePage,
-  BasePageModule,
-  ActionBarModule,
-  ActionGroupModule,
-  ActionButtonModule,
-  RequiredFunctionalitiesModule
+  BasePageSingleSection,
+  ActionBar,
+  ActionGroup,
+  ActionButton,
+  RequiredFunctionalities
 } from 'cmf-core-controls';
 
 /**
@@ -50,11 +50,12 @@ import {
 @Component({
   selector: 'test-lib-page-test-page',
   imports: [
-    BasePageModule,
-    ActionBarModule,
-    ActionButtonModule,
-    ActionGroupModule,
-    RequiredFunctionalitiesModule
+    BasePage,
+    BasePageSingleSection,
+    ActionBar,
+    ActionButton,
+    ActionGroup,
+    RequiredFunctionalities
   ],
   templateUrl: './page-test-page.component.html',
   styleUrl: './page-test-page.component.less',

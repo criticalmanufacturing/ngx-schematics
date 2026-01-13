@@ -103,7 +103,7 @@ describe('Generate Step', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 
   it('should generate the step ts file with the correct content', async () => {
@@ -113,7 +113,7 @@ describe('Generate Step', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 
   it('should generate the step html file with the correct content', async () => {
@@ -123,6 +123,6 @@ describe('Generate Step', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 });

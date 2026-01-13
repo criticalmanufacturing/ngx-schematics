@@ -1,17 +1,8 @@
 import { Component, forwardRef, inject, OnInit, viewChild } from '@angular/core';
 import Cmf from 'cmf-lbos';
-import {
-  CustomizableComponent,
-  HOST_VIEW_COMPONENT,
-  UtilService,
-  EntityTypeService
-} from 'cmf-core';
-import { PageBag, Wizard, WizardEventArgs } from 'cmf-core-controls';
-import {
-  TransactionWizardModule,
-  TransactionWizard,
-  TransactionEventArgs
-} from 'cmf-core-business-controls';
+import { CustomizableComponent, HOST_VIEW_COMPONENT, UtilService, EntityTypeService } from 'cmf-core';
+import { PageBag, Wizard, WizardStep, WizardEventArgs } from 'cmf-core-controls';
+import { TransactionWizard, TransactionEventArgs, TransactionWizardDirective } from 'cmf-core-business-controls';
 
 /**
  * @whatItDoes
@@ -49,7 +40,7 @@ import {
  */
 @Component({
   selector: 'test-lib-wizard-test-wizard',
-  imports: [TransactionWizardModule],
+  imports: [Wizard, WizardStep, TransactionWizardDirective],
   templateUrl: './wizard-test-wizard.component.html',
   styleUrl: './wizard-test-wizard.component.less',
   viewProviders: [
@@ -58,8 +49,7 @@ import {
 })
 export class WizardTestWizardComponent
   extends CustomizableComponent
-  implements OnInit, TransactionWizard
-{
+  implements OnInit, TransactionWizard {
   /** The instance of the wizard */
   instance: Cmf.TestNamespace.BusinessObjects.TestEntityType;
 

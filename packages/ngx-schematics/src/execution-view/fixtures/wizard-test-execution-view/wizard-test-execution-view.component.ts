@@ -1,22 +1,8 @@
 import { Component, forwardRef, inject, OnInit, viewChild } from '@angular/core';
 import Cmf from 'cmf-lbos';
-import {
-  CustomizableComponent,
-  HOST_VIEW_COMPONENT,
-  EntityTypeService,
-  UtilService
-} from 'cmf-core';
-import {
-  ExecutionViewModule,
-  ExecutionView,
-  ExecutionViewEventArgs,
-  PageBag
-} from 'cmf-core-controls';
-import {
-  TransactionExecutionView,
-  TransactionExecutionViewModule,
-  TransactionEventArgs
-} from 'cmf-core-business-controls';
+import { CustomizableComponent, HOST_VIEW_COMPONENT, EntityTypeService, UtilService } from 'cmf-core';
+import { ExecutionView, ExecutionViewTab, ExecutionViewEventArgs, PageBag } from 'cmf-core-controls';
+import { TransactionExecutionView, TransactionExecutionViewDirective, TransactionEventArgs } from 'cmf-core-business-controls';
 
 /**
  * @whatItDoes
@@ -53,7 +39,7 @@ import {
  */
 @Component({
   selector: 'test-lib-wizard-test-execution-view',
-  imports: [ExecutionViewModule, TransactionExecutionViewModule],
+  imports: [ExecutionView, ExecutionViewTab, TransactionExecutionViewDirective],
   templateUrl: './wizard-test-execution-view.component.html',
   styleUrl: './wizard-test-execution-view.component.less',
   viewProviders: [
@@ -65,8 +51,7 @@ import {
 })
 export class WizardTestExecutionViewComponent
   extends CustomizableComponent
-  implements OnInit, TransactionExecutionView
-{
+  implements OnInit, TransactionExecutionView {
   /** The instance of the execution view */
   instance: Cmf.TestNamespace.BusinessObjects.TestEntityType;
 

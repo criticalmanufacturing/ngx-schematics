@@ -112,7 +112,7 @@ describe('Generate Wizard Create Edit', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 
   it('should generate the wizard html file with the correct content', async () => {
@@ -122,7 +122,7 @@ describe('Generate Wizard Create Edit', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 
   it('should update the metadata with a new action', async () => {
@@ -132,6 +132,6 @@ describe('Generate Wizard Create Edit', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 });

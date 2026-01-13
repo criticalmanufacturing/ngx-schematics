@@ -90,7 +90,7 @@ describe('Generate Page', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 
   it('should generate the page ts file with the correct content', async () => {
@@ -100,7 +100,7 @@ describe('Generate Page', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 
   it('should update the metadata with a new action', async () => {
@@ -110,6 +110,6 @@ describe('Generate Page', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 });

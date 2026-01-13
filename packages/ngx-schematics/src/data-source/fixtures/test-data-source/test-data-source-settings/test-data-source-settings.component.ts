@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CustomizableComponent } from 'cmf-core';
-import { DataSourceSettingsDef, DataSourceSettingsModule } from 'cmf-core-dashboards';
+import { DataSourceSettingsDef, DataSourceSettings } from 'cmf-core-dashboards';
 
 /**
  * @whatItDoes
@@ -14,7 +14,7 @@ import { DataSourceSettingsDef, DataSourceSettingsModule } from 'cmf-core-dashbo
  */
 @Component({
   selector: 'test-lib-test-data-source-settings',
-  imports: [DataSourceSettingsModule],
+  imports: [DataSourceSettings],
   templateUrl: './test-data-source-settings.component.html',
   styleUrl: './test-data-source-settings.component.less'
 })

@@ -8,7 +8,7 @@ import {
 import { updateAppBuildTarget } from '@criticalmanufacturing/schematics-devkit/rules';
 
 /**
- * Updates all application that are using the angular service worker to use the custom service worker
+ * Updates all applications that are using the angular service worker to use the custom service worker
  */
 function updateAppModuleServiceWorker(project: string): Rule {
   return async (tree: Tree) => {
@@ -41,7 +41,7 @@ export default function (): Rule {
     }
 
     return chain([
-      updateAppBuildTarget(project, [{ path: ['assets'], value: SW_ASSETS }]),
+      updateAppBuildTarget(project, [{ path: ['assets'], value: SW_ASSETS, operation: 'add' }]),
       updateAppModuleServiceWorker(project)
     ]);
   };

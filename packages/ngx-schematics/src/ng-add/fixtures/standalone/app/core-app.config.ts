@@ -2,6 +2,7 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, isDevMode, provi
 import { provideServiceWorker } from '@angular/service-worker';
 import { provideCoreUI } from 'cmf-core-ui';
 import { provideMetadataRouter } from 'cmf-core';
+import './app.workers';
 
 export const appConfig: ApplicationConfig = {
   providers: [
