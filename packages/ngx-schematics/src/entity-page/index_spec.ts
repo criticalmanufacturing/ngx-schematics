@@ -95,7 +95,7 @@ describe('Generate Entity Page', () => {
     const expected = readFileSync(`${fixturesPath}/${expectedFiles.page.html}`, {
       encoding: 'utf-8'
     });
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 
   it('should generate the page component file with the correct content', async () => {
@@ -105,7 +105,7 @@ describe('Generate Entity Page', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 
   it('should get the routes for an entity in metadata', async () => {
@@ -115,7 +115,7 @@ describe('Generate Entity Page', () => {
       encoding: 'utf-8'
     });
 
-    expect(normalize(actual)).toBe(normalize(expected));
+    expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
   });
 
   describe('- Generate Details View', () => {
@@ -126,7 +126,7 @@ describe('Generate Entity Page', () => {
         encoding: 'utf-8'
       });
 
-      expect(normalize(actual)).toBe(normalize(expected));
+      expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
     });
 
     it('should generate the page component file with the correct content', async () => {
@@ -136,7 +136,7 @@ describe('Generate Entity Page', () => {
         encoding: 'utf-8'
       });
 
-      expect(normalize(actual)).toBe(normalize(expected));
+      expect(normalize(actual).split('\n')).toEqual(normalize(expected).split('\n'));
     });
   });
 });
