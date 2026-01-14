@@ -40,8 +40,6 @@ export function injectZoneDetectionOnAppConfig(appConfig: ObjectLiteralExpressio
  */
 export function addZoneChangeDetection(project: string): Rule {
   return async (tree: Tree) => {
-    console.debug('Adding zone-based change detection to the app config...');
-
     const appConfig = await getAppConfig(tree, project);
 
     if (!appConfig) {
