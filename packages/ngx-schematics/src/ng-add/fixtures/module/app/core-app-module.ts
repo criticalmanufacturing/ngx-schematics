@@ -5,7 +5,6 @@ import { App } from './app';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { CoreUIModule } from 'cmf-core-ui';
 import { MetadataRoutingModule } from 'cmf-core';
-import './app.workers';
 
 @NgModule({
   declarations: [

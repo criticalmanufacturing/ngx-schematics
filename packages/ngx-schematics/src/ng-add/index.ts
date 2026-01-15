@@ -32,7 +32,6 @@ import { updateAppModule } from './rules/update-app-module.js';
 import { updateAppConfig } from './rules/update-app-config.js';
 import { updateNgswConfig } from './rules/update-ngsw-config.js';
 import { updateWebmanifest } from './rules/update-webmanifest.js';
-import { addWorkers } from './rules/add-workers.js';
 
 /**
  * Updates main.ts file adding the load config method
@@ -83,8 +82,7 @@ function installSchematics(options: Schema) {
             updateBootstrapComponent({ project: options.project }),
             updateAppModule({ project: options.project, application: options.application }),
             updateAppConfig({ project: options.project, application: options.application }),
-            updateMain({ project: options.project }),
-            addWorkers(options as Required<Schema>)
+            updateMain({ project: options.project })
           ]
         : [noop()]),
       updateNgswConfig(options as Required<Schema>),
