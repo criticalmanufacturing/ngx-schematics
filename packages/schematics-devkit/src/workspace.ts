@@ -85,7 +85,7 @@ export function listNpmReleaseTags(pkg: string, version?: string): Promise<strin
 
       const regExp = /^([^:]+): (.+)$/gm;
       let match: RegExpExecArray | null;
-      let tags: string[] = [];
+      const tags: string[] = [];
       while ((match = regExp.exec(stdout))) {
         if (!version || match[2] === version) {
           tags.push(match[1]);
@@ -102,7 +102,7 @@ export function listNpmReleaseTags(pkg: string, version?: string): Promise<strin
  * @param array array of elements
  * @param elementsToAdd elements to add to array
  */
-export function addToJsonArray(array: JsonArray, elementsToAdd: any[]): void {
+export function addToJsonArray(array: JsonArray, elementsToAdd: JsonValue[]): void {
   elementsToAdd.forEach((toAdd) => {
     if (
       !array.some((existing) =>
@@ -119,7 +119,7 @@ export function addToJsonArray(array: JsonArray, elementsToAdd: any[]): void {
  * @param array the array
  * @param elementToRemove the element to remove
  */
-export function removeFromJsonArray(array: JsonArray, elementsToRemove: any[]): void {
+export function removeFromJsonArray(array: JsonArray, elementsToRemove: JsonValue[]): void {
   elementsToRemove.forEach((toRemove) => {
     const indexToRemove = array.findIndex((existing) =>
       isDeepStrictEqual(typeof existing === 'object' ? { ...existing } : existing, toRemove)

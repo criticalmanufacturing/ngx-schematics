@@ -7,7 +7,6 @@ import {
   move,
   noop,
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   url
@@ -23,7 +22,7 @@ import { MetadataProperty, updateMetadata } from '../utility/metadata.js';
 import { Schema } from './schema.js';
 import { updateLibraryAPI } from '../utility/update-library-api.js';
 export default function (_options: Schema): Rule {
-  return async (tree: Tree, _context: SchematicContext) => {
+  return async (tree: Tree) => {
     if (!_options.namespace) {
       _options.namespace = await promptNamespace();
     }

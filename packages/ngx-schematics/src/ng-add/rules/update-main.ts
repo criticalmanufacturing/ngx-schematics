@@ -1,4 +1,4 @@
-import { SchematicContext, Tree } from '@angular-devkit/schematics';
+import { Tree } from '@angular-devkit/schematics';
 import { SyntaxKind } from 'ts-morph';
 import {
   createSourceFile,
@@ -10,7 +10,7 @@ import {
  * Updates main.ts file adding the load config method
  */
 export function updateMain(options: { project: string }) {
-  return async (host: Tree, _context: SchematicContext) => {
+  return async (host: Tree) => {
     const mainPath = await getMainPath(host, options.project);
 
     if (!mainPath) {

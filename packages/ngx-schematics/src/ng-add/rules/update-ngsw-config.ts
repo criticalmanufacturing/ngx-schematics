@@ -8,7 +8,7 @@ import {
 import { readWorkspace } from '@schematics/angular/utility';
 
 function getAssetGroup(ngswConfig: JsonObject, name: string): JsonObject | undefined {
-  return ((ngswConfig as JsonObject)['assetGroups'] as JsonArray).find(
+  return ((ngswConfig)['assetGroups'] as JsonArray).find(
     (assetGroup) => (assetGroup as JsonObject)['name'] === name
   ) as JsonObject;
 }

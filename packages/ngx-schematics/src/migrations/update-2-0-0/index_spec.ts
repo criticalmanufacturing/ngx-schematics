@@ -43,7 +43,8 @@ describe('Test ng-update', () => {
     it('should update the default project builder polyfills', async () => {
       const workspace = JSON.parse(appTree.readContent('angular.json'));
 
-      const polyfills = workspace.projects.application.architect.build.options.polyfills;
+      const polyfills = workspace.projects.application.architect.build.options
+        .polyfills as string[];
       expect(polyfills === undefined || !polyfills.includes('reflect-metadata')).toBe(true);
 
       const tree = await migrationsSchematicRunner.runSchematic('update-2-0-0', {}, appTree);

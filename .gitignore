@@ -3,6 +3,7 @@
 packages/**/*.js
 packages/**/*.js.map
 packages/**/*.d.ts
+!eslint.config.js
 
 # IDEs
 .idea/

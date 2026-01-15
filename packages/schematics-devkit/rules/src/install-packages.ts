@@ -1,3 +1,4 @@
+import { SchematicsException } from '@angular-devkit/schematics';
 import { SpawnOptions, spawn } from 'child_process';
 import ora from 'ora';
 
@@ -49,19 +50,19 @@ export function installNpmPackages(
     const spinner = ora({
       text: `Installing packages (${taskPackageManagerName})...`,
       // Workaround for https://github.com/sindresorhus/ora/issues/136.
-      discardStdin: process.platform != 'win32'
+      discardStdin: process.platform !== 'win32'
     }).start();
     const childProcess = spawn(taskPackageManagerName, args, spawnOptions).on(
       'close',
       (code: number) => {
+        spinner.stop();
         if (code === 0) {
           spinner.succeed('Packages installed successfully.');
-          spinner.stop();
           resolve();
         } else {
           bufferedOutput.forEach(({ stream, data }) => stream.write(data));
           spinner.fail('Package install failed, see above.');
-          reject();
+          reject(new SchematicsException());
         }
       }
     );

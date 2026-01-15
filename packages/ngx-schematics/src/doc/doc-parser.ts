@@ -9,18 +9,18 @@ import {
   TypeQueryNode
 } from 'ts-morph';
 
-export type PropertyDescriptor = {
+export interface PropertyDescriptor {
   name: string;
   docs: string;
   type: string;
-};
+}
 
-export type DependencyDescriptor = {
+export interface DependencyDescriptor {
   name: string;
   pkg: string;
-};
+}
 
-export type DocData = {
+export interface DocData {
   name: string;
   selector: string;
   inputs: PropertyDescriptor[];
@@ -28,7 +28,7 @@ export type DocData = {
   components: DependencyDescriptor[];
   directives: DependencyDescriptor[];
   services: DependencyDescriptor[];
-};
+}
 
 function getElementsOrDefault(array: ArrayLiteralExpression | undefined): string[] {
   return (
@@ -46,7 +46,7 @@ function isDirectiveType(nodeType: Type): boolean {
   const classDec = nodeType
     .getSymbol()
     ?.getDeclarations()
-    .find((dec) => dec.isKind(SyntaxKind.ClassDeclaration)) as ClassDeclaration | undefined;
+    .find((dec) => dec.isKind(SyntaxKind.ClassDeclaration));
 
   return classDec?.getProperty('ɵdir') != null || classDec?.getDecorator('Directive') != null;
 }
@@ -55,7 +55,7 @@ function isComponentType(nodeType: Type): boolean {
   const classDec = nodeType
     .getSymbol()
     ?.getDeclarations()
-    .find((dec) => dec.isKind(SyntaxKind.ClassDeclaration)) as ClassDeclaration | undefined;
+    .find((dec) => dec.isKind(SyntaxKind.ClassDeclaration));
 
   return classDec?.getProperty('ɵcmp') != null || classDec?.getDecorator('Component') != null;
 }
@@ -64,7 +64,7 @@ function getModuleExport(nodeType: Type): Identifier | undefined {
   const classDec = nodeType
     .getSymbol()
     ?.getDeclarations()
-    .find((dec) => dec.isKind(SyntaxKind.ClassDeclaration)) as ClassDeclaration | undefined;
+    .find((dec) => dec.isKind(SyntaxKind.ClassDeclaration));
 
   const moduleTypeMeta = classDec?.getProperty('ɵmod');
   if (moduleTypeMeta) {
@@ -283,20 +283,14 @@ function parseClassImports(
     }
 
     const importNode = getModuleExport(type) ?? node;
-    let importPath = getImportPath(node) ?? '';
+    const importPath = getImportPath(node) ?? '';
 
-    let kind: 'directives' | 'components' | undefined = isDirectiveType(importNode.getType())
+    const kind: 'directives' | 'components' = isDirectiveType(importNode.getType())
       ? 'directives'
       : isComponentType(importNode.getType())
         ? 'components'
-        : undefined;
-    let name = importNode.getText();
-
-    if (!kind) {
-      // if unable to determine the import type, lets default to component
-      kind = 'components';
-      name = name.replace(/Module$/, '');
-    }
+        : // if unable to determine the import type, lets default to component
+          'components';
 
     if (!importPath || importPath.startsWith('.') || importPath.startsWith('cmf-')) {
       docData[kind].push({

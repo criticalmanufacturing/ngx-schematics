@@ -25,7 +25,7 @@ export interface IoTLibraryInfo {
  * Updates the package metadata with the desired information
  */
 export function updateLibraryMetadata(project: ProjectDefinition, options: IoTLibraryInfo): Rule {
-  return async (tree: Tree) => {
+  return (tree: Tree) => {
     const metadataPath = getFilePathFromEntryPoint(tree, project, 'metadata', (m) =>
       m.endsWith('/metadata')
     );

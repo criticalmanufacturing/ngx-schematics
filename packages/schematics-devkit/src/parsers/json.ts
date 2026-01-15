@@ -46,7 +46,7 @@ export class JSONFile {
     return this._jsonAst;
   }
 
-  get(jsonPath: JSONPath) {
+  get(jsonPath: JSONPath): JsonValue | undefined {
     const jsonAstNode = this.JsonAst;
 
     if (!jsonAstNode) {
@@ -54,7 +54,7 @@ export class JSONFile {
     }
 
     if (jsonPath.length === 0) {
-      return getNodeValue(jsonAstNode);
+      return getNodeValue(jsonAstNode) as JsonValue;
     }
 
     const node = findNodeAtLocation(jsonAstNode, jsonPath);
@@ -63,7 +63,7 @@ export class JSONFile {
       return;
     }
 
-    return getNodeValue(node);
+    return getNodeValue(node) as JsonValue;
   }
 
   modify(

@@ -1,15 +1,10 @@
 import { join, normalize, dirname } from '@angular-devkit/core';
-import {
-  chain,
-  Rule,
-  SchematicContext,
-  SchematicsException,
-  Tree
-} from '@angular-devkit/schematics';
+import { chain, Rule, SchematicsException, Tree } from '@angular-devkit/schematics';
 import { readWorkspace, ProjectDefinition } from '@schematics/angular/utility';
 import { createSourceFile, JSONFile, ProjectType } from '@criticalmanufacturing/schematics-devkit';
 
 import { setPackageInfoMetadata, PackageInfo, getMetadataFilePath } from '../utility/metadata.js';
+import { Schema } from './schema.js';
 
 function getAllFiles(host: Tree, rootPath: string): string[] {
   if (!host.exists(join(normalize(rootPath), 'ng-package.json'))) {
@@ -78,9 +73,14 @@ function fillMetadataPackageInfo(project: ProjectDefinition, options: Required<P
   };
 }
 
-export default function (_options: any): Rule {
-  return async (tree: Tree, _context: SchematicContext) => {
+export default function (_options: Schema): Rule {
+  return async (tree: Tree) => {
     const workspace = await readWorkspace(tree);
+
+    if (!_options.project) {
+      return;
+    }
+
     const project = workspace.projects.get(_options.project);
 
     if (!project) {

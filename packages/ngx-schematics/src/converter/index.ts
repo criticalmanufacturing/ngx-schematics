@@ -5,7 +5,6 @@ import {
   mergeWith,
   move,
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   url
@@ -17,7 +16,7 @@ import { updateMetadataPackageInfo } from '../utility/metadata.js';
 import { updateLibraryAPI } from '../utility/update-library-api.js';
 
 export default function (_options: Schema): Rule {
-  return async (tree: Tree, _context: SchematicContext) => {
+  return async (tree: Tree) => {
     const workspace = await readWorkspace(tree);
     const project = workspace.projects.get(_options.project);
 

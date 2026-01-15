@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "watch": "tsc -w -p tsconfig.json",
-    "test": "vitest"
+    "test": "vitest",
+    "lint": "eslint"
   },
   "keywords": [
     "schematics"

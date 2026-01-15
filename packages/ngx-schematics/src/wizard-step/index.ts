@@ -7,7 +7,6 @@ import {
   move,
   noop,
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   url
@@ -17,7 +16,7 @@ import { getDefaultPath, parseName, strings } from '@criticalmanufacturing/schem
 import { Schema } from './schema.js';
 
 export default function (_options: Schema): Rule {
-  return async (tree: Tree, _context: SchematicContext) => {
+  return async (tree: Tree) => {
     const workspace = await readWorkspace(tree);
     const project = workspace.projects.get(_options.project);
 

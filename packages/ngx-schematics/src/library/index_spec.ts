@@ -4,7 +4,7 @@ import { getAllFilesFromDir, normalize } from '@criticalmanufacturing/schematics
 import { JsonObject } from '@angular-devkit/core';
 import { readFileSync } from 'node:fs';
 
-function getFileContent(tree: UnitTestTree, path: string) {
+function getFileContent(tree: UnitTestTree, path: string): any {
   const content = tree.readContent(path).toString();
   return parse(content, undefined, { allowTrailingComma: true });
 }

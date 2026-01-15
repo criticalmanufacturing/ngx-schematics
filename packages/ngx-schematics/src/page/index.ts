@@ -7,7 +7,6 @@ import {
   move,
   noop,
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   url
@@ -30,8 +29,8 @@ import {
 import { updateLibraryAPI } from '../utility/update-library-api.js';
 import { Schema } from './schema.js';
 
-function updateRoutesMetadata(project: ProjectDefinition, options: any) {
-  return async (tree: Tree) => {
+function updateRoutesMetadata(project: ProjectDefinition, options: Schema) {
+  return (tree: Tree) => {
     const metadataPath = getMetadataFilePath(tree, project);
 
     if (!metadataPath) {
@@ -108,7 +107,7 @@ function getEntrypointMetadata(options: Schema): UpdateMetadataOptions {
 }
 
 export default function (_options: Schema): Rule {
-  return async (tree: Tree, _context: SchematicContext) => {
+  return async (tree: Tree) => {
     const workspace = await readWorkspace(tree);
     const project = workspace.projects.get(_options.project);
 
