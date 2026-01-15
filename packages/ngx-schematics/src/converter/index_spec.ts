@@ -71,7 +71,7 @@ describe('Generate Converter', () => {
     const tree = await schematicRunner.runSchematic('converter', converterOptions, appTree);
     const files = getAllFilesFromDir(`${libMainPath}/${converterName}`, tree);
 
-    expect(files).toEqual(jasmine.arrayContaining([`${libMainPath}/${expectedFiles.converter}`]));
+    expect(files).toEqual(expect.arrayContaining([`${libMainPath}/${expectedFiles.converter}`]));
   });
 
   it('should generate the converter file with the correct content', async () => {

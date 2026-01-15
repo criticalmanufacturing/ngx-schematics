@@ -70,7 +70,7 @@ describe('Generate Step', () => {
     const files = getAllFilesFromDir(`${libMainPath}/${stepName}`, tree);
 
     expect(files).toEqual(
-      jasmine.arrayContaining([
+      expect.arrayContaining([
         `${libMainPath}/${expectedFiles.step}.less`,
         `${libMainPath}/${expectedFiles.step}.html`,
         `${libMainPath}/${expectedFiles.step}.ts`
@@ -83,7 +83,7 @@ describe('Generate Step', () => {
     const tree = await schematicRunner.runSchematic('wizard-step', options, appTree);
     const files = getAllFilesFromDir(`${libMainPath}/${stepName}`, tree);
 
-    expect(files).toEqual(jasmine.arrayContaining([`${libMainPath}/${expectedFiles.step}.css`]));
+    expect(files).toEqual(expect.arrayContaining([`${libMainPath}/${expectedFiles.step}.css`]));
   });
 
   it('should not create the step style file', async () => {
@@ -92,7 +92,7 @@ describe('Generate Step', () => {
     const files = getAllFilesFromDir(`${libMainPath}/${stepName}`, tree);
 
     expect(files).not.toEqual(
-      jasmine.arrayContaining([`${libMainPath}/${expectedFiles.step}.less`])
+      expect.arrayContaining([`${libMainPath}/${expectedFiles.step}.less`])
     );
   });
 

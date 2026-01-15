@@ -77,7 +77,7 @@ describe('Generate Execution View', () => {
     const files = getAllFilesFromDir(`${libMainPath}/${executionViewName}`, tree);
 
     expect(files).toEqual(
-      jasmine.arrayContaining([
+      expect.arrayContaining([
         `${libMainPath}/${expectedFiles.executionView}.html`,
         `${libMainPath}/${expectedFiles.executionView}.ts`,
         `${libMainPath}/${expectedFiles.executionView}.less`
@@ -91,7 +91,7 @@ describe('Generate Execution View', () => {
     const files = getAllFilesFromDir(`${libMainPath}/${executionViewName}`, tree);
 
     expect(files).toEqual(
-      jasmine.arrayContaining([`${libMainPath}/${expectedFiles.executionView}.css`])
+      expect.arrayContaining([`${libMainPath}/${expectedFiles.executionView}.css`])
     );
   });
 
@@ -101,7 +101,7 @@ describe('Generate Execution View', () => {
     const files = getAllFilesFromDir(`${libMainPath}/${executionViewName}`, tree);
 
     expect(files).not.toEqual(
-      jasmine.arrayContaining([`${libMainPath}/${expectedFiles.executionView}.less`])
+      expect.arrayContaining([`${libMainPath}/${expectedFiles.executionView}.less`])
     );
   });
 

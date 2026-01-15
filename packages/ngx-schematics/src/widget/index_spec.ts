@@ -77,7 +77,7 @@ describe('Generate Widget', () => {
     );
 
     expect(files).toEqual(
-      jasmine.arrayContaining([
+      expect.arrayContaining([
         `${libMainPath}/${expectedFiles.wdiget}.html`,
         `${libMainPath}/${expectedFiles.wdiget}.ts`,
         `${libMainPath}/${expectedFiles.wdiget}.less`,
@@ -95,7 +95,7 @@ describe('Generate Widget', () => {
     const files = getAllFilesFromDir(`${libMainPath}/${widgetName}/${widgetName}-settings`, tree);
 
     expect(files).toEqual(
-      jasmine.arrayContaining([`${libMainPath}/${expectedFiles.widgetSettings}.css`])
+      expect.arrayContaining([`${libMainPath}/${expectedFiles.widgetSettings}.css`])
     );
   });
 
@@ -105,7 +105,7 @@ describe('Generate Widget', () => {
     const files = getAllFilesFromDir(`${libMainPath}/${widgetName}`, tree);
 
     expect(files).not.toEqual(
-      jasmine.arrayContaining([
+      expect.arrayContaining([
         `${libMainPath}/${expectedFiles.wdiget}.less`,
         `${libMainPath}/${expectedFiles.widgetSettings}.less`
       ])
@@ -147,9 +147,9 @@ describe('Generate Widget', () => {
     const tree = await schematicRunner.runSchematic('widget', options, appTree);
 
     const actual = tree.readContent(`${libMainPath}/${expectedFiles.wdiget}.ts`);
-    expect(actual)
-      .withContext('The styleUrl should not be fulfilled')
-      .not.toMatch(/styleUrl: '.\/(\w*-*)+-widget.component.\w*'/);
+    expect(actual, 'The styleUrl should not be fulfilled').not.toMatch(
+      /styleUrl: '.\/(\w*-*)+-widget.component.\w*'/
+    );
   });
 
   it('should update the metadata with a new action', async () => {
@@ -207,9 +207,9 @@ describe('Generate Widget', () => {
       const tree = await schematicRunner.runSchematic('widget', options, appTree);
       const actual = tree.readContent(`${libMainPath}/${expectedFiles.widgetSettings}.ts`);
 
-      expect(actual)
-        .withContext('The styleUrl should not be fulfilled')
-        .not.toMatch(/styleUrl: '.\/(\w*-*)+.component.\w*'/);
+      expect(actual, 'The styleUrl should not be fulfilled').not.toMatch(
+        /styleUrl: '.\/(\w*-*)+.component.\w*'/
+      );
     });
   });
 });

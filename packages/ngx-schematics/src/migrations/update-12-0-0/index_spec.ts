@@ -151,8 +151,8 @@ describe('Test ng-update', () => {
 
       const actual = deepCopy(targets[0].options!.styles);
 
-      expect(actual).not.toEqual(jasmine.arrayContaining(oldThemes));
-      expect(actual).toEqual(jasmine.arrayContaining(newThemes));
+      expect(actual).not.toEqual(expect.arrayContaining(oldThemes));
+      expect(actual).toEqual(expect.arrayContaining(newThemes));
     });
   });
 });
