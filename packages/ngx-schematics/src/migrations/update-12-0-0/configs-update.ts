@@ -35,7 +35,7 @@ const FLAGS = [
   }
 ];
 
-const POLYFILLS_TO_ADD = ['zone.js', '@angular/localize/init'];
+const LOCALIZE = ['@angular/localize/init'];
 
 const REFLECT = ['reflect-metadata'];
 
@@ -53,7 +53,7 @@ export function updateAppSettings({ project }: { project: string }): Rule {
           value: [...JQUERY_UI_ASSETS, ...FLAGS],
           operation: 'remove'
         },
-        { path: ['polyfills'], value: POLYFILLS_TO_ADD, operation: 'add' },
+        { path: ['polyfills'], value: LOCALIZE, operation: 'add' },
         { path: ['polyfills'], value: REFLECT, operation: 'remove' }
       ]),
       updateTsConfig([{ path: ['compilerOptions', 'skipLibCheck'], value: true }], project)
