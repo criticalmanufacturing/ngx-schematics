@@ -40,7 +40,8 @@ describe('Test ng-add', () => {
       routing: false,
       skipTests: false,
       skipPackageJson: false,
-      standalone: false
+      standalone: false,
+      zoneless: false
     };
 
     beforeEach(async () => {
@@ -167,7 +168,8 @@ describe('Test ng-add', () => {
       routing: false,
       skipTests: false,
       skipPackageJson: false,
-      standalone: true
+      standalone: true,
+      zoneless: false
     };
 
     beforeEach(async () => {

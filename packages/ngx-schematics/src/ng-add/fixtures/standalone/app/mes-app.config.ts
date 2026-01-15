@@ -6,7 +6,8 @@ import { provideMetadataRouter } from 'cmf-core';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideZoneChangeDetection({ eventCoalescing: true }), provideServiceWorker('ngsw-loader-worker.js', {
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideServiceWorker('ngsw-loader-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000'
     }),
