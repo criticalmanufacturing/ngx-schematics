@@ -5,7 +5,6 @@ import {
   mergeWith,
   move,
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   url
@@ -29,7 +28,7 @@ import {
 import { updateLibraryAPI } from '../utility/update-library-api.js';
 
 function updateRoutesMetadata(project: ProjectDefinition, options: Schema) {
-  return async (tree: Tree) => {
+  return (tree: Tree) => {
     const metadataPath = getMetadataFilePath(tree, project);
 
     if (!metadataPath) {
@@ -64,7 +63,7 @@ function updateRoutesMetadata(project: ProjectDefinition, options: Schema) {
 }
 
 export default function (_options: Schema): Rule {
-  return async (tree: Tree, _context: SchematicContext) => {
+  return async (tree: Tree) => {
     if (!_options.namespace) {
       _options.namespace = await promptNamespace();
     }

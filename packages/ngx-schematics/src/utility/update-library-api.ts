@@ -15,7 +15,7 @@ import {
  * @param project project definition from which the public api will be updated
  */
 export function updateLibraryAPI(project: ProjectDefinition): Rule {
-  return async (tree: Tree) => {
+  return (tree: Tree) => {
     if (
       project.extensions['projectType'] !== ProjectType.Library ||
       !tree.exists(join(normalize(project.root), 'ng-package.json'))

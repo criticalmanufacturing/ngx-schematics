@@ -22,7 +22,7 @@ export async function createMigrationProject(
 
   // override the native read file so the files are fetched from the tree
   // since they can contain pending changes
-  const nativeReadFile = fileSystem.readFileSync;
+  const nativeReadFile = fileSystem.readFileSync.bind(fileSystem);
   fileSystem.readFileSync = (filePath, encoding) => {
     const treePath = relative(rootDir, filePath);
 

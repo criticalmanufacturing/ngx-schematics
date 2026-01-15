@@ -1,5 +1,5 @@
 import { chain, Rule, Tree } from '@angular-devkit/schematics';
-import { readWorkspace, ProjectDefinition } from '@schematics/angular/utility';
+import { readWorkspace } from '@schematics/angular/utility';
 import { getDefaultPath, ProjectType, tryGetRoot } from '@criticalmanufacturing/schematics-devkit';
 import { isAbsolute, join, normalize, relative } from '@angular-devkit/core';
 import { Project } from 'ts-morph';
@@ -82,8 +82,6 @@ ${getDependenciesTemplate(docData.directives) || '_This component has no directi
 function updateDoc(options: Schema) {
   return async (tree: Tree) => {
     const workspace = await readWorkspace(tree);
-    let project: ProjectDefinition | undefined;
-    let projectName: string | undefined;
 
     const root = tryGetRoot();
 
@@ -102,7 +100,7 @@ function updateDoc(options: Schema) {
     const filePath = join(normalize(root), options.file);
     const relPath = relative(normalize(root), filePath).replace(/^\.\//, '');
 
-    [projectName, project] =
+    const [projectName, project] =
       Array.from(workspace.projects).find(
         ([, def]) =>
           def.extensions['projectType'] === ProjectType.Library &&
@@ -130,7 +128,7 @@ function updateDoc(options: Schema) {
         return;
       }
 
-      const docData = parseClassDoc(classDec, projectName!);
+      const docData = parseClassDoc(classDec, projectName);
 
       classDec.getJsDocs()[0]?.remove();
       classDec.addJsDoc(writeDoc(docData));

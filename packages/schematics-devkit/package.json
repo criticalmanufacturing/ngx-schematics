@@ -6,7 +6,7 @@
     "build": "tsc -p tsconfig.json",
     "watch": "tsc -w -p tsconfig.json",
     "test": "vitest",
-    "build-test": "npm run build && npm run test"
+    "lint": "eslint"
   },
   "keywords": [
     "schematics"

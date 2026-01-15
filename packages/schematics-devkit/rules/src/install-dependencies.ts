@@ -1,3 +1,4 @@
+import { isJsonObject } from '@angular-devkit/core';
 import { Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { JSONFile } from '@criticalmanufacturing/schematics-devkit';
@@ -31,11 +32,13 @@ export function getInstalledDependency(
 ): NodeDependency | undefined {
   const json = new JSONFile(tree, pkgJsonPath);
   for (const type of Object.values(NodeDependencyType)) {
-    if (json.get([type, name])) {
+    const dep = json.get([type, name]);
+
+    if (typeof dep === 'string') {
       return {
         name: name,
         type: type,
-        version: json.get([type, name])
+        version: dep
       };
     }
   }
@@ -50,6 +53,11 @@ function removeDependency(
 
   if (json.get([dependency.type, dependency.name])) {
     const deps = json.get([dependency.type]);
+
+    if (!deps || !isJsonObject(deps)) {
+      return;
+    }
+
     delete deps[dependency.name];
 
     json.modify([dependency.type], deps);

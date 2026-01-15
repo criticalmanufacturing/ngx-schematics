@@ -7,7 +7,6 @@ import {
   move,
   noop,
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   url
@@ -58,7 +57,7 @@ function getMetadataActions(project: string, name: string) {
 }
 
 export default function (_options: Schema): Rule {
-  return async (tree: Tree, _context: SchematicContext) => {
+  return async (tree: Tree) => {
     if (!_options.namespace) {
       _options.namespace = await promptNamespace();
     }

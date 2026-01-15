@@ -109,7 +109,7 @@ function createMetadataSubEntry(options: { name: string; skipTsConfig?: boolean 
     }
 
     const packageName = `${options.name}/metadata`;
-    const folderName = basename(normalize(project!.root));
+    const folderName = basename(normalize(project.root));
     const distRoot = `./dist/${folderName}/metadata`;
     const namePrefix = options.name.replace(/^cmf-/, '');
 
@@ -120,7 +120,7 @@ function createMetadataSubEntry(options: { name: string; skipTsConfig?: boolean 
         name: namePrefix,
         entryFile: 'public-api',
         relativePathToWorkspaceRoot: relativeToRoot(join(normalize(project.root), 'metadata')),
-        distRoot: join(basename(normalize(project!.root)), 'metadata')
+        distRoot: join(basename(normalize(project.root)), 'metadata')
       }),
       move(join(normalize(project.root), 'metadata'))
     ]);

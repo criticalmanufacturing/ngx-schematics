@@ -98,7 +98,7 @@ function processDynamicImports(source: SourceFile, modifiedFiles: Set<SourceFile
             ?.getNameNode();
 
           const pageComponent = importNode?.getText().replace(/RoutingModule$/, '');
-          const etName = path?.match(/Entity\/(\w+)\/\:id/)?.[1];
+          const etName = path?.match(/Entity\/(\w+)\/:id/)?.[1];
 
           if (!importNode || !pageComponent) {
             return;
@@ -227,7 +227,7 @@ function processStaticImports(
 
             let templateHtml: HTMLElement | undefined;
             if (template) {
-              templateHtml = parse(template.replaceAll(/[\[\]]/g, ''));
+              templateHtml = parse(template.replaceAll(/[[\]]/g, ''));
             }
 
             Object.entries(modules).forEach(([pkg, components]) => {

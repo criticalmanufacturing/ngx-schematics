@@ -18,7 +18,7 @@ function updateNgswConfig(options: { project: string }): Rule {
 
     const ngswConfigPath = join(normalize(project.root), 'ngsw-config.json');
     const ngswConfig = tree.readJson(ngswConfigPath) as JsonObject;
-    const assetsAssetGroup = ((ngswConfig as JsonObject)['assetGroups'] as JsonArray).find(
+    const assetsAssetGroup = ((ngswConfig)['assetGroups'] as JsonArray).find(
       (assetGroup) => (assetGroup as JsonObject)['name'] === 'assets'
     ) as JsonObject;
 

@@ -23,5 +23,8 @@ jobs:
       - name: Build packages
         run: npm run build
 
+      - name: Lint packages
+        run: npm run lint
+
       - name: Run schematics tests
         run: npm run test

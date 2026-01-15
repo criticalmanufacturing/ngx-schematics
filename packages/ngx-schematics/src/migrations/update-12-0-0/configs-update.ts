@@ -40,7 +40,7 @@ const LOCALIZE = ['@angular/localize/init'];
 const REFLECT = ['reflect-metadata'];
 
 export function updateAppSettings({ project }: { project: string }): Rule {
-  return async () => {
+  return () => {
     return chain([
       updateAppBuildTarget(project, [
         {

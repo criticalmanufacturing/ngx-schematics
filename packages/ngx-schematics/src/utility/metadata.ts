@@ -100,7 +100,9 @@ export function insertMetadata(
   }
 
   const allAccessors = metadataClass.getGetAccessors();
-  const accessor = allAccessors.find((accessor) => accessor.getName() === propertyIdentifier);
+  const accessor = allAccessors.find(
+    (accessor) => accessor.getName() === (propertyIdentifier as string)
+  );
 
   // add all required imports
   insertImports(source, {
@@ -297,7 +299,7 @@ export function updatePackageInfo(source: SourceFile, options: PackageInfo): voi
  * @param options Update options with the information to insert in the metadata
  */
 export function updateMetadata(project: ProjectDefinition, options: UpdateMetadataOptions): Rule {
-  return async (tree: Tree) => {
+  return (tree: Tree) => {
     const metadataPath = getMetadataFilePath(tree, project);
 
     if (!metadataPath) {
@@ -323,7 +325,7 @@ export function updateMetadata(project: ProjectDefinition, options: UpdateMetada
  * @returns
  */
 export function updateMetadataPackageInfo(project: ProjectDefinition, options: PackageInfo): Rule {
-  return async (tree: Tree) => {
+  return (tree: Tree) => {
     const metadataPath = getMetadataFilePath(tree, project);
 
     if (!metadataPath) {

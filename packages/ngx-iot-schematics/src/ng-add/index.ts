@@ -3,7 +3,6 @@ import {
   externalSchematic,
   noop,
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree
 } from '@angular-devkit/schematics';
@@ -62,7 +61,7 @@ function updatePackagejson(): Rule {
     const newProjectRoot = (workspace.extensions.newProjectRoot as string) ?? 'projects';
 
     packJson.modify(['scripts'], {
-      ...(packJson.get(['scripts']) ?? {}),
+      ...((packJson.get(['scripts']) as Record<string, string>) ?? {}),
       lint: 'npm run lint -ws',
       build: 'npm run build -ws'
     });
@@ -74,7 +73,7 @@ function updatePackagejson(): Rule {
  * Updates main.ts file adding the load config method
  */
 function installSchematics(options: Schema) {
-  return async (tree: Tree, _context: SchematicContext) => {
+  return (tree: Tree) => {
     if (!options.version) {
       throw new SchematicsException('Option "version" is required.');
     }
@@ -117,7 +116,7 @@ function installSchematics(options: Schema) {
 // You don't have to export the function as default. You can also have more than one rule factory
 // per file.
 export default function (_options: Schema): Rule {
-  return async (_: Tree, _context: SchematicContext) => {
+  return async () => {
     if (!_options.version) {
       const [appTags, pkgTags] = await Promise.all([
         listNpmReleaseTags(CORE_IOT_PACKAGE),

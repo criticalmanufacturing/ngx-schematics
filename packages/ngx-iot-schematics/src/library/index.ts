@@ -12,7 +12,7 @@ import {
   schematic,
   url
 } from '@angular-devkit/schematics';
-import { JsonArray, JsonObject, basename, join, normalize } from '@angular-devkit/core';
+import { JsonArray, JsonObject, JsonValue, basename, join, normalize } from '@angular-devkit/core';
 import { readWorkspace } from '@schematics/angular/utility';
 import { input } from '@inquirer/prompts';
 import { JSONFile, relativeToRoot, strings } from '@criticalmanufacturing/schematics-devkit';
@@ -32,7 +32,7 @@ function editVsCodeSettings(): Rule {
   return async (tree: Tree) => {
     const workspace = await readWorkspace(tree);
 
-    const root = workspace.extensions['newProjectRoot'] ?? 'projects';
+    const root = (workspace.extensions['newProjectRoot'] as string | undefined) ?? 'projects';
     const vscodeSettingsPath = join(normalize('.vscode'), 'settings.json');
     const fileExclude = `{
     "${root}/**/*.js": { "when": "$(basename).ts" },
@@ -52,7 +52,10 @@ function editVsCodeSettings(): Rule {
       return;
     }
 
-    new JSONFile(tree, vscodeSettingsPath).modify(['files.exclude'], JSON.parse(fileExclude));
+    new JSONFile(tree, vscodeSettingsPath).modify(
+      ['files.exclude'],
+      JSON.parse(fileExclude) as JsonValue
+    );
   };
 }
 
@@ -75,10 +78,10 @@ function updatePackagejson(options: { project: string; name: string }): Rule {
     }
 
     const rootPack = new JSONFile(tree, 'package.json');
-    const version = rootPack.get(['dependencies', 'cmf-core-connect-iot']);
+    const version = rootPack.get(['dependencies', 'cmf-core-connect-iot']) ?? '0.0.0';
 
     packJson.modify(['peerDependencies'], {
-      ...(packJson.get(['peerDependencies']) ?? {}),
+      ...((packJson.get(['peerDependencies']) as Record<string, string>) ?? {}),
       '@criticalmanufacturing/connect-iot-controller-engine': version,
       'cmf-core': version,
       'cmf-core-business-controls': version,
@@ -87,7 +90,7 @@ function updatePackagejson(options: { project: string; name: string }): Rule {
     });
 
     packJson.modify(['scripts'], {
-      ...(packJson.get(['scripts']) ?? {}),
+      ...((packJson.get(['scripts']) as Record<string, string>) ?? {}),
       build:
         'concurrently "npm run build:designer" "npm run build:runtime" "npm run build:tests" -r',
       'build:designer': 'ng build --configuration=development',

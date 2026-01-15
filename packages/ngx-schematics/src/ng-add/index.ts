@@ -3,7 +3,6 @@ import {
   externalSchematic,
   noop,
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree
 } from '@angular-devkit/schematics';
@@ -37,7 +36,7 @@ import { updateWebmanifest } from './rules/update-webmanifest.js';
  * Updates main.ts file adding the load config method
  */
 function installSchematics(options: Schema) {
-  return async (tree: Tree, _context: SchematicContext) => {
+  return async (tree: Tree) => {
     if (options.project) {
       const workspace = await readWorkspace(tree);
       const project = workspace.projects.get(options.project);
@@ -102,7 +101,7 @@ function installSchematics(options: Schema) {
 // You don't have to export the function as default. You can also have more than one rule factory
 // per file.
 export default function (_options: Schema): Rule {
-  return async (tree: Tree, _context: SchematicContext) => {
+  return async (tree: Tree) => {
     if (!_options.version) {
       const appPackage = _options.application === 'MES' ? MES_BASE_MODULE[0] : CORE_BASE_MODULE[0];
 

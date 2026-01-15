@@ -2,7 +2,7 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { parse } from 'jsonc-parser';
 import { getAllFilesFromDir } from '@criticalmanufacturing/schematics-devkit/testing';
 
-function getFileContent(tree: UnitTestTree, path: string) {
+function getFileContent(tree: UnitTestTree, path: string): any {
   const content = tree.readContent(path).toString();
   return parse(content, undefined, { allowTrailingComma: true });
 }
