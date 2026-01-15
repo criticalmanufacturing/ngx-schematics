@@ -42,5 +42,12 @@ export function updateServiceWorker(
 
   swPathNode.replaceWithText(`'ngsw-loader-worker.js'`);
 
-  return callExp;
+  const importsArray = callExp?.getParentIfKind(SyntaxKind.ArrayLiteralExpression);
+
+  // Fix formatting: if inside an imports array, remove double newlines after commas; otherwise, ensure there's a newline before the call expression
+  if (importsArray?.getParentIfKind(SyntaxKind.PropertyAssignment)?.getName() === 'imports') {
+    importsArray.replaceWithText(importsArray.getText().replace(/,\s*\n\s*\n/g, ',\n')); // Remove double newlines after commas)
+  } else {
+    callExp?.getPreviousSiblingIfKind(SyntaxKind.CommaToken)?.appendWhitespace('\n');
+  }
 }

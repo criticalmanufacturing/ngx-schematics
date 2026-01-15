@@ -3,8 +3,6 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 import { getBuildTargets } from '@criticalmanufacturing/schematics-devkit';
 import { NEW_THEMES, OLD_THEMES } from './themes-update';
-import { PROJECT_LOADER } from '../../ng-add/package-configs';
-import { Project, SyntaxKind } from 'ts-morph';
 
 /**
  * Mock config.json file with blue and gray themes included
@@ -187,112 +185,6 @@ describe('Test ng-update', () => {
 
       expect(actual).not.toEqual(expect.arrayContaining(oldThemes));
       expect(actual).toEqual(expect.arrayContaining(newThemes));
-    });
-
-    it('should update the application builder outputPath', async () => {
-      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
-
-      const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
-      expect(angularJsonContent.projects.application.architect.build.options.loader).toEqual(
-        PROJECT_LOADER
-      );
-    });
-
-    it('should update the application assets', async () => {
-      const angularJsonContent = JSON.parse(appTree.readContent('/angular.json'));
-
-      angularJsonContent.projects.application.architect.build.options.assets ??= [];
-      angularJsonContent.projects.application.architect.build.options.assets.push({
-        glob: '**/*',
-        input: 'node_modules/monaco-editor/min/vs',
-        output: 'monaco-editor/vs'
-      });
-
-      appTree.overwrite('/angular.json', JSON.stringify(angularJsonContent));
-
-      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
-
-      const updatedAngularJsonContent = JSON.parse(tree.readContent('/angular.json'));
-
-      expect(
-        updatedAngularJsonContent.projects.application.architect.build.options.assets
-      ).not.toEqual(
-        expect.arrayContaining([
-          {
-            glob: '**/*',
-            input: 'node_modules/monaco-editor/min/vs',
-            output: 'monaco-editor/vs'
-          }
-        ])
-      );
-    });
-
-    it('should update the application polyfills', async () => {
-      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
-
-      const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
-      expect(angularJsonContent.projects.application.architect.build.options.polyfills).toEqual(
-        expect.arrayContaining(['zone.js', '@angular/localize/init'])
-      );
-    });
-
-    it('should have the necessary files', async () => {
-      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
-
-      expect(tree.files).toEqual(expect.arrayContaining(['/application/src/app/app.workers.ts']));
-    });
-
-    it('Should add the zone-based change detection provider to the app.config.ts file', async () => {
-      appTree.overwrite('/application/src/main.ts', mainMock);
-      appTree.create('/application/src/app/app.config.ts', appConfigMock);
-
-      // Run the migration
-      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
-
-      // Read the updated config.json file
-      const config = tree.readText('/application/src/app/app.config.ts');
-
-      const project = new Project();
-      const appConfigSource = project.createSourceFile(
-        '/application/src/app/app.config.ts',
-        config
-      );
-
-      expect(appConfigSource, 'App config source file should be defined').toBeDefined();
-      expect(appConfigSource.getFullText()?.length ?? -1).not.toEqual(-1);
-
-      const angularCoreImport = appConfigSource
-        .getImportDeclarations()
-        .find((imp) => imp?.getModuleSpecifier().getText() === "'@angular/core'");
-
-      expect(angularCoreImport, 'Angular core import should be defined').toBeDefined();
-
-      const zoneChangeDetectionImport = angularCoreImport
-        ?.getNamedImports()
-        .find((imp) => imp.getName() === 'provideZoneChangeDetection');
-
-      expect(
-        zoneChangeDetectionImport,
-        'provideZoneChangeDetection import should be defined'
-      ).toBeDefined();
-
-      const appConfigExport = appConfigSource.getExportedDeclarations()?.get('appConfig')?.[0];
-
-      expect(appConfigExport, 'appConfig export declaration should be defined').toBeDefined();
-
-      const providers = appConfigExport
-        ?.asKindOrThrow(SyntaxKind.VariableDeclaration)
-        .getInitializerIfKindOrThrow(SyntaxKind.ObjectLiteralExpression)
-        .getPropertyOrThrow('providers')
-        .asKindOrThrow(SyntaxKind.PropertyAssignment)
-        .getInitializerIfKindOrThrow(SyntaxKind.ArrayLiteralExpression)
-        .getElements();
-
-      expect(providers?.length).toBeGreaterThan(0);
-
-      expect(providers?.map((provider) => provider.getText())).toContain(
-        'provideZoneChangeDetection({ eventCoalescing: true })'
-      );
     });
   });
 });

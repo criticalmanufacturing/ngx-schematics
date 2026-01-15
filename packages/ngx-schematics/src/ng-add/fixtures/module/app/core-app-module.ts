@@ -1,11 +1,10 @@
-import { NgModule, provideBrowserGlobalErrorListeners, isDevMode } from '@angular/core';
+import { NgModule, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { App } from './app';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { CoreUIModule } from 'cmf-core-ui';
 import { MetadataRoutingModule } from 'cmf-core';
-import './app.workers';
 
 @NgModule({
   declarations: [
@@ -24,6 +23,7 @@ import './app.workers';
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideZoneChangeDetection({ eventCoalescing: true }),
   ],
   bootstrap: [App]
 })
