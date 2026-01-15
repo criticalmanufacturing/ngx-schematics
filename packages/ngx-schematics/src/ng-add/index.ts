@@ -94,7 +94,6 @@ function installSchematics(options: Schema) {
         { path: ['compilerOptions', 'strictNullChecks'], value: false },
         { path: ['compilerOptions', 'preserveSymlinks'], value: true }
       ]),
-      // options.eslint ? updateESlintConfig() : noop(),
       installDependencies(dependencies)
     ]);
   };
