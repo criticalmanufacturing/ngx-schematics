@@ -4,7 +4,6 @@ import { migrate as migrateSuperExpressions } from '@criticalmanufacturing/schem
 import { migrate as migrateStandalone } from '@criticalmanufacturing/schematics-devkit/migrations/update-12-0-0-standalone';
 import { updateThemesInConfigFile } from './themes-update';
 import { updateAppSettings } from './configs-update';
-import { addWorkers } from '../../ng-add/rules/add-workers';
 
 export default function (): Rule {
   return async (tree: Tree) => {
@@ -18,8 +17,7 @@ export default function (): Rule {
       updateThemesInConfigFile({ project }),
       updateAppSettings({ project }),
       migrateSuperExpressions({ path: './' }),
-      migrateStandalone({ path: './' }),
-      addWorkers({ project })
+      migrateStandalone({ path: './' })
     ]);
   };
 }

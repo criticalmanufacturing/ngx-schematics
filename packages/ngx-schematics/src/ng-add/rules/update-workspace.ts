@@ -6,7 +6,6 @@ import {
   PROJECT_ALLOWED_COMMONJS_DEPENDENCIES,
   PROJECT_CORE_ASSETS,
   PROJECT_CORE_STYLES,
-  PROJECT_LOADER,
   PROJECT_MES_ASSETS,
   PROJECT_MES_STYLES,
   PROJECT_SCRIPTS
@@ -97,9 +96,7 @@ export function updateWorkspace(options: {
       // Add scripts
       { path: ['scripts'], value: PROJECT_SCRIPTS, operation: 'add' },
       // update output path
-      { path: ['outputPath'], value: { base: `dist/${options.project}`, browser: '' } },
-      // Add loader
-      { path: ['loader'], value: PROJECT_LOADER, operation: 'add' }
+      { path: ['outputPath'], value: { base: `dist/${options.project}`, browser: '' } }
     ]);
   };
 }

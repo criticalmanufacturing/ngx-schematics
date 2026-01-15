@@ -83,6 +83,11 @@ export const PROJECT_ASSETS = [
   ...SW_ASSETS,
   {
     glob: '**/*',
+    input: 'node_modules/monaco-editor/min/vs',
+    output: 'monaco-editor/vs'
+  },
+  {
+    glob: '**/*',
     input: 'node_modules/cmf-core-fablive/assets',
     output: 'assets/fablive'
   },
@@ -225,7 +230,3 @@ export const PROJECT_SCRIPTS = [
     input: 'node_modules/cmf.kendoui/js/jszip.min.js'
   }
 ];
-
-export const PROJECT_LOADER = {
-  '.ttf': 'file'
-};
