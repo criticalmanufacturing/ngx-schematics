@@ -4,6 +4,7 @@ import { CORE_BASE_MODULE, MES_BASE_MODULE, METADATA_ROUTING_MODULE } from '../p
 import { Schema } from '../schema.js';
 import { addSymbolToNgModuleMetadata, getAppModulePath } from '../../utility/ng-module.js';
 import { updateServiceWorker } from '../../migrations/update-1-2-0/update-service-worker.js';
+import { injectZoneDetectionOnAppModule } from '../../migrations/update-12-0-0/add-zone-change-detection.js';
 
 /**
  * Updates app module adding the desired package modules
@@ -25,6 +26,8 @@ export function updateAppModule(options: {
     if (!source) {
       return;
     }
+
+    injectZoneDetectionOnAppModule(source);
 
     if (options.application === 'MES') {
       addSymbolToNgModuleMetadata(source, 'imports', MES_BASE_MODULE[1], MES_BASE_MODULE[0]);

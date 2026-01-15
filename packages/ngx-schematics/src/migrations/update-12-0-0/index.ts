@@ -4,7 +4,10 @@ import { migrate as migrateSuperExpressions } from '@criticalmanufacturing/schem
 import { migrate as migrateStandalone } from '@criticalmanufacturing/schematics-devkit/migrations/update-12-0-0-standalone';
 import { updateThemesInConfigFile } from './themes-update';
 import { updateAppSettings } from './configs-update';
-import { addZoneChangeDetection } from './add-zone-change-detection';
+import {
+  addZoneChangeDetectionAppConfig,
+  addZoneChangeDetectionAppModule
+} from './add-zone-change-detection';
 
 export default function (): Rule {
   return async (tree: Tree) => {
@@ -19,7 +22,8 @@ export default function (): Rule {
       updateAppSettings({ project }),
       migrateSuperExpressions({ path: './' }),
       migrateStandalone({ path: './' }),
-      addZoneChangeDetection(project)
+      addZoneChangeDetectionAppConfig(project),
+      addZoneChangeDetectionAppModule(project)
     ]);
   };
 }

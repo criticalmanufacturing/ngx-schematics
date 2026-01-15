@@ -1,11 +1,13 @@
-import { ObjectLiteralExpression, SyntaxKind } from 'ts-morph';
+import { ObjectLiteralExpression, SourceFile, SyntaxKind } from 'ts-morph';
 import {
   addSymbolToArrayLiteral,
+  createSourceFile,
   getObjectProperty,
   insertImport
 } from '@criticalmanufacturing/schematics-devkit';
 import { Rule, Tree } from '@angular-devkit/schematics';
 import { getAppConfig } from '../../utility/app-config';
+import { addSymbolToNgModuleMetadata, getAppModulePath } from '../../utility/ng-module';
 
 /**
  * Injects Zone-based change detection into the provided app config object.
@@ -34,11 +36,24 @@ export function injectZoneDetectionOnAppConfig(appConfig: ObjectLiteralExpressio
 }
 
 /**
+ * Injects Zone-based change detection into the provided app module file.
+ * @param sourceFile The app module source file
+ */
+export function injectZoneDetectionOnAppModule(sourceFile: SourceFile) {
+  addSymbolToNgModuleMetadata(
+    sourceFile,
+    'providers',
+    'provideZoneChangeDetection({ eventCoalescing: true })',
+    '@angular/core'
+  );
+}
+
+/**
  * Schematics rule to add zone change detection to the app config file.
  * @param project The project name
  * @returns The schematics rule
  */
-export function addZoneChangeDetection(project: string): Rule {
+export function addZoneChangeDetectionAppConfig(project: string): Rule {
   return async (tree: Tree) => {
     const appConfig = await getAppConfig(tree, project);
 
@@ -49,6 +64,27 @@ export function addZoneChangeDetection(project: string): Rule {
     const sourceFile = appConfig?.getSourceFile();
 
     injectZoneDetectionOnAppConfig(appConfig);
+
+    sourceFile.formatText({ indentSize: 2 });
+    tree.overwrite(sourceFile.getFilePath(), sourceFile.getFullText());
+  };
+}
+
+export function addZoneChangeDetectionAppModule(project: string): Rule {
+  return async (tree: Tree) => {
+    const appModulePath = await getAppModulePath(tree, project);
+
+    if (!appModulePath) {
+      return;
+    }
+
+    const sourceFile = createSourceFile(tree, appModulePath);
+
+    if (!sourceFile) {
+      return;
+    }
+
+    injectZoneDetectionOnAppModule(sourceFile);
 
     sourceFile.formatText({ indentSize: 2 });
     tree.overwrite(sourceFile.getFilePath(), sourceFile.getFullText());

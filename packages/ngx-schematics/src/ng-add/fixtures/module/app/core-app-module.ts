@@ -1,4 +1,4 @@
-import { NgModule, provideBrowserGlobalErrorListeners, isDevMode } from '@angular/core';
+import { NgModule, provideBrowserGlobalErrorListeners, isDevMode, provideZoneChangeDetection } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { App } from './app';
@@ -23,6 +23,7 @@ import { MetadataRoutingModule } from 'cmf-core';
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideZoneChangeDetection({ eventCoalescing: true })
   ],
   bootstrap: [App]
 })
