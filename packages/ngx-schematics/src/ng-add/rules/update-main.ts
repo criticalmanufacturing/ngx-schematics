@@ -43,23 +43,12 @@ export function updateMain(options: { project: string }) {
     }
 
     const bootstrapStatement = bootstrapCall.getFirstAncestorByKind(SyntaxKind.ExpressionStatement);
-    const isModuleBootstrap = bootstrapCall.getExpression().getText().endsWith('bootstrapModule');
-    const bootstrapCallArgs = bootstrapCall.getArguments();
-
-    const moduleIdentifier = isModuleBootstrap
-      ? bootstrapCallArgs[0]?.asKind(SyntaxKind.Identifier)
-      : bootstrapCallArgs[1]?.asKind(SyntaxKind.Identifier);
+    const moduleIdentifier = bootstrapCall.getExpression().getText().endsWith('bootstrapModule')
+      ? bootstrapCall.getArguments()[0]?.asKind(SyntaxKind.Identifier)
+      : bootstrapCall.getArguments()[1]?.asKind(SyntaxKind.Identifier);
 
     if (!bootstrapStatement || !moduleIdentifier) {
       return;
-    }
-
-    if (isModuleBootstrap) {
-      bootstrapCallArgs[1].asKind(SyntaxKind.ObjectLiteralExpression)?.addPropertyAssignment({
-        name: 'ngZoneEventCoalescing',
-        initializer: 'true',
-        trailingTrivia: ','
-      });
     }
 
     // remove app module import declaration

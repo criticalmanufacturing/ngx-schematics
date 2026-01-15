@@ -29,38 +29,6 @@ const configJsonMock = (startupTheme = 'cmf.style.blue') => `\
 }
 `;
 
-const mainMock = `/// <reference types="@angular/localize" />
-
-import { bootstrapApplication } from '@angular/platform-browser';
-import { App } from './app/app';
-import { loadApplicationConfig } from 'cmf-core/init';
-
-loadApplicationConfig('assets/config.json').then(() => {
-  import(/* webpackMode: "eager" */ './app/app.config').then(({ appConfig }) => {
-    bootstrapApplication(App, appConfig)
-      .catch((err) => console.error(err));
-  });
-});
-`;
-
-const appConfigMock = `import { ApplicationConfig, provideBrowserGlobalErrorListeners, isDevMode } from '@angular/core';
-import { provideServiceWorker } from '@angular/service-worker';
-import { provideCoreUI } from 'cmf-core-ui';
-import { provideMetadataRouter } from 'cmf-core';
-
-export const appConfig: ApplicationConfig = {
-  providers: [
-    provideBrowserGlobalErrorListeners(),
-    provideServiceWorker('ngsw-loader-worker.js', {
-      enabled: !isDevMode(),
-      registrationStrategy: 'registerWhenStable:30000'
-    }),
-    provideCoreUI(),
-    provideMetadataRouter()
-  ]
-};
-`;
-
 describe('Test ng-update', () => {
   const migrationsSchematicRunner = new SchematicTestRunner(
     '@criticalmanufacturing/ngx-schematics',

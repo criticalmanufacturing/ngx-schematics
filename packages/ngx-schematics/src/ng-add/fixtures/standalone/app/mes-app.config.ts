@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, isDevMode, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, isDevMode } from '@angular/core';
 import { provideServiceWorker } from '@angular/service-worker';
 import { provideMesUI } from 'cmf-mes-ui';
 import { provideMetadataRouter } from 'cmf-core';
@@ -11,7 +11,6 @@ export const appConfig: ApplicationConfig = {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000'
     }),
-    provideZoneChangeDetection({ eventCoalescing: true }),
     provideMesUI(),
     provideMetadataRouter()
   ]

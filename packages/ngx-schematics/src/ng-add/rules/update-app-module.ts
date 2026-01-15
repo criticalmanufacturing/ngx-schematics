@@ -4,7 +4,6 @@ import { CORE_BASE_MODULE, MES_BASE_MODULE, METADATA_ROUTING_MODULE } from '../p
 import { Schema } from '../schema.js';
 import { addSymbolToNgModuleMetadata, getAppModulePath } from '../../utility/ng-module.js';
 import { updateServiceWorker } from '../../migrations/update-1-2-0/update-service-worker.js';
-import { SyntaxKind } from 'ts-morph';
 
 /**
  * Updates app module adding the desired package modules
@@ -40,15 +39,7 @@ export function updateAppModule(options: {
       METADATA_ROUTING_MODULE[0]
     );
 
-    const serviceWorkerCallExpression = updateServiceWorker(source);
-
-    const importsArray = serviceWorkerCallExpression?.getParentIfKind(
-      SyntaxKind.ArrayLiteralExpression
-    );
-
-    if (importsArray?.getParentIfKind(SyntaxKind.PropertyAssignment)?.getName() === 'imports') {
-      importsArray.replaceWithText(importsArray.getText().replace(/,\s*\n\s*\n/g, ',\n')); // Remove double newlines after commas)
-    }
+    updateServiceWorker(source);
 
     source.formatText({ indentSize: 2 });
     tree.overwrite(source.getFilePath(), source.getFullText());

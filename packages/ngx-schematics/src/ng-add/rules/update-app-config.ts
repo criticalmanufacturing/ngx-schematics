@@ -16,7 +16,6 @@ import {
 } from '../package-configs.js';
 import { getAppConfig } from '../../utility/app-config.js';
 import { updateServiceWorker } from '../../migrations/update-1-2-0/update-service-worker.js';
-import { injectZoneDetectionOnAppConfig } from '../../migrations/update-12-0-0/add-zone-change-detection.js';
 
 /**
  * Updates the application config providers base on the provided application type
@@ -39,8 +38,6 @@ export function updateAppConfig(options: {
     if (!arrLiteral) {
       return;
     }
-
-    injectZoneDetectionOnAppConfig(appConfig);
 
     if (options.application === 'MES') {
       addSymbolToArrayLiteral(arrLiteral, '\n' + MES_BASE_PROVIDE[1]);
@@ -78,9 +75,7 @@ export function updateAppConfig(options: {
       tree.delete(routesFile);
     }
 
-    updateServiceWorker(arrLiteral)
-      ?.getPreviousSiblingIfKind(SyntaxKind.CommaToken)
-      ?.appendWhitespace('\n');
+    updateServiceWorker(arrLiteral);
 
     arrLiteral.getSourceFile().formatText({ indentSize: 2 });
     tree.overwrite(
