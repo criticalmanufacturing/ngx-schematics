@@ -23,7 +23,7 @@ import { MetadataRoutingModule } from 'cmf-core';
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideZoneChangeDetection(),
   ],
   bootstrap: [App]
 })

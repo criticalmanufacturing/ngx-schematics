@@ -16,6 +16,7 @@ import {
 } from '../package-configs.js';
 import { getAppConfig } from '../../utility/app-config.js';
 import { updateServiceWorker } from '../../migrations/update-1-2-0/update-service-worker.js';
+import { removeZoneEventCoalescing } from './remove-zone-event-coalescing.js';
 
 /**
  * Updates the application config providers base on the provided application type
@@ -76,6 +77,8 @@ export function updateAppConfig(options: {
     }
 
     updateServiceWorker(arrLiteral);
+
+    removeZoneEventCoalescing(appConfig.getSourceFile());
 
     arrLiteral.getSourceFile().formatText({ indentSize: 2 });
     tree.overwrite(
