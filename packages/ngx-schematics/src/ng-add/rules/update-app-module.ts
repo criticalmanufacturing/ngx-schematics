@@ -4,6 +4,7 @@ import { CORE_BASE_MODULE, MES_BASE_MODULE, METADATA_ROUTING_MODULE } from '../p
 import { Schema } from '../schema.js';
 import { addSymbolToNgModuleMetadata, getAppModulePath } from '../../utility/ng-module.js';
 import { updateServiceWorker } from '../../migrations/update-1-2-0/update-service-worker.js';
+import { removeZoneEventCoalescing } from './remove-zone-event-coalescing.js';
 
 /**
  * Updates app module adding the desired package modules
@@ -40,6 +41,8 @@ export function updateAppModule(options: {
     );
 
     updateServiceWorker(source);
+
+    removeZoneEventCoalescing(source);
 
     source.formatText({ indentSize: 2 });
     tree.overwrite(source.getFilePath(), source.getFullText());
