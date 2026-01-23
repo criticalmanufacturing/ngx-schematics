@@ -2,6 +2,7 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChang
 import { provideServiceWorker } from '@angular/service-worker';
 import { provideMesUI } from 'cmf-mes-ui';
 import { provideMetadataRouter } from 'cmf-core';
+import './app.workers';
 
 export const appConfig: ApplicationConfig = {
   providers: [

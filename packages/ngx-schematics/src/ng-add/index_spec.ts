@@ -73,6 +73,7 @@ describe('Test ng-add', () => {
           '/application/src/app/app.ts',
           '/application/src/app/app.css',
           '/application/src/app/app.html',
+          '/application/src/app/app.workers.ts',
           '/application/src/assets/config.json',
           '/application/src/manifest.webmanifest'
         ])
@@ -201,6 +202,7 @@ describe('Test ng-add', () => {
           '/application/src/app/app.ts',
           '/application/src/app/app.css',
           '/application/src/app/app.html',
+          '/application/src/app/app.workers.ts',
           '/application/src/assets/config.json',
           '/application/src/manifest.webmanifest'
         ])
@@ -238,6 +240,19 @@ describe('Test ng-add', () => {
 
         const actual = tree.readContent('/application/src/app/app.ts');
         const expected = readFileSync(`${fixturesPath}/standalone/app/app.ts`, {
+          encoding: 'utf-8'
+        });
+
+        expect(normalize(actual)).toEqual(normalize(expected));
+      });
+    });
+
+    describe('- Generate workers.ts', () => {
+      it('should have the updated workers.ts', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const actual = tree.readContent('/application/src/app/app.workers.ts');
+        const expected = readFileSync(`${fixturesPath}/standalone/app/app.workers.ts`, {
           encoding: 'utf-8'
         });
 
@@ -318,6 +333,15 @@ describe('Test ng-add', () => {
         expect(
           angularJsonContent.projects.application.architect.lint.options.lintFilePatterns
         ).toEqual(expect.arrayContaining(['application/**/*.ts', 'application/**/*.html']));
+      });
+
+      it('should update the application builder loader', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
+        expect(angularJsonContent.projects.application.architect.build.options.loader).toEqual({
+          '.css': 'empty'
+        });
       });
     });
 

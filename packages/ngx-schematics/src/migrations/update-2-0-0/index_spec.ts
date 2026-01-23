@@ -19,7 +19,8 @@ describe('Test ng-update', () => {
     routing: false,
     skipTests: false,
     skipPackageJson: false,
-    standalone: false
+    standalone: false,
+    zoneless: false
   };
 
   let appTree: UnitTestTree;
