@@ -236,6 +236,8 @@ export const PROJECT_SCRIPTS = [
   'node_modules/cmf.kendoui/js/kendo.slider.min.js',
   'node_modules/cmf.kendoui/js/kendo.button.min.js',
   'node_modules/cmf.kendoui/js/kendo.colorpicker.min.js',
+  "node_modules/cmf.kendoui/js/kendo.numerictextbox.min.js",
+  "node_modules/cmf.kendoui/js/kendo.tabstrip.min.js",
   'node_modules/cmf.kendoui/js/kendo.editor.min.js',
   'node_modules/cmf.kendoui/js/kendo.columnsorter.min.js',
   'node_modules/cmf.kendoui/js/kendo.resizable.min.js',
