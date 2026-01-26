@@ -3,6 +3,7 @@ import {
   updateAppBuildTarget,
   updateTsConfig
 } from '@criticalmanufacturing/schematics-devkit/rules';
+import { PROJECT_LOADER } from '../../ng-add/package-configs';
 
 const JQUERY_UI_SCRIPTS = [
   'node_modules/jquery-ui/ui/version.js',
@@ -35,6 +36,14 @@ const FLAGS = [
   }
 ];
 
+const MONACO_SCRIPTS = [
+  {
+    glob: '**/*',
+    input: 'node_modules/monaco-editor/min/vs',
+    output: 'monaco-editor/vs'
+  }
+];
+
 const LOCALIZE = ['@angular/localize/init'];
 
 const REFLECT = ['reflect-metadata'];
@@ -50,11 +59,12 @@ export function updateAppSettings({ project }: { project: string }): Rule {
         },
         {
           path: ['assets'],
-          value: [...JQUERY_UI_ASSETS, ...FLAGS],
+          value: [...JQUERY_UI_ASSETS, ...FLAGS, ...MONACO_SCRIPTS],
           operation: 'remove'
         },
         { path: ['polyfills'], value: LOCALIZE, operation: 'add' },
-        { path: ['polyfills'], value: REFLECT, operation: 'remove' }
+        { path: ['polyfills'], value: REFLECT, operation: 'remove' },
+        { path: ['loader'], value: PROJECT_LOADER, operation: 'add' }
       ]),
       updateTsConfig([{ path: ['compilerOptions', 'skipLibCheck'], value: true }], project)
     ]);
