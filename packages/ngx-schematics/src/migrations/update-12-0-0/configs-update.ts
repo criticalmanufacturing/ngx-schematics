@@ -48,6 +48,11 @@ const LOCALIZE = ['@angular/localize/init'];
 
 const REFLECT = ['reflect-metadata'];
 
+export const KENDO_SCRIPTS = [
+  'node_modules/cmf.kendoui/js/kendo.numerictextbox.min.js',
+  'node_modules/cmf.kendoui/js/kendo.tabstrip.min.js'
+];
+
 export function updateAppSettings({ project }: { project: string }): Rule {
   return () => {
     return chain([
@@ -64,7 +69,12 @@ export function updateAppSettings({ project }: { project: string }): Rule {
         },
         { path: ['polyfills'], value: LOCALIZE, operation: 'add' },
         { path: ['polyfills'], value: REFLECT, operation: 'remove' },
-        { path: ['loader'], value: PROJECT_LOADER, operation: 'add' }
+        { path: ['loader'], value: PROJECT_LOADER, operation: 'add' },
+        {
+          path: ['scripts'],
+          value: [...KENDO_SCRIPTS],
+          operation: 'add'
+        }
       ]),
       updateTsConfig([{ path: ['compilerOptions', 'skipLibCheck'], value: true }], project)
     ]);
