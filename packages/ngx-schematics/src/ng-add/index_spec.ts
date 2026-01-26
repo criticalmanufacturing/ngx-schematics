@@ -2,6 +2,7 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { normalize } from '@criticalmanufacturing/schematics-devkit/testing';
 import { parse } from 'jsonc-parser';
 import { readFileSync } from 'node:fs';
+import { PROJECT_LOADER } from './package-configs';
 
 describe('Test ng-add', () => {
   const schematicRunner = new SchematicTestRunner(
@@ -339,9 +340,9 @@ describe('Test ng-add', () => {
         const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
 
         const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
-        expect(angularJsonContent.projects.application.architect.build.options.loader).toEqual({
-          '.css': 'empty'
-        });
+        expect(angularJsonContent.projects.application.architect.build.options.loader).toEqual(
+          PROJECT_LOADER
+        );
       });
     });
 
