@@ -4,6 +4,7 @@ import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 import { getBuildTargets } from '@criticalmanufacturing/schematics-devkit';
 import { NEW_THEMES, OLD_THEMES } from './themes-update';
 import { PROJECT_LOADER } from '../../ng-add/package-configs';
+import { KENDO_SCRIPTS } from './configs-update';
 
 /**
  * Mock config.json file with blue and gray themes included
@@ -208,6 +209,15 @@ describe('Test ng-update', () => {
       const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
 
       expect(tree.files).toEqual(expect.arrayContaining(['/application/src/app/app.workers.ts']));
+    });
+
+    it('should update the application scripts', async () => {
+      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+
+      const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
+      expect(angularJsonContent.projects.application.architect.build.options.scripts).toEqual(
+        expect.arrayContaining(KENDO_SCRIPTS)
+      );
     });
   });
 });
