@@ -48,9 +48,7 @@ export function installNpmPackages(
 
   return new Promise<void>((resolve, reject) => {
     const spinner = ora({
-      text: `Installing packages (${taskPackageManagerName})...`,
-      // Workaround for https://github.com/sindresorhus/ora/issues/136.
-      discardStdin: process.platform !== 'win32'
+      text: `Installing packages (${taskPackageManagerName})...`
     }).start();
     const childProcess = spawn(taskPackageManagerName, args, spawnOptions).on(
       'close',

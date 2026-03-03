@@ -3,6 +3,7 @@ import { normalize } from '@criticalmanufacturing/schematics-devkit/testing';
 import { parse } from 'jsonc-parser';
 import { readFileSync } from 'node:fs';
 import { PROJECT_LOADER } from './package-configs';
+import '../testing/child_process-exec.mock';
 
 describe('Test ng-add', () => {
   const schematicRunner = new SchematicTestRunner(
@@ -423,6 +424,26 @@ describe('Test ng-add', () => {
         });
 
         expect(normalize(actual)).toEqual(normalize(expected));
+      });
+    });
+
+    describe('- Generate i18n-extract configuration', () => {
+      it('should update the i18n-extract configuration', async () => {
+        const ngAddMesOptions = {
+          ...ngAddOptions,
+          application: 'MES'
+        };
+
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddMesOptions, appTree);
+
+        const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
+        const i18nExtractConfig =
+          angularJsonContent.projects.application.architect.build.configurations['i18n-extract'];
+
+        expect(i18nExtractConfig).toBeDefined();
+        expect(i18nExtractConfig.externalDependencies).toEqual(
+          expect.arrayContaining(['cmf-core', 'cmf-mes'])
+        );
       });
     });
   });

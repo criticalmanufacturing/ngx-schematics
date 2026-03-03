@@ -1,5 +1,6 @@
 import { chain, Rule, Tree } from '@angular-devkit/schematics';
 import { getDefaultApplicationProject } from '@criticalmanufacturing/schematics-devkit';
+import { updateI18nExtract } from '@criticalmanufacturing/schematics-devkit/rules';
 import { migrate as migrateSuperExpressions } from '@criticalmanufacturing/schematics-devkit/migrations/update-12-0-0-super';
 import { migrate as migrateStandalone } from '@criticalmanufacturing/schematics-devkit/migrations/update-12-0-0-standalone';
 import { updateThemesInConfigFile } from './themes-update';
@@ -19,7 +20,8 @@ export default function (): Rule {
       updateAppSettings({ project }),
       migrateSuperExpressions({ path: './' }),
       migrateStandalone({ path: './' }),
-      addWorkers({ project })
+      addWorkers({ project }),
+      updateI18nExtract({ project, version: '12' })
     ]);
   };
 }

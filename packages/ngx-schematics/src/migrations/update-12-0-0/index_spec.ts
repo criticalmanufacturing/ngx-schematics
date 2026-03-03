@@ -5,6 +5,7 @@ import { getBuildTargets } from '@criticalmanufacturing/schematics-devkit';
 import { NEW_THEMES, OLD_THEMES } from './themes-update';
 import { PROJECT_LOADER } from '../../ng-add/package-configs';
 import { KENDO_SCRIPTS } from './configs-update';
+import '../../testing/child_process-exec.mock';
 
 /**
  * Mock config.json file with blue and gray themes included

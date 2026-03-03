@@ -6,6 +6,8 @@
 # Ignore Test Files
 *_spec.js
 *_spec.d.ts
+*.mock.js
+*.mock.d.ts
 
 # Ignore Config Files
 tsconfig.json
