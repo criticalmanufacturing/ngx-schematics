@@ -22,7 +22,8 @@ import {
   getInstalledDependency,
   installDependencies,
   updateTsConfig,
-  installNpmPackages
+  installNpmPackages,
+  updateI18nExtract
 } from '@criticalmanufacturing/schematics-devkit/rules';
 
 import { version as pkgVersion, name as pkgName } from '../../package.json';
@@ -58,6 +59,8 @@ function installSchematics(options: Schema) {
       if (project.targets.size === 0) {
         throw new SchematicsException(`Targets are not defined for this project.`);
       }
+    } else {
+      throw new SchematicsException(`Project option is required.`);
     }
 
     if (!options.version) {
@@ -81,17 +84,24 @@ function installSchematics(options: Schema) {
     return chain([
       ...(options.project
         ? [
-            addConfigJson(options as Required<Schema>),
-            updateIndexFiles(options as Required<Schema>),
+            addConfigJson({ project: options.project }),
+            updateIndexFiles({ project: options.project }),
             updateBootstrapComponent({ project: options.project }),
             updateAppModule({ project: options.project, application: options.application }),
             updateAppConfig({ project: options.project, application: options.application }),
             updateMain({ project: options.project })
           ]
         : [noop()]),
-      updateNgswConfig(options as Required<Schema>),
+      updateNgswConfig({ project: options.project }),
       updateWorkspace(options),
       installDependencies(dependencies),
+      'skipI18nExtract' in options && options.skipI18nExtract
+        ? noop()
+        : updateI18nExtract({
+            project: options.project,
+            version: options.version,
+            application: options.application
+          }),
       updateTsConfig([
         [['compilerOptions', 'strictFunctionTypes'], false],
         [['compilerOptions', 'noImplicitAny'], false],
