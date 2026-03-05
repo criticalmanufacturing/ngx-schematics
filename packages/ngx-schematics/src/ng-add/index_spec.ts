@@ -16,7 +16,8 @@ describe('Test ng-add', () => {
   const ngAddOptions = {
     project: 'application',
     application: 'Core',
-    version: 'dev'
+    version: 'dev',
+    skipI18nExtract: true
   };
 
   let appTree: UnitTestTree;
