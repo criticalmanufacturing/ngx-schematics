@@ -442,7 +442,7 @@ describe('Test ng-add', () => {
 
         expect(i18nExtractConfig).toBeDefined();
         expect(i18nExtractConfig.externalDependencies).toEqual(
-          expect.arrayContaining(['cmf-core', 'cmf-mes'])
+          expect.arrayContaining(['cmf-core', 'cmf-core-ui', 'cmf-mes', 'cmf-mes-ui'])
         );
       });
     });
