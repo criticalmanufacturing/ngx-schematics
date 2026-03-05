@@ -36,6 +36,8 @@ export function removeDirectory(sourcePath: string): Rule {
  */
 export function removeFile(sourcePath: string): Rule {
   return (tree: Tree) => {
-    tree.delete(sourcePath);
+    if (tree.exists(sourcePath)) {
+      tree.delete(sourcePath);
+    }
   };
 }
