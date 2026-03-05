@@ -66,9 +66,15 @@ export function updateI18nExtract(options: {
       options.application = 'cmf-mes-ui' in deps ? 'MES' : 'Core';
     }
 
-    const uiDepsPromise = [fetchPkgDependencies('cmf-core-ui', options.version)];
+    const uiDepsPromise = [
+      fetchPkgDependencies('cmf-core-ui', options.version),
+      Promise.resolve(['cmf-core-ui'])
+    ];
     if (options.application === 'MES') {
-      uiDepsPromise.push(fetchPkgDependencies('cmf-mes-ui', options.version));
+      uiDepsPromise.push(
+        fetchPkgDependencies('cmf-mes-ui', options.version),
+        Promise.resolve(['cmf-mes-ui'])
+      );
     }
 
     const uiDeps = (await Promise.all(uiDepsPromise))
