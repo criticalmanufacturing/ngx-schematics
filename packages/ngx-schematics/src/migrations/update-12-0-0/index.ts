@@ -3,6 +3,7 @@ import { getDefaultApplicationProject } from '@criticalmanufacturing/schematics-
 import { updateI18nExtract } from '@criticalmanufacturing/schematics-devkit/rules';
 import { migrate as migrateSuperExpressions } from '@criticalmanufacturing/schematics-devkit/migrations/update-12-0-0-super';
 import { migrate as migrateStandalone } from '@criticalmanufacturing/schematics-devkit/migrations/update-12-0-0-standalone';
+import { migrate as migrateLboCall } from '@criticalmanufacturing/schematics-devkit/migrations/update-12-0-0-lbo-call';
 import { updateThemesInConfigFile } from './themes-update';
 import { updateAppSettings } from './configs-update';
 import { addWorkers } from '../../ng-add/rules/add-workers';
@@ -20,6 +21,7 @@ export default function (): Rule {
       updateAppSettings({ project }),
       migrateSuperExpressions({ path: './' }),
       migrateStandalone({ path: './' }),
+      migrateLboCall({ path: './' }),
       addWorkers({ project }),
       updateI18nExtract({ project, version: '12' })
     ]);
