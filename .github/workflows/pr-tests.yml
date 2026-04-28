@@ -6,7 +6,7 @@ on:
 jobs:
   test:
     name: Run Tests
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-set
 
     steps:
       - name: Checkout code
