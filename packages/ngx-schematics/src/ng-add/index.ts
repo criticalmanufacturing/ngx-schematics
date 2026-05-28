@@ -92,7 +92,11 @@ function installSchematics(options: Schema) {
       updateNgswConfig({ project: options.project }),
       updateWebmanifest({ project: options.project }),
       updateWorkspace(options),
-      updateI18nExtract({ project: options.project, version: options.version, application: options.application }),
+      updateI18nExtract({
+        project: options.project,
+        version: options.version,
+        application: options.application
+      }),
       updateTsConfig([
         { path: ['compilerOptions', 'strictFunctionTypes'], value: false },
         { path: ['compilerOptions', 'noImplicitAny'], value: false },

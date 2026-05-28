@@ -27,21 +27,17 @@ function updateRecord(
 
   if (currValue != null && isJsonArray(currValue) && isJsonArray(value)) {
     if (operation === 'add') {
-      addToJsonArray(currValue, value);
-      return;
+      value = addToJsonArray([...currValue], value);
     } else if (operation === 'remove') {
-      removeFromJsonArray(currValue, value);
-      return;
+      value = removeFromJsonArray([...currValue], value);
     }
   }
 
   if (currValue != null && isJsonObject(currValue) && isJsonObject(value)) {
     if (operation === 'add') {
-      addToJsonObject(currValue, value);
-      return;
+      value = addToJsonObject({ ...currValue }, value);
     } else if (operation === 'remove') {
-      removeFromJsonObject(currValue, value);
-      return;
+      value = removeFromJsonObject({ ...currValue }, value);
     }
   }
 

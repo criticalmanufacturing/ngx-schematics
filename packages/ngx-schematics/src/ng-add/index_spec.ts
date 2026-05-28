@@ -2,7 +2,7 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { normalize } from '@criticalmanufacturing/schematics-devkit/testing';
 import { parse } from 'jsonc-parser';
 import { readFileSync } from 'node:fs';
-import { PROJECT_LOADER } from './package-configs';
+import { KENDO_STYLES, PROJECT_LOADER, V12_ASSETS } from './package-configs';
 import '../testing/child_process-exec.mock';
 
 describe('Test ng-add', () => {
@@ -322,6 +322,38 @@ describe('Test ng-add', () => {
         expect(angularJsonContent.cli.schematicCollections).toContain(
           '@criticalmanufacturing/ngx-schematics'
         );
+      });
+
+      it('should have kendo ui styles', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
+        const styles = angularJsonContent.projects.application.architect.build.options.styles;
+
+        expect(styles).toEqual(expect.arrayContaining(KENDO_STYLES));
+      });
+
+      it('should have cmf-core-iot and zxing-wasm assets', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
+        const assets = angularJsonContent.projects.application.architect.build.options.assets;
+
+        expect(assets).toEqual(expect.arrayContaining(V12_ASSETS));
+      });
+
+      it('should not have @criticalmanufacturing/connect-iot styles', async () => {
+        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+        const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
+        const styles: string[] =
+          angularJsonContent.projects.application.architect.build.options.styles;
+
+        const connectIotStyles = styles.filter(
+          (s) => typeof s === 'string' && s.includes('@criticalmanufacturing/connect-iot')
+        );
+
+        expect(connectIotStyles).toEqual([]);
       });
 
       it('should have lint architect', async () => {

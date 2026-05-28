@@ -61,6 +61,22 @@ export const PROJECT_ALLOWED_COMMONJS_DEPENDENCIES = [
 ];
 
 /**
+ * Project Assets for v12 update
+ */
+export const V12_ASSETS = [
+  {
+    glob: '**/*',
+    input: 'node_modules/cmf-core-iot/assets',
+    output: 'assets/iot'
+  },
+  {
+    glob: '**/*.wasm',
+    input: 'node_modules/zxing-wasm/dist/reader',
+    output: 'zxing-wasm/reader'
+  }
+];
+
+/**
  * Project Assets
  */
 export const PROJECT_ASSETS = [
@@ -105,7 +121,8 @@ export const PROJECT_ASSETS = [
     glob: 'index.d.ts',
     input: 'node_modules/cmf-lbos',
     output: 'assets/@types/cmf-lbos'
-  }
+  },
+  ...V12_ASSETS
 ];
 
 /**
@@ -126,20 +143,19 @@ export const PROJECT_MES_ASSETS = [
 ];
 
 /**
+ * KENDO UI Styles
+ */
+export const KENDO_STYLES = ['node_modules/cmf-core/assets/style/vendor/kendo-ui.scss'];
+
+/**
  * Generic Project Styles
  */
 const GENERIC_STYLES = [
   'node_modules/toastr/toastr.less',
   'node_modules/bootstrap/dist/css/bootstrap.css',
-  'node_modules/cmf.kendoui/styles/kendo.common.min.css',
+  ...KENDO_STYLES,
   'node_modules/cmf-core-connect-iot/assets/fonts/coreconnectiot/icon-core-connect-iot-font.less',
-  'node_modules/cmf-core-iotevents/assets/fonts/coreiotevents/icon-core-iot-events-font.less',
-  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-core-tasks/assets/font/icon-core-tasks-connect-iot-font.less',
-  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-filedrivers-tasks/assets/font/icon-filesbased-iot-font.less',
-  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-oib-tasks/assets/font/icon-oib-tasks-connect-iot-font.less',
-  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-secsgem-tasks/assets/font/icon-secsgem-iot-font.less',
-  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-factoryautomation-tasks/assets/font/icon-factoryautomation-tasks-connect-iot-font.less',
-  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-opcua-tasks/assets/font/icon-opcua-tasks-connect-iot-font.less'
+  'node_modules/cmf-core-iotevents/assets/fonts/coreiotevents/icon-core-iot-events-font.less'
 ];
 
 /**
@@ -162,7 +178,6 @@ export const PROJECT_MES_STYLES = [
   ...GENERIC_STYLES,
   'node_modules/cmf-mes-kpi/assets/fonts/meskpi/icon-mes-kpi-font.less',
   'node_modules/cmf-mes/assets/style/styles.less',
-  'node_modules/@criticalmanufacturing/connect-iot-controller-engine-mes-tasks/assets/font/icon-mes-connect-iot-font.less',
   ...THEMES.map((theme) => ({
     inject: false,
     bundleName: theme,
@@ -178,54 +193,7 @@ export const PROJECT_SCRIPTS = [
   'node_modules/toastr/toastr.js',
   'node_modules/bootstrap/js/collapse.js',
   'node_modules/bootstrap/js/transition.js',
-  'node_modules/bootstrap/js/dropdown.js',
-  'node_modules/cmf.kendoui/js/kendo.core.min.js',
-  'node_modules/cmf.kendoui/js/kendo.fx.min.js',
-  'node_modules/cmf.kendoui/js/kendo.ooxml.min.js',
-  'node_modules/cmf.kendoui/js/kendo.excel.min.js',
-  'node_modules/cmf.kendoui/js/kendo.data.odata.min.js',
-  'node_modules/cmf.kendoui/js/kendo.data.xml.min.js',
-  'node_modules/cmf.kendoui/js/kendo.data.min.js',
-  'node_modules/cmf.kendoui/js/kendo.popup.min.js',
-  'node_modules/cmf.kendoui/js/kendo.menu.min.js',
-  'node_modules/cmf.kendoui/js/kendo.userevents.min.js',
-  'node_modules/cmf.kendoui/js/kendo.draganddrop.min.js',
-  'node_modules/cmf.kendoui/js/kendo.floatinglabel.min.js',
-  'node_modules/cmf.kendoui/js/kendo.maskedtextbox.min.js',
-  'node_modules/cmf.kendoui/js/kendo.list.min.js',
-  'node_modules/cmf.kendoui/js/kendo.mobile.scroller.min.js',
-  'node_modules/cmf.kendoui/js/kendo.virtuallist.min.js',
-  'node_modules/cmf.kendoui/js/kendo.dropdownlist.min.js',
-  'node_modules/cmf.kendoui/js/kendo.combobox.min.js',
-  'node_modules/cmf.kendoui/js/kendo.autocomplete.min.js',
-  'node_modules/cmf.kendoui/js/kendo.window.min.js',
-  'node_modules/cmf.kendoui/js/kendo.color.min.js',
-  'node_modules/cmf.kendoui/js/kendo.slider.min.js',
-  'node_modules/cmf.kendoui/js/kendo.button.min.js',
-  'node_modules/cmf.kendoui/js/kendo.colorpicker.min.js',
-  "node_modules/cmf.kendoui/js/kendo.numerictextbox.min.js",
-  "node_modules/cmf.kendoui/js/kendo.tabstrip.min.js",
-  'node_modules/cmf.kendoui/js/kendo.editor.min.js',
-  'node_modules/cmf.kendoui/js/kendo.columnsorter.min.js',
-  'node_modules/cmf.kendoui/js/kendo.resizable.min.js',
-  'node_modules/cmf.kendoui/js/kendo.selectable.min.js',
-  'node_modules/cmf.kendoui/js/kendo.pager.min.js',
-  'node_modules/cmf.kendoui/js/kendo.grid.min.js',
-  'node_modules/cmf.kendoui/js/kendo.splitter.min.js',
-  'node_modules/cmf.kendoui/js/kendo.tooltip.min.js',
-  'node_modules/cmf.kendoui/js/kendo.drawing.min.js',
-  'node_modules/cmf.kendoui/js/kendo.dataviz.core.min.js',
-  'node_modules/cmf.kendoui/js/kendo.dataviz.chart.min.js',
-  'node_modules/cmf.kendoui/js/kendo.dataviz.themes.min.js',
-  'node_modules/cmf.kendoui/js/kendo.dataviz.treemap.min.js',
-  'node_modules/cmf.kendoui/js/kendo.calendar.min.js',
-  'node_modules/cmf.kendoui/js/kendo.multiviewcalendar.min.js',
-  'node_modules/cmf.kendoui/js/kendo.pdf.min.js',
-  {
-    bundleName: 'jszip',
-    inject: false,
-    input: 'node_modules/cmf.kendoui/js/jszip.min.js'
-  }
+  'node_modules/bootstrap/js/dropdown.js'
 ];
 
 export const PROJECT_LOADER = {

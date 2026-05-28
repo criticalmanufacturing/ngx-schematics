@@ -1,6 +1,10 @@
 import { Rule, Tree } from '@angular-devkit/schematics';
 import { createSourceFile } from '@criticalmanufacturing/schematics-devkit';
-import { CORE_BASE_MODULE, MES_BASE_MODULE, METADATA_ROUTING_MODULE } from '../package-configs.js';
+import {
+  CORE_BASE_PROVIDE,
+  MES_BASE_PROVIDE,
+  METADATA_ROUTING_PROVIDE
+} from '../package-configs.js';
 import { Schema } from '../schema.js';
 import { addSymbolToNgModuleMetadata, getAppModulePath } from '../../utility/ng-module.js';
 import { updateServiceWorker } from '../../migrations/update-1-2-0/update-service-worker.js';
@@ -28,16 +32,16 @@ export function updateAppModule(options: {
     }
 
     if (options.application === 'MES') {
-      addSymbolToNgModuleMetadata(source, 'imports', MES_BASE_MODULE[1], MES_BASE_MODULE[0]);
+      addSymbolToNgModuleMetadata(source, 'providers', MES_BASE_PROVIDE[1], MES_BASE_PROVIDE[0]);
     } else {
-      addSymbolToNgModuleMetadata(source, 'imports', CORE_BASE_MODULE[1], CORE_BASE_MODULE[0]);
+      addSymbolToNgModuleMetadata(source, 'providers', CORE_BASE_PROVIDE[1], CORE_BASE_PROVIDE[0]);
     }
 
     addSymbolToNgModuleMetadata(
       source,
-      'imports',
-      METADATA_ROUTING_MODULE[1],
-      METADATA_ROUTING_MODULE[0]
+      'providers',
+      METADATA_ROUTING_PROVIDE[1],
+      METADATA_ROUTING_PROVIDE[0]
     );
 
     updateServiceWorker(source);

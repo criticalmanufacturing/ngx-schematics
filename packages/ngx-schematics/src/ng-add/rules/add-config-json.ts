@@ -27,7 +27,7 @@ export function addConfigJson(options: { project: string }): Rule {
 
     const templateSource = apply(url(join(normalize(__dirname), '../files/assets')), [
       applyTemplates({
-        root: relative(join(normalize('/'), sourcePath), normalize('/')),
+        root: relative(join(normalize('/'), sourcePath, 'assets'), normalize('/')),
         startupCulture: 'en-US',
         startupTheme: 'cmf.style.light',
         supportedCultures: `[

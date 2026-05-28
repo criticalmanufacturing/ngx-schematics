@@ -3,8 +3,8 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 import { getBuildTargets } from '@criticalmanufacturing/schematics-devkit';
 import { NEW_THEMES, OLD_THEMES } from './themes-update';
-import { PROJECT_LOADER } from '../../ng-add/package-configs';
-import { KENDO_SCRIPTS } from './configs-update';
+import { KENDO_STYLES, PROJECT_LOADER, V12_ASSETS } from '../../ng-add/package-configs';
+import { KENDO_OLD_SCRIPTS, KENDO_OLD_STYLES, CONNECT_IOT_STYLES } from './configs-update';
 import '../../testing/child_process-exec.mock';
 
 /**
@@ -212,13 +212,70 @@ describe('Test ng-update', () => {
       expect(tree.files).toEqual(expect.arrayContaining(['/application/src/app/app.workers.ts']));
     });
 
-    it('should update the application scripts', async () => {
+    it('should remove cmf.kendoui scripts', async () => {
+      const angularJsonContent = JSON.parse(appTree.readContent('/angular.json'));
+
+      angularJsonContent.projects.application.architect.build.options.scripts ??= [];
+      angularJsonContent.projects.application.architect.build.options.scripts.push(
+        ...KENDO_OLD_SCRIPTS
+      );
+
+      appTree.overwrite('/angular.json', JSON.stringify(angularJsonContent));
+
+      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+
+      const updatedAngularJsonContent = JSON.parse(tree.readContent('/angular.json'));
+      const scripts =
+        updatedAngularJsonContent.projects.application.architect.build.options.scripts;
+
+      expect(scripts).not.toEqual(expect.arrayContaining([KENDO_OLD_SCRIPTS]));
+    });
+
+    it('should remove cmf.kendoui styles and add new kendo style', async () => {
+      const angularJsonContent = JSON.parse(appTree.readContent('/angular.json'));
+
+      angularJsonContent.projects.application.architect.build.options.styles ??= [];
+      angularJsonContent.projects.application.architect.build.options.styles.push(
+        ...KENDO_OLD_STYLES
+      );
+
+      appTree.overwrite('/angular.json', JSON.stringify(angularJsonContent));
+
+      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+
+      const updatedAngularJsonContent = JSON.parse(tree.readContent('/angular.json'));
+      const styles = updatedAngularJsonContent.projects.application.architect.build.options.styles;
+
+      expect(styles).not.toEqual(expect.arrayContaining([KENDO_OLD_STYLES]));
+
+      expect(styles).toEqual(expect.arrayContaining(KENDO_STYLES));
+    });
+
+    it('should remove @criticalmanufacturing/connect-iot styles', async () => {
+      const angularJsonContent = JSON.parse(appTree.readContent('/angular.json'));
+
+      angularJsonContent.projects.application.architect.build.options.styles ??= [];
+      angularJsonContent.projects.application.architect.build.options.styles.push(
+        ...CONNECT_IOT_STYLES
+      );
+
+      appTree.overwrite('/angular.json', JSON.stringify(angularJsonContent));
+
+      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+
+      const updatedAngularJsonContent = JSON.parse(tree.readContent('/angular.json'));
+      const styles = updatedAngularJsonContent.projects.application.architect.build.options.styles;
+
+      expect(styles).not.toEqual(expect.arrayContaining(CONNECT_IOT_STYLES));
+    });
+
+    it('should add cmf-core-iot and zxing-wasm assets', async () => {
       const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
 
       const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
-      expect(angularJsonContent.projects.application.architect.build.options.scripts).toEqual(
-        expect.arrayContaining(KENDO_SCRIPTS)
-      );
+      const assets = angularJsonContent.projects.application.architect.build.options.assets;
+
+      expect(assets).toEqual(expect.arrayContaining(V12_ASSETS));
     });
   });
 });
