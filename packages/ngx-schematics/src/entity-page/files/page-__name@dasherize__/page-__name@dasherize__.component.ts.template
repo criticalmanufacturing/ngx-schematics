@@ -1,4 +1,4 @@
-import { Component, forwardRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef } from '@angular/core';
 import Cmf from 'cmf-lbos';
 import { CustomizableComponent, HOST_VIEW_COMPONENT } from 'cmf-core';
 import {
@@ -48,7 +48,8 @@ import {
   templateUrl: './page-<%= dasherize(name) %>.component.html',
   viewProviders: [
     { provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Page<%= classify(name) %>Component) }
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.Eager
 })
 export class Page<%= classify(name) %>Component
   extends CustomizableComponent

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CustomizableComponent } from 'cmf-core';
 import { WidgetSettings, WidgetSettingsService } from 'cmf-core-dashboards';
 import { <%= classify(name) %>WidgetSettingsService, <%= classify(name) %>WidgetSettings } from './<%= dasherize(name) %>-widget-settings.service';
@@ -23,7 +23,8 @@ import { <%= classify(name) %>WidgetSettingsService, <%= classify(name) %>Widget
   imports: [WidgetSettings],
   templateUrl: './<%= dasherize(name) %>-widget-settings.component.html',
   <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-widget-settings.component.<%= style %>'<% } %>,
-  providers: [{ provide: WidgetSettingsService, useClass: <%= classify(name) %>WidgetSettingsService }]
+  providers: [{ provide: WidgetSettingsService, useClass: <%= classify(name) %>WidgetSettingsService }],
+  changeDetection: ChangeDetectionStrategy.Eager
 })
 export class <%= classify(name) %>WidgetSettingsComponent extends CustomizableComponent {
   /** Widget settings */

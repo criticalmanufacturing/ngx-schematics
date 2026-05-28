@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import Cmf from 'cmf-lbos';
 import { CustomizableComponent } from 'cmf-core';
@@ -40,7 +40,8 @@ import { EntityPageService, DetailsView } from 'cmf-core-business-controls';
 @Component({
   selector: '<%= dasherize(project) %>-page-<%= dasherize(name) %>-details-view',
   imports: [DetailsView],
-  templateUrl: './page-<%= dasherize(name) %>-details-view.component.html'
+  templateUrl: './page-<%= dasherize(name) %>-details-view.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager
 })
 export class Page<%= classify(name) %>DetailsViewComponent extends CustomizableComponent {
   /** Entity Page service */

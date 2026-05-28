@@ -1,4 +1,4 @@
-import { Component, forwardRef, inject, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, inject, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   CustomizableComponent,
@@ -61,7 +61,8 @@ import {
   styleUrl: './page-test-page.component.less',
   viewProviders: [
     { provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => PageTestPageComponent) }
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.Eager
 })
 export class PageTestPageComponent extends CustomizableComponent {
   /** The nested Base Page element */

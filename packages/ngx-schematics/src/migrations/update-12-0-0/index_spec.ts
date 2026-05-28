@@ -1,4 +1,4 @@
-import { deepCopy, JsonArray, JsonObject } from '@angular-devkit/core';
+import { JsonArray, JsonObject } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 import { getBuildTargets } from '@criticalmanufacturing/schematics-devkit';
@@ -153,7 +153,7 @@ describe('Test ng-update', () => {
       workspace = await readWorkspace(tree);
       targets = getBuildTargets(workspace.projects.get('application')!);
 
-      const actual = deepCopy(targets[0].options!.styles);
+      const actual = targets[0].options!.styles;
 
       expect(actual).not.toEqual(expect.arrayContaining(oldThemes));
       expect(actual).toEqual(expect.arrayContaining(newThemes));

@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "tsconfig",
     "lib": ["es2022"],
     "declaration": true,
     "target": "es2022",

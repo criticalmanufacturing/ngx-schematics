@@ -79,9 +79,11 @@ function updatePackagejson(options: { project: string; name: string }): Rule {
 
     const rootPack = new JSONFile(tree, 'package.json');
     const version = rootPack.get(['dependencies', 'cmf-core-connect-iot']) ?? '0.0.0';
+    const peerDeps = packJson.get(['peerDependencies']) as JsonObject | undefined;
+    const scripts = packJson.get(['scripts']) as JsonObject | undefined;
 
     packJson.modify(['peerDependencies'], {
-      ...((packJson.get(['peerDependencies']) as Record<string, string>) ?? {}),
+      ...(peerDeps ?? {}),
       '@criticalmanufacturing/connect-iot-controller-engine': version,
       'cmf-core': version,
       'cmf-core-business-controls': version,
@@ -90,7 +92,7 @@ function updatePackagejson(options: { project: string; name: string }): Rule {
     });
 
     packJson.modify(['scripts'], {
-      ...((packJson.get(['scripts']) as Record<string, string>) ?? {}),
+      ...(scripts ?? {}),
       build:
         'concurrently "npm run build:designer" "npm run build:runtime" "npm run build:tests" -r',
       'build:designer': 'ng build --configuration=development',

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import Cmf from 'cmf-lbos';
 import { CustomizableComponent } from 'cmf-core';
@@ -40,7 +40,8 @@ import { EntityPageService, DetailsView } from 'cmf-core-business-controls';
 @Component({
   selector: 'test-lib-page-test-entity-type-details-view',
   imports: [DetailsView],
-  templateUrl: './page-test-entity-type-details-view.component.html'
+  templateUrl: './page-test-entity-type-details-view.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager
 })
 export class PageTestEntityTypeDetailsViewComponent extends CustomizableComponent {
   /** Entity Page service */
