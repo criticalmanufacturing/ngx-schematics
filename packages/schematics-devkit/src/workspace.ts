@@ -102,7 +102,7 @@ export function listNpmReleaseTags(pkg: string, version?: string): Promise<strin
  * @param array array of elements
  * @param elementsToAdd elements to add to array
  */
-export function addToJsonArray(array: JsonArray, elementsToAdd: JsonValue[]): void {
+export function addToJsonArray(array: JsonArray, elementsToAdd: JsonValue[]): JsonArray {
   elementsToAdd.forEach((toAdd) => {
     if (
       !array.some((existing) =>
@@ -112,6 +112,8 @@ export function addToJsonArray(array: JsonArray, elementsToAdd: JsonValue[]): vo
       array.push(toAdd);
     }
   });
+
+  return array;
 }
 
 /**
@@ -119,7 +121,7 @@ export function addToJsonArray(array: JsonArray, elementsToAdd: JsonValue[]): vo
  * @param array the array
  * @param elementToRemove the element to remove
  */
-export function removeFromJsonArray(array: JsonArray, elementsToRemove: JsonValue[]): void {
+export function removeFromJsonArray(array: JsonArray, elementsToRemove: JsonValue[]): JsonArray {
   elementsToRemove.forEach((toRemove) => {
     const indexToRemove = array.findIndex((existing) =>
       isDeepStrictEqual(typeof existing === 'object' ? { ...existing } : existing, toRemove)
@@ -129,6 +131,8 @@ export function removeFromJsonArray(array: JsonArray, elementsToRemove: JsonValu
       array.splice(indexToRemove, 1);
     }
   });
+
+  return array;
 }
 
 /**
@@ -139,10 +143,12 @@ export function removeFromJsonArray(array: JsonArray, elementsToRemove: JsonValu
 export function addToJsonObject(
   object: JsonObject,
   elementsToAdd: Record<string, JsonValue>
-): void {
+): JsonObject {
   Object.entries(elementsToAdd).forEach(([key, toAdd]) => {
     object[key] = toAdd;
   });
+
+  return object;
 }
 
 /**
@@ -153,12 +159,14 @@ export function addToJsonObject(
 export function removeFromJsonObject(
   object: JsonObject,
   elementsToRemove: Record<string, JsonValue>
-): void {
+): JsonObject {
   Object.entries(elementsToRemove).forEach(([key, toRemove]) => {
     if (isDeepStrictEqual(object[key], toRemove)) {
       delete object[key];
     }
   });
+
+  return object;
 }
 
 /**

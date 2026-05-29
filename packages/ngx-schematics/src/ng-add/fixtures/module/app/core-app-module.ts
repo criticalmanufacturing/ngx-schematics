@@ -3,8 +3,8 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { App } from './app';
 import { ServiceWorkerModule } from '@angular/service-worker';
-import { CoreUIModule } from 'cmf-core-ui';
-import { MetadataRoutingModule } from 'cmf-core';
+import { provideCoreUI } from 'cmf-core-ui';
+import { provideMetadataRouter } from 'cmf-core';
 import './app.workers';
 
 @NgModule({
@@ -18,13 +18,13 @@ import './app.workers';
       // Register the ServiceWorker as soon as the application is stable
       // or after 30 seconds (whichever comes first).
       registrationStrategy: 'registerWhenStable:30000'
-    }),
-    CoreUIModule.forRoot(),
-    MetadataRoutingModule
+    })
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection(),
+    provideCoreUI(),
+    provideMetadataRouter()
   ],
   bootstrap: [App]
 })
