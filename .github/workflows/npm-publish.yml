@@ -19,10 +19,10 @@ jobs:
     environment: npm-publish
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Check version
@@ -30,9 +30,9 @@ jobs:
         run: |
           PACKAGE_NAME=$(jq -r '.name' ./packages/ngx-schematics/package.json)
           VERSION=$(npm pkg get version --workspaces=false | tr -d '"')
-          
+
           echo "Checking ${PACKAGE_NAME}@${VERSION}"
-          
+
           if npm view ${PACKAGE_NAME}@${VERSION} version 2>/dev/null; then
             echo "Version exists on NPM"
             echo "versionExists=true" >> $GITHUB_OUTPUT
@@ -40,7 +40,7 @@ jobs:
             echo "Version does not exist on NPM"
             echo "versionExists=false" >> $GITHUB_OUTPUT
           fi
-          
+
           if [[ $VERSION == *"-"* ]]; then
             echo "Version is a pre-release"
             echo "isPreRelease=true" >> $GITHUB_OUTPUT
@@ -51,46 +51,48 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-      
+
       - name: Build
         if: steps.check.outputs.versionExists == 'false'
         run: npm run build
-      
+
       - name: Run tests
         if: steps.check.outputs.versionExists == 'false'
         run: npm run test
-      
+
       - name: Publish
         if: steps.check.outputs.versionExists == 'false'
         run: |
           DRY_RUN="${{ inputs.dry_run }}"
-          
+          TAG=$(echo "${{ inputs.tag }}" | awk '{print $1}')
+
           ARGS=""
-          [ "$DRY_RUN" == "true" ] && ARGS="--dry-run"
-          
+          [ -n "$TAG" ] && ARGS="--tag $TAG"
+          [ "$DRY_RUN" == "true" ] && ARGS="$ARGS --dry-run"
+
           npm run publish -- $ARGS
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      
+
       - name: Add tags
         run: |
           TAGS="${{ inputs.tag }}"
           DRY_RUN="${{ inputs.dry_run }}"
-          
+
           ARGS="$TAGS"
           [ "$DRY_RUN" == "true" ] && ARGS="$ARGS --dry-run"
-          
+
           npm run add-tags -- $ARGS
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      
+
       - name: Create GitHub Release
         if: steps.check.outputs.versionExists == 'false' && steps.check.outputs.isPreRelease == 'false' && inputs.dry_run == false
         run: |
           VERSION=$(npm pkg get version --workspaces=false | tr -d '"')
           NOTES=$(cat <<EOF
           ## NPM Packages on https://www.npmjs.com/
-          
+
           * @criticalmanufacturing/ngx-schematics
           * @criticalmanufacturing/ngx-iot-schematics
           * @criticalmanufacturing/schematics-devkit
