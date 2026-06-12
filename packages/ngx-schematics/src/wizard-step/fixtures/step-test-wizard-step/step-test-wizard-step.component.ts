@@ -1,4 +1,12 @@
-import { Component, forwardRef, input, inject, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  forwardRef,
+  input,
+  inject,
+  OnChanges,
+  SimpleChanges
+} from '@angular/core';
 import Cmf from 'cmf-lbos';
 import {
   CustomizableComponent,
@@ -65,19 +73,14 @@ interface DataRowTag {
  */
 @Component({
   selector: 'test-lib-step-test-wizard-step',
-  imports: [
-    ColumnView,
-    LeafContent,
-    PropertyViewer,
-    PropertyEditor,
-    PropertyContainer
-  ],
+  imports: [ColumnView, LeafContent, PropertyViewer, PropertyEditor, PropertyContainer],
   hostDirectives: [Validator],
   templateUrl: './step-test-wizard-step.component.html',
   styleUrl: './step-test-wizard-step.component.less',
   providers: [
     { provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => StepTestWizardStepComponent) }
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.Eager
 })
 export class StepTestWizardStepComponent extends CustomizableComponent implements OnChanges {
   /** Column view initial data */

@@ -1,8 +1,29 @@
-import { Component, forwardRef, inject, OnInit, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  forwardRef,
+  inject,
+  OnInit,
+  viewChild
+} from '@angular/core';
 import Cmf from 'cmf-lbos';
-import { CustomizableComponent, HOST_VIEW_COMPONENT, EntityTypeService, UtilService } from 'cmf-core';
-import { ExecutionView, ExecutionViewTab, ExecutionViewEventArgs, PageBag } from 'cmf-core-controls';
-import { TransactionExecutionView, TransactionExecutionViewDirective, TransactionEventArgs } from 'cmf-core-business-controls';
+import {
+  CustomizableComponent,
+  HOST_VIEW_COMPONENT,
+  EntityTypeService,
+  UtilService
+} from 'cmf-core';
+import {
+  ExecutionView,
+  ExecutionViewTab,
+  ExecutionViewEventArgs,
+  PageBag
+} from 'cmf-core-controls';
+import {
+  TransactionExecutionView,
+  TransactionExecutionViewDirective,
+  TransactionEventArgs
+} from 'cmf-core-business-controls';
 
 /**
  * @whatItDoes
@@ -47,11 +68,13 @@ import { TransactionExecutionView, TransactionExecutionViewDirective, Transactio
       provide: HOST_VIEW_COMPONENT,
       useExisting: forwardRef(() => WizardTestExecutionViewComponent)
     }
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.Eager
 })
 export class WizardTestExecutionViewComponent
   extends CustomizableComponent
-  implements OnInit, TransactionExecutionView {
+  implements OnInit, TransactionExecutionView
+{
   /** The instance of the execution view */
   instance: Cmf.TestNamespace.BusinessObjects.TestEntityType;
 

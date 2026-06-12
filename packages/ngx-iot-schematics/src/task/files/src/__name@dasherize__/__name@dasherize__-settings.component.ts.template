@@ -1,4 +1,5 @@
 import {
+    ChangeDetectionStrategy,
     Component,
     OnInit,
     OnChanges,
@@ -46,7 +47,8 @@ export interface <%= classify(name) %>TaskSettings extends <%= classify(name) %>
         PropertyContainerModule
     ],
     templateUrl: '<%= name %>-settings.component.html',
-    <% if (style !== 'none') { %>styleUrl: './<%= name %>-settings.component.<%= style %>',<% } %>
+    <% if (style !== 'none') { %>styleUrl: './<%= name %>-settings.component.<%= style %>',<% } %>,,
+    changeDetection: ChangeDetectionStrategy.Eager
 })
 export class <%= classify(name) %>Settings extends TaskSettingsBase implements OnInit, OnChanges {
 

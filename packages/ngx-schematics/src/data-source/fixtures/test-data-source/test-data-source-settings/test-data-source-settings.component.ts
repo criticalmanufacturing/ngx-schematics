@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CustomizableComponent } from 'cmf-core';
 import { DataSourceSettingsDef, DataSourceSettings } from 'cmf-core-dashboards';
 
@@ -16,7 +16,8 @@ import { DataSourceSettingsDef, DataSourceSettings } from 'cmf-core-dashboards';
   selector: 'test-lib-test-data-source-settings',
   imports: [DataSourceSettings],
   templateUrl: './test-data-source-settings.component.html',
-  styleUrl: './test-data-source-settings.component.less'
+  styleUrl: './test-data-source-settings.component.less',
+  changeDetection: ChangeDetectionStrategy.Eager
 })
 export class TestDataSourceSettingsComponent extends CustomizableComponent {
   /** The settings of the TestDataSource */

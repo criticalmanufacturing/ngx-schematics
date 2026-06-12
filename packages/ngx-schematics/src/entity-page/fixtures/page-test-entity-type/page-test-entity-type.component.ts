@@ -1,4 +1,4 @@
-import { Component, forwardRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef } from '@angular/core';
 import Cmf from 'cmf-lbos';
 import { CustomizableComponent, HOST_VIEW_COMPONENT } from 'cmf-core';
 import {
@@ -48,7 +48,8 @@ import {
   templateUrl: './page-test-entity-type.component.html',
   viewProviders: [
     { provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => PageTestEntityTypeComponent) }
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.Eager
 })
 export class PageTestEntityTypeComponent
   extends CustomizableComponent

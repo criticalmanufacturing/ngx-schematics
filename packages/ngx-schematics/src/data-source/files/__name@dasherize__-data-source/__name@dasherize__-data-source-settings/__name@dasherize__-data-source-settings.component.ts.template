@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CustomizableComponent } from 'cmf-core';
 import { DataSourceSettingsDef, DataSourceSettings } from 'cmf-core-dashboards';
 
@@ -16,7 +16,8 @@ import { DataSourceSettingsDef, DataSourceSettings } from 'cmf-core-dashboards';
   selector: '<%= dasherize(project) %>-<%= dasherize(name) %>-data-source-settings',
   imports: [DataSourceSettings],
   templateUrl: './<%= dasherize(name) %>-data-source-settings.component.html',
-  <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-data-source-settings.component.<%= dasherize(style) %>'<% } %>
+  <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-data-source-settings.component.<%= dasherize(style) %>'<% } %>,
+  changeDetection: ChangeDetectionStrategy.Eager
 })
 export class <%= classify(name) %>DataSourceSettingsComponent extends CustomizableComponent {
   /** The settings of the <%= classify(name) %>DataSource */

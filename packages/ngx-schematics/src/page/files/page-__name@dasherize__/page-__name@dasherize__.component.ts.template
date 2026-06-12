@@ -1,4 +1,4 @@
-import { Component, forwardRef, inject, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, inject, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   CustomizableComponent,
@@ -61,7 +61,8 @@ import {
   <% if (style !== 'none') { %>styleUrl: './page-<%= dasherize(name) %>.component.<%= style %>',<% } %>
   viewProviders: [
     { provide: HOST_VIEW_COMPONENT, useExisting: forwardRef(() => Page<%= classify(name) %>Component) }
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.Eager
 })
 export class Page<%= classify(name) %>Component extends CustomizableComponent {
   /** The nested Base Page element */

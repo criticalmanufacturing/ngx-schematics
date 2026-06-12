@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import Cmf from 'cmf-lbos';
 import { CustomizableComponent, UtilService, EntityTypeService } from 'cmf-core';
 import { PageBag } from 'cmf-core-controls';
@@ -41,11 +41,13 @@ import { EditMode, CreateEditEntity, CreateEditStepGeneralData } from 'cmf-core-
   selector: 'test-lib-wizard-create-edit-test-entity-type',
   imports: [CreateEditEntity, CreateEditStepGeneralData],
   templateUrl: './wizard-create-edit-test-entity-type.component.html',
-  styleUrl: './wizard-create-edit-test-entity-type.component.less'
+  styleUrl: './wizard-create-edit-test-entity-type.component.less',
+  changeDetection: ChangeDetectionStrategy.Eager
 })
 export class WizardCreateEditTestEntityTypeComponent
   extends CustomizableComponent
-  implements OnInit {
+  implements OnInit
+{
   /** Wizard mode */
   editMode: EditMode = EditMode.Create;
 
