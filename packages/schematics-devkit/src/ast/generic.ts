@@ -169,10 +169,8 @@ export function removeImport(source: SourceFile, symbolName: string, module: str
 
   if (importNode) {
     const namedImports = importNode.getNamedImports();
-
-    if (importNode.getNamedImports().length > 1) {
-      namedImports.find((node) => node.getName() === symbolName)?.remove();
-    } else {
+    namedImports.find((node) => node.getName() === symbolName)?.remove();
+    if (namedImports.length === 0) {
       importNode.remove();
     }
   }

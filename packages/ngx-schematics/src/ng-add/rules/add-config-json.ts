@@ -3,6 +3,7 @@ import {
   apply,
   applyTemplates,
   chain,
+  MergeStrategy,
   mergeWith,
   move,
   Rule,
@@ -59,7 +60,7 @@ export function addConfigJson(options: { project: string }): Rule {
     return chain([
       removeDirectory(join(normalize(project.root), 'public', 'icons')),
       removeFile(join(normalize(project.root), 'public', 'favicon.ico')),
-      mergeWith(templateSource)
+      mergeWith(templateSource, MergeStrategy.Overwrite)
     ]);
   };
 }

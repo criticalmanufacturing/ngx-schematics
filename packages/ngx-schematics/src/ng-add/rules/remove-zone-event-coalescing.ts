@@ -8,5 +8,9 @@ export function removeZoneEventCoalescing(sourceFile: SourceFile): void {
   sourceFile
     .getDescendantsOfKind(SyntaxKind.CallExpression)
     ?.filter((callExpr) => callExpr.getExpression().getText() === 'provideZoneChangeDetection')
-    ?.forEach((callExpr) => callExpr.removeArgument(0));
+    ?.forEach((callExpr) => {
+      if (callExpr.getArguments().length > 0) {
+        return callExpr.removeArgument(0);
+      }
+    });
 }

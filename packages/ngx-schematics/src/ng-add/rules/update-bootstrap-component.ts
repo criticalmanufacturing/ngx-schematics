@@ -6,7 +6,9 @@ import {
   getRelativeImportPath,
   getMainPath,
   getObjectProperty,
-  removeImport
+  removeImport,
+  insertImport,
+  getIndentSize
 } from '@criticalmanufacturing/schematics-devkit';
 import { getNgModuleBootstrapComponentPath } from '../../utility/ng-module.js';
 
@@ -115,6 +117,51 @@ export function updateBootstrapComponent(options: { project: string }) {
       }
     }
 
+    if (
+      compMetadata
+        .getProperty('changeDetection')
+        ?.asKind(SyntaxKind.PropertyAssignment)
+        ?.getInitializer()
+        ?.getText() !== 'ChangeDetectionStrategy.Eager'
+    ) {
+      // insert Eager change detection strategy
+      compMetadata.addPropertyAssignment({
+        name: 'changeDetection',
+        initializer: 'ChangeDetectionStrategy.Eager'
+      });
+    }
+
+    if (
+      compMetadata
+        .getProperty('standalone')
+        ?.asKind(SyntaxKind.PropertyAssignment)
+        ?.getInitializer()
+        ?.getText() !== 'false'
+    ) {
+      // insert RouterOutlet in imports array for standalone components
+      const importsProp = compMetadata.getProperty('imports');
+      if (importsProp) {
+        const arrayExp = importsProp
+          .asKind(SyntaxKind.PropertyAssignment)
+          ?.getInitializer()
+          ?.asKind(SyntaxKind.ArrayLiteralExpression);
+
+        if (arrayExp && !arrayExp.getElements().some((el) => el.getText() === 'RouterOutlet')) {
+          arrayExp.insertElement(0, 'RouterOutlet');
+          insertImport(compSource, 'RouterOutlet', '@angular/router');
+        }
+      } else if (!compMetadata.getProperty('imports')) {
+        compMetadata.addPropertyAssignment({
+          name: 'imports',
+          initializer: '[RouterOutlet]'
+        });
+        insertImport(compSource, 'RouterOutlet', '@angular/router');
+      }
+    }
+
+    compMetadata.formatText({ indentSize: getIndentSize(compSource) });
+
+    insertImport(compSource, 'ChangeDetectionStrategy', '@angular/core');
     removeImport(compSource, 'signal', '@angular/core');
 
     const templateNode = getObjectProperty(compMetadata, 'template')
