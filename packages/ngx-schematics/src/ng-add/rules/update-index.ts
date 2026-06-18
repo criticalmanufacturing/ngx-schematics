@@ -67,7 +67,7 @@ export function updateIndexFiles(options: { project: string }): Rule {
       }
 
       const head = index.querySelector('head');
-      if (head) {
+      if (head && !head.querySelector('meta[name="theme-color"]')) {
         head.insertAdjacentHTML('beforeend', '  <meta name="theme-color" content="#1976d2">');
       }
 

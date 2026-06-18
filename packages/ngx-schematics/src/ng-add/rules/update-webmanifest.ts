@@ -16,6 +16,11 @@ export function updateWebmanifest(options: { project: string }): Rule {
     }
 
     const manifestPath = join(normalize(project.root), '/public/manifest.webmanifest');
+
+    if (tree.exists(manifestPath) === false) {
+      return;
+    }
+
     const manifest = tree.readJson(manifestPath);
 
     if (typeof manifest !== 'object' || Array.isArray(manifest) || manifest == null) {

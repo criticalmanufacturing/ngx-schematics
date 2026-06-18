@@ -42,7 +42,6 @@ export function installNpmPackages(
   const taskPackageManagerName = 'npm';
   const args = ['install', save, ...pkgs];
   const spawnOptions: SpawnOptions = {
-    shell: true,
     stdio: ['ignore', 'ignore', 'pipe']
   };
 

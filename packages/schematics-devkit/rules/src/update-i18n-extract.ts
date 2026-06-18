@@ -12,13 +12,6 @@ import { getBuildTargets } from '@criticalmanufacturing/schematics-devkit';
  * @returns A promise that resolves to an array of peer dependency names.
  */
 export async function fetchPkgDependencies(pkg: string, version: string): Promise<string[]> {
-  const spinner =
-    process.env.NODE_ENV !== 'test'
-      ? ora({
-          text: `Fetching ${pkg} packages dependencies...`
-        }).start()
-      : null;
-
   try {
     const output = (
       await promisify(exec)(`npm view ${pkg}@${version} peerDependencies --json`, {
@@ -26,19 +19,13 @@ export async function fetchPkgDependencies(pkg: string, version: string): Promis
       })
     ).stdout;
 
-    spinner?.stop();
-    spinner?.succeed();
-
     if (output.trim() === '') {
       return [];
     }
 
     return Object.keys(JSON.parse(output) as Record<string, string>);
   } catch (err) {
-    console.error(err);
-    spinner?.stop();
-    spinner?.fail('Failed to fetch package, see above.');
-    throw new SchematicsException();
+    throw new SchematicsException(err instanceof Error ? err.message : JSON.stringify(err));
   }
 }
 
@@ -77,10 +64,26 @@ export function updateI18nExtract(options: {
       );
     }
 
-    const uiDeps = (await Promise.all(uiDepsPromise))
-      .flat()
-      .filter((pkg) => pkg.startsWith('@criticalmanufacturing/') || pkg.startsWith('cmf-'))
-      .sort();
+    const spinner =
+      process.env.NODE_ENV !== 'test'
+        ? ora({
+            text: `Fetching ui dependencies...`
+          }).start()
+        : null;
+
+    let uiDeps: string[] = [];
+    try {
+      uiDeps = (await Promise.all(uiDepsPromise))
+        .flat()
+        .filter((pkg) => pkg.startsWith('@criticalmanufacturing/') || pkg.startsWith('cmf-'))
+        .sort();
+
+      spinner?.succeed();
+    } catch {
+      spinner?.fail('Failed to fetch package, see above.');
+    } finally {
+      spinner?.stop();
+    }
 
     getBuildTargets(projectDef).forEach((target) => {
       target.configurations ??= {};

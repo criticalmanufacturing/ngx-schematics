@@ -3,6 +3,7 @@ import {
   apply,
   applyTemplates,
   chain,
+  MergeStrategy,
   mergeWith,
   move,
   Rule,
@@ -40,12 +41,18 @@ export function addWorkers(options: { project: string }): Rule {
       return;
     }
 
-    appFile.addImportDeclaration({
-      moduleSpecifier: './app.workers'
-    });
+    if (
+      !appFile.getImportDeclaration(
+        (moduleSpecifier) => moduleSpecifier.getModuleSpecifierValue() === './app.workers'
+      )
+    ) {
+      appFile.addImportDeclaration({
+        moduleSpecifier: './app.workers'
+      });
+    }
 
     tree.overwrite(appRootPath, appFile.getFullText());
 
-    return chain([mergeWith(templateSource)]);
+    return chain([mergeWith(templateSource, MergeStrategy.Overwrite)]);
   };
 }

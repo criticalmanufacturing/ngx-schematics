@@ -8,7 +8,7 @@ import {
 import { readWorkspace } from '@schematics/angular/utility';
 
 function getAssetGroup(ngswConfig: JsonObject, name: string): JsonObject | undefined {
-  return ((ngswConfig)['assetGroups'] as JsonArray).find(
+  return (ngswConfig['assetGroups'] as JsonArray).find(
     (assetGroup) => (assetGroup as JsonObject)['name'] === name
   ) as JsonObject;
 }
@@ -51,15 +51,17 @@ export function updateNgswConfig(options: { project: string }): Rule {
 
     ngswConfig['dataGroups'] ??= [];
 
-    (ngswConfig['dataGroups'] as JsonArray).push({
-      name: 'config',
-      urls: ['/assets/config.json'],
-      cacheConfig: {
-        maxSize: 1,
-        maxAge: '30d',
-        strategy: 'freshness'
+    addToJsonArray(ngswConfig['dataGroups'] as JsonArray, [
+      {
+        name: 'config',
+        urls: ['/assets/config.json'],
+        cacheConfig: {
+          maxSize: 1,
+          maxAge: '30d',
+          strategy: 'freshness'
+        }
       }
-    });
+    ]);
 
     ngswConfig['navigationRequestStrategy'] = 'freshness';
 
