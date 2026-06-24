@@ -1,4 +1,4 @@
-import { EnvironmentProviders, NgModule } from '@angular/core';
+import { EnvironmentProviders } from '@angular/core';
 import { provideMetadata } from 'cmf-core';
 
 import { TestLibMetadataService } from './test-lib-metadata.service';
