@@ -27,7 +27,6 @@
   "general": {
     "supportedCultures": <%= supportedCultures %>,
     "supportedThemes": <%= supportedThemes %>,
-    "defaultDomain": "",
     "startup": {
       "startupCulture": "<%= startupCulture %>",
       "startupTheme": "<%= startupTheme %>"
