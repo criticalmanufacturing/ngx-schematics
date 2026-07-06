@@ -21,7 +21,7 @@ export default function (): Rule {
       migrateSuperExpressions({ path: './' }),
       migrateStandalone({ path: './' }),
       addWorkers({ project }),
-      updateI18nExtract({ project, version: '12' })
+      updateI18nExtract({ project, version: '12.0.0-alpha.1' })
     ]);
   };
 }
