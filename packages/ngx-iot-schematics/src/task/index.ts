@@ -36,7 +36,9 @@ export default function (_options: Schema): Rule {
       throw new SchematicsException(`Task name is required`);
     }
 
-    _options.path = join(normalize(getDefaultPath(project)), 'tasks');
+    if (_options.path === undefined) {
+      _options.path = join(normalize(getDefaultPath(project)), 'tasks');
+    }
 
     const parsedPath = parseName(_options.path, _options.name);
     _options.name = parsedPath.name;

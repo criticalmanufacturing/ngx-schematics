@@ -1,6 +1,3 @@
-/* eslint-disable @angular-eslint/component-class-suffix */
-/* eslint-disable @angular-eslint/component-selector */
-/* eslint-disable  @typescript-eslint/no-explicit-any */
 import {
     Component,
     OnInit,
@@ -49,8 +46,8 @@ export interface <%= classify(name) %>TaskSettings extends <%= classify(name) %>
         BaseWidgetModule,
         PropertyContainerModule
     ],
-    templateUrl: '<%= dasherize(name) %>-settings.component.html',
-    <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-settings.component.<%= style %>',<% } %>
+    templateUrl: '<%= name %>-settings.component.html',
+    <% if (style !== 'none') { %>styleUrl: './<%= name %>-settings.component.<%= style %>',<% } %>
 })
 export class <%= classify(name) %>Settings extends TaskSettingsBase implements OnInit, OnChanges {
 
