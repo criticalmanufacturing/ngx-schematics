@@ -105,7 +105,7 @@ function updatePackagejson(options: { project: string; name: string }): Rule {
 }
 
 /**
- * Adds "**\/*.d.ts" to ignorePatterns in the project's .eslintrc.json
+ * Adds "**\/*.d.ts" to ignorePatterns and disables common IoT rules in the project's .eslintrc.json
  */
 function updateEslintIgnorePatterns(options: { project: string }): Rule {
   return async (tree: Tree) => {
@@ -123,11 +123,23 @@ function updateEslintIgnorePatterns(options: { project: string }): Rule {
     }
 
     const eslintFile = new JSONFile(tree, eslintPath);
-    const existing = (eslintFile.get(['ignorePatterns']) as string[]) ?? [];
 
-    if (!existing.includes('**/*.d.ts')) {
-      eslintFile.modify(['ignorePatterns'], [...existing, '**/*.d.ts']);
+    // Exclude compiled declaration files from linting
+    const existingPatterns = (eslintFile.get(['ignorePatterns']) as string[]) ?? [];
+    if (!existingPatterns.includes('**/*.d.ts')) {
+      eslintFile.modify(['ignorePatterns'], [...existingPatterns, '**/*.d.ts']);
     }
+
+    // Disable rules that are expected to fire in generated IoT library code
+    const existingRules = (eslintFile.get(['rules']) as Record<string, string>) ?? {};
+    eslintFile.modify(['rules'], {
+      ...existingRules,
+      '@angular-eslint/component-class-suffix': 'off',
+      '@angular-eslint/component-selector': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/ban-types': 'off'
+    });
   };
 }
 
