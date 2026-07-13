@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { Converter } from '@criticalmanufacturing/connect-iot-controller-engine';
-import EngineTestSuite from '@criticalmanufacturing/connect-iot-controller-engine/test';
+import EngineTestSuite from '@criticalmanufacturing/connect-iot-controller-engine/dist/test';
 import { <%= classify(name) %>Converter } from '<%= relativeTo %>/<%= dasherize(name) %>/<%= dasherize(name) %>.converter';
 
 describe('<%= nameify(name) %> converter', () => {
