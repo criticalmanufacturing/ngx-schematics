@@ -1,9 +1,11 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-types */
 import 'reflect-metadata';
 import * as chai from 'chai';
 import { Task } from '@criticalmanufacturing/connect-iot-controller-engine';
-import EngineTestSuite from '@criticalmanufacturing/connect-iot-controller-engine/test';
-<% if(isForProtocol === true) { %>import { DriverProxyMock } from '@criticalmanufacturing/connect-iot-controller-engine/test/mocks/driver-proxy.mock';<% } %>
-// import { DataStoreMock } from '@criticalmanufacturing/connect-iot-controller-engine/test/mocks/data-store.mock';
+import EngineTestSuite from '@criticalmanufacturing/connect-iot-controller-engine/dist/test';
+<% if(isForProtocol === true) { %>import { DriverProxyMock } from '@criticalmanufacturing/connect-iot-controller-engine/dist/test/mocks/driver-proxy.mock';<% } %>
+// import { DataStoreMock } from '@criticalmanufacturing/connect-iot-controller-engine/dist/test/mocks/data-store.mock';
 
 import { <%= classify(name) %>Settings } from '<%= relativeTo %>/<%= dasherize(name) %>/<%= dasherize(name) %>.task';
 import { <%= classify(name) %>Module } from '<%= relativeTo %>/<%= dasherize(name) %>/<%= dasherize(name) %>.task-module';
@@ -67,6 +69,7 @@ describe('<%= classify(name) %> Task tests', () => {
             // Add more links needed here...
         ],
         <% if(isForProtocol === true) { %>driverMock<% } %><% if(isForProtocol === false) { %>undefined<% } %>,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (containerId) => {
             // Change what you need in the container
             // Example:

@@ -105,6 +105,33 @@ function updatePackagejson(options: { project: string; name: string }): Rule {
 }
 
 /**
+ * Adds "**\/*.d.ts" to ignorePatterns in the project's .eslintrc.json
+ */
+function updateEslintIgnorePatterns(options: { project: string }): Rule {
+  return async (tree: Tree) => {
+    const workspace = await readWorkspace(tree);
+    const project = workspace.projects.get(options.project);
+
+    if (!project) {
+      return;
+    }
+
+    const eslintPath = join(normalize(project.root), '.eslintrc.json');
+
+    if (!tree.exists(eslintPath)) {
+      return;
+    }
+
+    const eslintFile = new JSONFile(tree, eslintPath);
+    const existing = (eslintFile.get(['ignorePatterns']) as string[]) ?? [];
+
+    if (!existing.includes('**/*.d.ts')) {
+      eslintFile.modify(['ignorePatterns'], [...existing, '**/*.d.ts']);
+    }
+  };
+}
+
+/**
  * IoT Library generator
  */
 function addIoTLibrary(options: { project: string; skipInstall: boolean; fullname: string }) {
@@ -154,6 +181,7 @@ function addIoTLibrary(options: { project: string; skipInstall: boolean; fullnam
         name: options.fullname
       }),
       editVsCodeSettings(),
+      updateEslintIgnorePatterns({ project: options.project }),
       schematic('task', {
         path: `${sourceDir}/tasks`,
         project: options.project,

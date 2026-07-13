@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import { Converter, DI, Dependencies, TYPES } from '@criticalmanufacturing/connect-iot-controller-engine';
 
 /**
@@ -17,6 +18,7 @@ export class <%= classify(name) %>Converter implements Converter.ConverterInstan
      * @param value <%= inputType %> value
      * @param parameters Transformation parameters
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     transform(value: <%= inputType %>, parameters: { [key: string]: any; }): <%= outputType %> {
         // >>TODO: Add converter code
         throw new Error('>>TODO: Not implemented yet');
