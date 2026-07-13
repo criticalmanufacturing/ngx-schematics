@@ -35,9 +35,7 @@ export default function (_options: Schema): Rule {
       throw new SchematicsException(`Converter name is required`);
     }
 
-    if (_options.path === undefined) {
-      _options.path = join(normalize(getDefaultPath(project)), 'converters');
-    }
+    _options.path = join(normalize(getDefaultPath(project)), 'converters');
 
     const parsedPath = parseName(_options.path, _options.name);
     _options.name = parsedPath.name;

@@ -46,8 +46,8 @@ export interface <%= classify(name) %>TaskSettings extends <%= classify(name) %>
         BaseWidgetModule,
         PropertyContainerModule
     ],
-    templateUrl: '<%= name %>-settings.component.html',
-    <% if (style !== 'none') { %>styleUrls: ['./<%= name %>-settings.component.<%= style %>'],<% } %>
+    templateUrl: '<%= dasherize(name) %>-settings.component.html',
+    <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-settings.component.<%= style %>',<% } %>
 })
 export class <%= classify(name) %>Settings extends TaskSettingsBase implements OnInit, OnChanges {
 
