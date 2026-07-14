@@ -10,27 +10,27 @@ import { UtilService } from 'cmf-core';
 import { BaseWidget } from 'cmf-core-controls';
 import { TaskDefinitionSettings, TaskSettings, TaskSettingsBase } from 'cmf-core-connect-iot';
 
-import * as <%= classify(name) %>Task from './<%= dasherize(name) %>.task';
+import * as TestTaskTask from './test-task.task';
 
 /** Constants */
-export interface <%= classify(name) %>TaskSettings extends <%= classify(name) %>Task.<%= classify(name) %>Settings, TaskDefinitionSettings {}
+export interface TestTaskTaskSettings extends TestTaskTask.TestTaskSettings, TaskDefinitionSettings {}
 
 @Component({
-  selector: '<%= prefix %>-tasks-<%= dasherize(name) %>-settings',
+  selector: 'testlib-tasks-test-task-settings',
   imports: [TaskSettings, BaseWidget],
-  templateUrl: '<%= dasherize(name) %>-settings.component.html',
-  <% if (style !== 'none') { %>styleUrl: './<%= dasherize(name) %>-settings.component.<%= style %>',<% } %>
+  templateUrl: 'test-task-settings.component.html',
+  styleUrl: './test-task-settings.component.less',
   changeDetection: ChangeDetectionStrategy.Eager,
 })
-export class <%= classify(name) %>Settings extends TaskSettingsBase implements OnInit, OnChanges {
+export class TestTaskSettings extends TaskSettingsBase implements OnInit, OnChanges {
   /** Services */
   private _util = inject(UtilService);
 
   /** Task settings */
-  override settings: <%= classify(name) %>TaskSettings;
+  override settings: TestTaskTaskSettings;
 
   /** Task Instance */
-  private _taskInstance: <%= classify(name) %>Task.<%= classify(name) %>Task;
+  private _taskInstance: TestTaskTask.TestTaskTask;
 
   constructor() {
     super();
@@ -41,10 +41,10 @@ export class <%= classify(name) %>Settings extends TaskSettingsBase implements O
   /** Triggered when the task is created and define the default values */
   ngOnInit(): void {
     const currentSettings = Object.assign({}, this.settings);
-    Object.assign(this.settings, <%= classify(name) %>Task.SETTINGS_DEFAULTS, currentSettings);
+    Object.assign(this.settings, TestTaskTask.SETTINGS_DEFAULTS, currentSettings);
 
     if (this.container != null) {
-      this._taskInstance = this.container.task as <%= classify(name) %>Task.<%= classify(name) %>Task;
+      this._taskInstance = this.container.task as TestTaskTask.TestTaskTask;
     }
 
     // Initialize default values for settings page
@@ -75,7 +75,7 @@ export class <%= classify(name) %>Settings extends TaskSettingsBase implements O
    * Process all nodes (default and outputs)
    * @param settings Settings
    */
-  onBeforeSave(settings: <%= classify(name) %>Task.<%= classify(name) %>Settings): <%= classify(name) %>Task.<%= classify(name) %>Settings {
+  onBeforeSave(settings: TestTaskTask.TestTaskSettings): TestTaskTask.TestTaskSettings {
     return settings;
   }
 }

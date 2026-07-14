@@ -1,13 +1,13 @@
+<% if (inputType !== 'any' && outputType !== 'any') { %>import { Converter } from '@criticalmanufacturing/connect-iot-controller-engine';<% } %>
 import { ConverterDesigner } from 'cmf-core-connect-iot';
-import { Converter } from '@criticalmanufacturing/connect-iot-controller-engine';
 
 @ConverterDesigner({
-    name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>#TITLE:<%= nameify(name) %>`,
-    input: <%= converterInputType %>,
-    output: <%= converterOutputType %>,
-    parameters: {
-        // Add parameters here
-        // example: parameterId: System.PropertyValueType.String,
-    }
+  name: $localize`:@@<%= dasherize(project) %>/<%= dasherize(name) %>#TITLE:<%= nameify(name) %>`,
+  input: <%= converterInputType %>,
+  output: <%= converterOutputType %>,
+  parameters: {
+    // Add parameters here
+    // example: parameterId: System.PropertyValueType.String,
+  },
 })
-export class <%= classify(name) %>Designer { }
+export class <%= classify(name) %>Designer {}

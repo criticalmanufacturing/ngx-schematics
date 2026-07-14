@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "Commonjs",
+    "module": "nodenext",
     "target": "ES6",
     "lib": ["es2018", "dom"],
     "sourceMap": true,
@@ -10,7 +10,7 @@
     "pretty": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "skipLibCheck": true, 
     "esModuleInterop": true,
     // strict rules:

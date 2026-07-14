@@ -2,6 +2,6 @@ import { Task } from '@criticalmanufacturing/connect-iot-controller-engine';
 import { <%= classify(name) %>Task } from './<%= dasherize(name) %>.task';
 
 @Task.TaskModule({
-    task: <%= classify(name) %>Task
+  task: <%= classify(name) %>Task,
 })
-export class <%= classify(name) %>Module { }
+export class <%= classify(name) %>Module {}

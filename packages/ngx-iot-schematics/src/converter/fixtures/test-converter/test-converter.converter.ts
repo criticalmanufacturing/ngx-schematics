@@ -12,16 +12,16 @@ import {
  *
  */
 @Converter.Converter()
-export class <%= classify(name) %>Converter implements Converter.ConverterInstance<<%= inputType %>, <%= outputType %>> {
+export class TestConverterConverter implements Converter.ConverterInstance<any, any> {
   @DI.Inject(TYPES.Dependencies.Logger)
   private _logger: Dependencies.Logger;
 
   /**
    * >>TODO: Enter description here!
-   * @param value <%= inputType %> value
+   * @param value any value
    * @param parameters Transformation parameters
    */
-  transform(value: <%= inputType %>, parameters: { [key: string]: any }): <%= outputType %> {
+  transform(value: any, parameters: { [key: string]: any }): any {
     // >>TODO: Add converter code
     throw new Error('>>TODO: Not implemented yet');
   }
