@@ -32,7 +32,7 @@
     "inputType": {
       "type": "string",
       "description": "The input type of the converter.",
-      "default": "any",
+      "default": "Any",
       "enum": [
         "Any",
         "String",
@@ -50,7 +50,7 @@
     "outputType": {
       "type": "string",
       "description": "The output type of the converter.",
-      "default": "any",
+      "default": "Any",
       "enum": [
         "Any",
         "String",

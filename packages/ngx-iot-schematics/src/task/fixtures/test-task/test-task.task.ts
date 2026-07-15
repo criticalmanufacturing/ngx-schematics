@@ -7,7 +7,7 @@ import {
 } from '@criticalmanufacturing/connect-iot-controller-engine';
 
 /** Default values for settings */
-export const SETTINGS_DEFAULTS: <%= classify(name) %>Settings = {
+export const SETTINGS_DEFAULTS: TestTaskSettings = {
   inputs: [],
   outputs: [],
   message: '',
@@ -30,10 +30,10 @@ export const SETTINGS_DEFAULTS: <%= classify(name) %>Settings = {
  * * `Error` : ** error ** - Triggered when the task failed for some reason
  *
  * ### Settings
- * See {@see <%= classify(name) %>Settings}
+ * See {@see TestTaskSettings}
  */
 @Task.Task()
-export class <%= classify(name) %>Task implements Task.TaskInstance, <%= classify(name) %>Settings {
+export class TestTaskTask implements Task.TaskInstance, TestTaskSettings {
   /** Accessor helper for untyped properties and output emitters. */
   [key: string]: any;
 
@@ -59,10 +59,7 @@ export class <%= classify(name) %>Task implements Task.TaskInstance, <%= classif
 
   @DI.Inject(TYPES.Dependencies.Logger)
   private _logger: Dependencies.Logger;
-<% if(isForProtocol === true) { %>
-  @DI.Inject(TYPES.System.Driver)
-  private _driverProxy: System.DriverProxy;
-<% } %>
+
   /**
    * When one or more input values is changed this will be triggered,
    * @param changes Task changes
@@ -103,7 +100,7 @@ export class <%= classify(name) %>Task implements Task.TaskInstance, <%= classif
 }
 
 // Add settings here
-/** <%= classify(name) %> Settings object */
-export interface <%= classify(name) %>Settings extends System.TaskDefaultSettings {
+/** TestTask Settings object */
+export interface TestTaskSettings extends System.TaskDefaultSettings {
   message: string;
 }

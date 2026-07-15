@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "nodenext",
     "target": "ES6",
     "skipLibCheck": true,
     "types": ["reflect-metadata", "node", "mocha"],
@@ -12,7 +12,7 @@
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     // strict rules:
     "noImplicitAny": false,
     "noImplicitThis": false,

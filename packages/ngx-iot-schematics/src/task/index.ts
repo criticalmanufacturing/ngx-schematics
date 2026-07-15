@@ -36,9 +36,7 @@ export default function (_options: Schema): Rule {
       throw new SchematicsException(`Task name is required`);
     }
 
-    if (_options.path === undefined) {
-      _options.path = join(normalize(getDefaultPath(project)), 'tasks');
-    }
+    _options.path = join(normalize(getDefaultPath(project)), 'tasks');
 
     const parsedPath = parseName(_options.path, _options.name);
     _options.name = parsedPath.name;
@@ -50,7 +48,8 @@ export default function (_options: Schema): Rule {
       skipStyleFile ? filter((path) => !path.endsWith('.__style__.template')) : noop(),
       applyTemplates({
         ...strings,
-        ..._options
+        ..._options,
+        prefix: project.prefix ?? strings.dasherize(_options.project)
       }),
       move(parsedPath.path)
     ]);

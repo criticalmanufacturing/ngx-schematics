@@ -136,7 +136,7 @@ describe('Generate Library', () => {
     const tree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
 
     const workspace = JSON.parse(tree.readContent('/angular.json'));
-    expect(workspace.projects.testlib.prefix).toEqual('lib');
+    expect(workspace.projects.testlib.prefix).toEqual('testlib');
   });
 
   it('should set the prefix correctly', async () => {

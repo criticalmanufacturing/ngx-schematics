@@ -1,6 +1,7 @@
 # Compiled Output
 *.d.ts
 *.js
+!eslint.config.js
 *.js.map
 
 # Tests

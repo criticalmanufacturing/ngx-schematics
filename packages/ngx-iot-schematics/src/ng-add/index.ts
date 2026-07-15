@@ -21,7 +21,7 @@ import { JSONFile, listNpmReleaseTags } from '@criticalmanufacturing/schematics-
 
 import pkg from '../../package.json';
 import { Schema } from './schema.js';
-import { CORE_IOT_PACKAGE, IOT_DEPENDENCIES } from './definition.js';
+import { CORE_IOT_PACKAGE, IOT_DEPENDENCIES, NODE_VERSION } from './definition.js';
 
 /**
  * Updates the angular.json file with all the relevant configuration
@@ -86,6 +86,16 @@ function installSchematics(options: Schema) {
         type: NodeDependencyType.Dev,
         overwrite: true
       },
+      {
+        name: '@angular/localize',
+        version: `~${require('@angular/localize/package.json').version}`,
+        type: NodeDependencyType.Default
+      },
+      {
+        name: '@types/node',
+        version: `^${require('@types/node/package.json').version}`,
+        type: NodeDependencyType.Dev
+      },
       ...IOT_DEPENDENCIES.map((name) => ({
         name,
         type: NodeDependencyType.Default,
@@ -94,12 +104,6 @@ function installSchematics(options: Schema) {
     ];
 
     return chain([
-      options.project
-        ? externalSchematic('@angular/localize', 'ng-add', {
-            project: options.project,
-            useAtRuntime: true
-          })
-        : noop(),
       updateWorkspace(),
       installDependencies(dependencies),
       updatePackagejson(),
@@ -117,7 +121,7 @@ function installSchematics(options: Schema) {
 // You don't have to export the function as default. You can also have more than one rule factory
 // per file.
 export default function (_options: Schema): Rule {
-  return async () => {
+  return async (tree: Tree) => {
     if (!_options.version) {
       const [appTags, pkgTags] = await Promise.all([
         listNpmReleaseTags(CORE_IOT_PACKAGE),
@@ -138,17 +142,28 @@ export default function (_options: Schema): Rule {
       });
     }
 
-    if (_options.eslint) {
-      const angularVersion = require('@angular/cli/package.json').version.replace(
-        /^(.\d+)\.\d+\.\d+/,
-        '$1'
+    const workspace = await readWorkspace(tree);
+    _options.eslint =
+      _options.eslint &&
+      !((workspace.extensions.cli as JsonObject)?.schematicCollections as string[])?.some((x) =>
+        ['@angular-eslint/schematics', 'angular-eslint'].includes(x)
       );
 
-      await installNpmPackages([`@angular-eslint/schematics@${angularVersion}`]);
+    const angularVersion = require('@angular/cli/package.json').version.replace(
+      /^(.\d+)\.\d+\.\d+/,
+      '$1'
+    );
+
+    if (_options.eslint) {
+      await installNpmPackages([
+        ...(_options.eslint ? [`angular-eslint@${angularVersion}`] : []),
+        `@angular/localize@${angularVersion}`,
+        `@types/node@${NODE_VERSION}`
+      ]);
     }
 
     return chain([
-      _options.eslint ? externalSchematic('@angular-eslint/schematics', 'ng-add', {}) : noop(),
+      _options.eslint ? externalSchematic('angular-eslint', 'ng-add', {}) : noop(),
       installSchematics(_options)
     ]);
   };
