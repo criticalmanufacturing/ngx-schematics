@@ -1,6 +1,6 @@
 {
   "name": "@criticalmanufacturing/schematics",
-  "version": "11.0.15",
+  "version": "11.0.16",
   "description": "Critical Manufacturing Angular Schematics",
   "private": true,
   "dependencies": {
@@ -37,4 +37,3 @@
     "packages/*"
   ]
 }
-
