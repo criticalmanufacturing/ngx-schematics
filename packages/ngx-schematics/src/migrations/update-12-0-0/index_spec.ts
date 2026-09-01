@@ -277,5 +277,39 @@ describe('Test ng-update', () => {
 
       expect(assets).toEqual(expect.arrayContaining(V12_ASSETS));
     });
+
+    it('should not update templates outside Angular project roots', async () => {
+      const templatePath = '/outside-project.component.html';
+      const template = '<cmf-core-controls-actionButton [lessRelevant]="true" />';
+      appTree.create(templatePath, template);
+
+      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+
+      expect(tree.readText(templatePath)).toBe(template);
+    });
+
+    it('should map boolean less relevant values and preserve unrelated bindings', async () => {
+      const templatePath = '/application/src/app/action-buttons.component.html';
+      appTree.create(
+        templatePath,
+        [
+          '<cmf-core-controls-actionButton [lessRelevant]="true" />',
+          '<cmf-core-controls-actionButton [lessRelevant]="false" />',
+          '<cmf-core-controls-actionButton [lessRelevant]="isLessRelevant" />',
+          '<other-component [lessRelevant]="true" />'
+        ].join('\n')
+      );
+
+      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+
+      expect(tree.readText(templatePath)).toBe(
+        [
+          '<cmf-core-controls-actionButton placement="MORE_OPTIONS" />',
+          '<cmf-core-controls-actionButton placement="STANDARD" />',
+          '<cmf-core-controls-actionButton [lessRelevant]="isLessRelevant" />',
+          '<other-component [lessRelevant]="true" />'
+        ].join('\n')
+      );
+    });
   });
 });

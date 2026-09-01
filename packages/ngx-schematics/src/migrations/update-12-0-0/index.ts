@@ -6,6 +6,7 @@ import { migrate as migrateStandalone } from '@criticalmanufacturing/schematics-
 import { updateThemesInConfigFile } from './themes-update';
 import { updateAppSettings } from './configs-update';
 import { addWorkers } from '../../ng-add/rules/add-workers';
+import { updateActionButtonPlacement } from './action-button-update';
 
 export default function (): Rule {
   return async (tree: Tree) => {
@@ -21,6 +22,7 @@ export default function (): Rule {
       migrateSuperExpressions({ path: './' }),
       migrateStandalone({ path: './' }),
       addWorkers({ project }),
+      updateActionButtonPlacement({ path: './' }),
       updateI18nExtract({ project, version: '12.0.0-alpha.1' })
     ]);
   };
