@@ -159,7 +159,7 @@ describe('Test ng-update', () => {
       expect(actual).toEqual(expect.arrayContaining(newThemes));
     });
 
-    it('should update the application builder outputPath', async () => {
+    it('should update the application builder loader', async () => {
       const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
 
       const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));

@@ -97,7 +97,10 @@ export function updateWorkspace(options: {
       // Add scripts
       { path: ['scripts'], value: PROJECT_SCRIPTS, operation: 'add' },
       // update output path
-      { path: ['outputPath'], value: { base: `dist/${options.project}`, browser: '' } },
+      {
+        path: ['outputPath'],
+        value: { base: `dist/${options.project.toLowerCase()}`, browser: '' }
+      },
       // Add loader
       { path: ['loader'], value: PROJECT_LOADER, operation: 'add' }
     ]);
