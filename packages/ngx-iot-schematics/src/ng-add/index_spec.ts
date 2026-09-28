@@ -7,7 +7,7 @@ describe('Test ng-add', () => {
     require.resolve('../collection.json')
   );
 
-  const workspaceOptions = { name: 'workspace', version: '10.0.0' };
+  const workspaceOptions = { name: 'workspace', version: '22.2.0' };
 
   const appOptions = {
     name: 'application',

@@ -6,18 +6,21 @@ const mockedExec = vi.fn(
     _: ExecOptionsWithBufferEncoding,
     callback: (error: ExecException | null, output: { stdout: string; stderr: string }) => void
   ) => {
-    const [pkg, version] =
-      cmd?.match(/npm view (.+?)@(.+) peerDependencies --json/)?.slice(1) ?? [];
+    const [pkg, version] = cmd.match(/npm view (.+?)@(.+) peerDependencies --json/)?.slice(1) ?? [];
 
     if (pkg === 'cmf-core-ui') {
-      callback(null, { stdout: `{ "cmf-core": "${version}" }`, stderr: '' });
+      callback(null, {
+        stdout: `{ "cmf-core": "${version}" }`,
+        stderr: ''
+      });
     } else if (pkg === 'cmf-mes-ui') {
       callback(null, {
         stdout: `{ "cmf-core": "${version}", "cmf-mes": "${version}" }`,
         stderr: ''
       });
     } else {
-      callback(new Error(`Package ${pkg} not found`), { stdout: '', stderr: '' });
+      const error = Object.assign(new Error(`Package ${pkg} not found`), { cmd });
+      callback(error, { stdout: '', stderr: '' });
     }
   }
 );

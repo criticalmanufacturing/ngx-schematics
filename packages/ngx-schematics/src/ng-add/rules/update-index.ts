@@ -10,7 +10,7 @@ import { join, normalize } from '@angular-devkit/core';
  * 2. Inserts the base themes in the head
  * 3. Inserts the loading container in the body in each file
  */
-export function updateIndexFiles(options: { project: string }): Rule {
+export function updateIndexHTMLFiles(options: { project: string }): Rule {
   return async (tree: Tree) => {
     const workspace = await readWorkspace(tree);
     const project = workspace.projects.get(options.project);

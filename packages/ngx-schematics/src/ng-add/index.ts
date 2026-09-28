@@ -23,7 +23,7 @@ import { listNpmReleaseTags } from '@criticalmanufacturing/schematics-devkit';
 import { CORE_BASE_MODULE, MES_BASE_MODULE } from './package-configs.js';
 import pkg from '../../package.json';
 import { Schema } from './schema.js';
-import { updateIndexFiles } from './rules/update-index.js';
+import { updateIndexHTMLFiles } from './rules/update-index.js';
 import { updateBootstrapComponent } from './rules/update-bootstrap-component.js';
 import { updateMain } from './rules/update-main.js';
 import { addConfigJson } from './rules/add-config-json.js';
@@ -33,6 +33,7 @@ import { updateAppConfig } from './rules/update-app-config.js';
 import { updateNgswConfig } from './rules/update-ngsw-config.js';
 import { updateWebmanifest } from './rules/update-webmanifest.js';
 import { addWorkers } from './rules/add-workers.js';
+import { updatePackageJson } from './rules/update-package-json.js';
 
 /**
  * Updates main.ts file adding the load config method
@@ -81,7 +82,7 @@ function installSchematics(options: Schema) {
       ...(options.project
         ? [
             addConfigJson({ project: options.project }),
-            updateIndexFiles({ project: options.project }),
+            updateIndexHTMLFiles({ project: options.project }),
             updateBootstrapComponent({ project: options.project }),
             updateAppModule({ project: options.project, application: options.application }),
             updateAppConfig({ project: options.project, application: options.application }),
@@ -103,6 +104,7 @@ function installSchematics(options: Schema) {
         { path: ['compilerOptions', 'strictNullChecks'], value: false },
         { path: ['compilerOptions', 'preserveSymlinks'], value: true }
       ]),
+      updatePackageJson(),
       installDependencies(dependencies)
     ]);
   };

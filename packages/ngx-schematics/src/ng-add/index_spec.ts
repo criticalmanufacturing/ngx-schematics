@@ -1,3 +1,4 @@
+import { JsonObject } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { normalize } from '@criticalmanufacturing/schematics-devkit/testing';
 import { parse } from 'jsonc-parser';
@@ -13,7 +14,7 @@ describe('Test ng-add', () => {
 
   const workspaceOptions = {
     name: 'workspace',
-    version: '10.0.0'
+    version: '22.2.0'
   };
 
   const ngAddOptions = {
@@ -168,7 +169,7 @@ describe('Test ng-add', () => {
       name: 'application',
       inlineStyle: false,
       inlineTemplate: false,
-      routing: false,
+      routing: true,
       skipTests: false,
       skipPackageJson: false,
       standalone: true,
@@ -210,6 +211,14 @@ describe('Test ng-add', () => {
         ])
       );
       expect(tree.files.every((x) => !x.startsWith('/application/public'))).toBeTruthy();
+    });
+
+    it('should have the package.json updated', async () => {
+      const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+
+      const actual = tree.readJson('/package.json') as JsonObject;
+
+      expect(actual['overrides']).toEqual({ blockly: { jsdom: '$jsdom' } });
     });
 
     describe('- Generate index.html', () => {

@@ -15,8 +15,7 @@
       "address": "",
       "port": 0,
       "timeout": 120000
-    },
-    "isLoadBalancerEnabled": false
+    }
   },
   "lboGenerator": {
     "enableSsl": false,
