@@ -31,36 +31,6 @@ export const THEMES = [
 ];
 
 /**
- * Project Allowed CommonJS Dependencies
- */
-export const PROJECT_ALLOWED_COMMONJS_DEPENDENCIES = [
-  'quagga',
-  'html2canvas',
-  'zipson',
-  'decimal.js',
-  'moment',
-  'moment-duration-format',
-  'backbone',
-  'jquery',
-  'lodash',
-  'raf',
-  'rgbcolor',
-  'core-js',
-  'dompurify',
-  'jsonata',
-  'xpath',
-  'xmldom',
-  'inversify',
-  'escape-latex',
-  'fraction.js',
-  'complex.js',
-  'javascript-natural-sort',
-  'seedrandom',
-  'typed-function',
-  'buffer'
-];
-
-/**
  * Project Assets for v12 update
  */
 export const V12_ASSETS = [

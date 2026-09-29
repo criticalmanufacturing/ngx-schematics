@@ -7,6 +7,16 @@ import {
 } from '@criticalmanufacturing/schematics-devkit';
 import { readWorkspace } from '@schematics/angular/utility';
 
+export const NGSW_WELL_KNOWN_CONFIG = {
+  name: 'well-known-configuration',
+  urls: ['/.well-known/criticalmanufacturing-configuration'],
+  cacheConfig: {
+    maxSize: 1,
+    maxAge: '1h',
+    strategy: 'performance'
+  }
+};
+
 function getAssetGroup(ngswConfig: JsonObject, name: string): JsonObject | undefined {
   return (ngswConfig['assetGroups'] as JsonArray).find(
     (assetGroup) => (assetGroup as JsonObject)['name'] === name
@@ -60,7 +70,8 @@ export function updateNgswConfig(options: { project: string }): Rule {
           maxAge: '30d',
           strategy: 'freshness'
         }
-      }
+      },
+      NGSW_WELL_KNOWN_CONFIG
     ]);
 
     ngswConfig['navigationRequestStrategy'] = 'freshness';

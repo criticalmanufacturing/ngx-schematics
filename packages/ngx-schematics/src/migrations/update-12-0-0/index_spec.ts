@@ -6,6 +6,7 @@ import { NEW_THEMES, OLD_THEMES } from './themes-update';
 import { KENDO_STYLES, PROJECT_LOADER, V12_ASSETS } from '../../ng-add/package-configs';
 import { KENDO_OLD_SCRIPTS, KENDO_OLD_STYLES, CONNECT_IOT_STYLES } from './configs-update';
 import '../../testing/child_process-exec.mock';
+import { NGSW_WELL_KNOWN_CONFIG } from '../../ng-add/rules/update-ngsw-config';
 
 /**
  * Mock config.json file with blue and gray themes included
@@ -310,6 +311,75 @@ describe('Test ng-update', () => {
           '<other-component [lessRelevant]="true" />'
         ].join('\n')
       );
+    });
+
+    it('should update configs in the ngsw-config.json', async () => {
+      appTree.create(
+        '/application/ngsw-config.json',
+        `\
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "resources": {
+        "files": [
+          "/favicon.ico",
+          "/manifest.webmanifest",
+          "/*.css",
+          "/*.js",
+          "/monaco-editor/**/*.js"
+        ]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/assets/**",
+          "!/assets/config.json",
+          "/media/**",
+          "/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"
+        ]
+      }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "config",
+      "urls": [
+        "/assets/config.json"
+      ],
+      "cacheConfig": {
+        "maxSize": 1,
+        "maxAge": "30d",
+        "strategy": "freshness"
+      }
+    }
+  ],
+  "navigationRequestStrategy": "freshness"
+}`
+      );
+
+      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+      const ngswConfig = tree.readJson('/application/ngsw-config.json') as JsonObject;
+
+      expect(ngswConfig['dataGroups']).toStrictEqual([
+        {
+          name: 'config',
+          urls: ['/assets/config.json'],
+          cacheConfig: {
+            maxSize: 1,
+            maxAge: '30d',
+            strategy: 'freshness'
+          }
+        },
+        NGSW_WELL_KNOWN_CONFIG
+      ]);
     });
   });
 });

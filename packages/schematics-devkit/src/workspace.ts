@@ -170,16 +170,27 @@ export function removeFromJsonObject(
 }
 
 /**
- * Finds the name of the first application project defined in the worspace
+ * Finds the name and definition of the first application project defined in the worspace
  * @param tree Tree
- * @returns the project name or undefined if not found
+ * @returns the project name and definition or undefined if not found
  */
-export async function getDefaultApplicationProject(tree: Tree): Promise<string | undefined> {
+export async function getDefaultApplicationProject(
+  tree: Tree
+): Promise<[string, ProjectDefinition] | undefined> {
   const workspace = await readWorkspace(tree);
 
   return Array.from(workspace.projects.entries()).find(([, def]) => {
     return def.extensions.projectType === ProjectType.Application;
-  })?.[0];
+  });
+}
+
+/**
+ * Finds the name of the first application project defined in the worspace
+ * @param tree Tree
+ * @returns the project name or undefined if not found
+ */
+export async function getDefaultAppProjectName(tree: Tree): Promise<string | undefined> {
+  return (await getDefaultApplicationProject(tree))?.[0];
 }
 
 /**
