@@ -1,6 +1,5 @@
 import { NgModule, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { App } from './app';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { provideMesUI } from 'cmf-mes-ui';

@@ -1,4 +1,4 @@
-import { getSystemPath, normalize, virtualFs } from '@angular-devkit/core';
+import { getSystemPath, normalize } from '@angular-devkit/core';
 import { TempScopedNodeJsSyncHost } from '@angular-devkit/core/node/testing';
 import { HostTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing/index.js';
@@ -12,7 +12,7 @@ describe('inject migration', () => {
   let previousWorkingDir: string;
 
   function writeFile(filePath: string, contents: string) {
-    host.sync.write(normalize(filePath), virtualFs.stringToFileBuffer(contents));
+    host.sync.write(normalize(filePath), new TextEncoder().encode(contents).buffer);
   }
 
   function runMigration(options?: { path?: string }) {
