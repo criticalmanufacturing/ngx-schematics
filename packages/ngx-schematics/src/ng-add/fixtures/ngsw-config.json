@@ -40,6 +40,17 @@
         "maxAge": "30d",
         "strategy": "freshness"
       }
+    },
+    {
+      "name": "well-known-configuration",
+      "urls": [
+        "/.well-known/criticalmanufacturing-configuration"
+      ],
+      "cacheConfig": {
+        "maxSize": 1,
+        "maxAge": "1h",
+        "strategy": "performance"
+      }
     }
   ],
   "navigationRequestStrategy": "freshness"

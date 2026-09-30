@@ -17,7 +17,7 @@ import {
   createSourceFile,
   strings,
   relativeToRoot,
-  getDefaultApplicationProject,
+  getDefaultAppProjectName,
   getObjectProperty,
   addSymbolToArrayLiteral,
   insertImport
@@ -69,7 +69,7 @@ function updateAppConfig(options: { packageName: string; namePrefix: string }): 
 
 function updateAppModule(options: { packageName: string; namePrefix: string }): Rule {
   return async (tree: Tree) => {
-    const project = await getDefaultApplicationProject(tree);
+    const project = await getDefaultAppProjectName(tree);
 
     if (!project) {
       return;

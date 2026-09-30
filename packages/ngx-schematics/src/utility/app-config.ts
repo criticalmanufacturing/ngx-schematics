@@ -1,7 +1,7 @@
 import { Tree } from '@angular-devkit/schematics';
 import {
   createSourceFile,
-  getDefaultApplicationProject,
+  getDefaultAppProjectName,
   getMainPath,
   getRelativeImportPath
 } from '@criticalmanufacturing/schematics-devkit';
@@ -13,7 +13,7 @@ import { ObjectLiteralExpression, SyntaxKind } from 'ts-morph';
 export async function getDefaultAppConfig(
   tree: Tree
 ): Promise<ObjectLiteralExpression | undefined> {
-  const project = await getDefaultApplicationProject(tree);
+  const project = await getDefaultAppProjectName(tree);
 
   if (!project) {
     return;

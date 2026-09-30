@@ -3,7 +3,6 @@ import { Rule, SchematicsException, Tree } from '@angular-devkit/schematics';
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 import { getBuildTargets } from '@criticalmanufacturing/schematics-devkit';
 import {
-  PROJECT_ALLOWED_COMMONJS_DEPENDENCIES,
   PROJECT_CORE_ASSETS,
   PROJECT_CORE_STYLES,
   PROJECT_LOADER,
@@ -30,8 +29,7 @@ export function updateWorkspace(options: {
 
     // Add schematics to the schematic collections
     let schematicCollections = (workspace.extensions.cli as JsonObject).schematicCollections as
-      | JsonArray
-      | undefined;
+      JsonArray | undefined;
 
     if (!schematicCollections) {
       schematicCollections = (workspace.extensions.cli as JsonObject).schematicCollections = [];
@@ -75,12 +73,6 @@ export function updateWorkspace(options: {
     return updateAppBuildTarget(options.project, [
       // add preserve symlinks to install custom libraries like cutom lbos
       { path: ['preserveSymlinks'], value: true },
-      // Add allowedCommonJsDependencies
-      {
-        path: ['allowedCommonJsDependencies'],
-        value: PROJECT_ALLOWED_COMMONJS_DEPENDENCIES,
-        operation: 'add'
-      },
       {
         path: ['assets'],
         value: (options.application === 'MES'

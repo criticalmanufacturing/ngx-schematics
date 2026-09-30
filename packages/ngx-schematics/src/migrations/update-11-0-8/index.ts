@@ -1,9 +1,6 @@
 import { join, JsonArray, JsonObject, normalize } from '@angular-devkit/core';
 import { chain, Rule, SchematicsException, Tree } from '@angular-devkit/schematics';
-import {
-  addToJsonArray,
-  getDefaultApplicationProject
-} from '@criticalmanufacturing/schematics-devkit';
+import { addToJsonArray, getDefaultAppProjectName } from '@criticalmanufacturing/schematics-devkit';
 import { readWorkspace } from '@schematics/angular/utility';
 
 function updateNgswConfig(options: { project: string }): Rule {
@@ -18,7 +15,7 @@ function updateNgswConfig(options: { project: string }): Rule {
 
     const ngswConfigPath = join(normalize(project.root), 'ngsw-config.json');
     const ngswConfig = tree.readJson(ngswConfigPath) as JsonObject;
-    const assetsAssetGroup = ((ngswConfig)['assetGroups'] as JsonArray).find(
+    const assetsAssetGroup = (ngswConfig['assetGroups'] as JsonArray).find(
       (assetGroup) => (assetGroup as JsonObject)['name'] === 'assets'
     ) as JsonObject;
 
@@ -34,7 +31,7 @@ function updateNgswConfig(options: { project: string }): Rule {
 
 export default function (): Rule {
   return async (tree: Tree) => {
-    const project = await getDefaultApplicationProject(tree);
+    const project = await getDefaultAppProjectName(tree);
 
     if (!project) {
       return;

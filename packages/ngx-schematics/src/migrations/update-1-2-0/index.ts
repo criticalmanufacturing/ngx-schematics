@@ -3,7 +3,7 @@ import { SW_ASSETS, updateServiceWorker } from './update-service-worker';
 import { getAppModulePath } from '../../utility/ng-module';
 import {
   createSourceFile,
-  getDefaultApplicationProject
+  getDefaultAppProjectName
 } from '@criticalmanufacturing/schematics-devkit';
 import { updateAppBuildTarget } from '@criticalmanufacturing/schematics-devkit/rules';
 
@@ -34,7 +34,7 @@ function updateAppModuleServiceWorker(project: string): Rule {
 
 export default function (): Rule {
   return async (tree: Tree) => {
-    const project = await getDefaultApplicationProject(tree);
+    const project = await getDefaultAppProjectName(tree);
 
     if (!project) {
       return;

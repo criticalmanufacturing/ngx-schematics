@@ -2,7 +2,7 @@ import { Rule, SchematicsException, Tree, chain } from '@angular-devkit/schemati
 import {
   createSourceFile,
   getBuildTargets,
-  getDefaultApplicationProject,
+  getDefaultAppProjectName,
   removeFromJsonArray
 } from '@criticalmanufacturing/schematics-devkit';
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
@@ -114,7 +114,7 @@ function updateAppScripts(options: { project: string }): Rule {
 
 export default function (): Rule {
   return async (tree: Tree) => {
-    const project = await getDefaultApplicationProject(tree);
+    const project = await getDefaultAppProjectName(tree);
 
     if (!project) {
       return;
