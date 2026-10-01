@@ -27,7 +27,7 @@ export default function (): Rule {
       migrateStandalone({ path: './' }),
       addWorkers({ project }),
       updateActionButtonPlacement({ path: './' }),
-      updateI18nExtract({ project, version: '12.0.0-alpha.1' }),
+      updateI18nExtract({ project, version: '12.0.0-beta.2' }),
       updateJsonFile(join(normalize(definition.root), 'ngsw-config.json'), [
         { path: ['dataGroups'], value: [NGSW_WELL_KNOWN_CONFIG], operation: 'add' }
       ])
