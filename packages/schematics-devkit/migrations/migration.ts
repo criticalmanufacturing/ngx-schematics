@@ -47,9 +47,8 @@ export async function createMigrationProject(
       return;
     }
 
-    tsProject.addSourceFilesAtPaths(
-      relative(path, srcRoot).startsWith('..') ? join(path, '**/*.ts') : join(srcRoot, '**/*.ts')
-    );
+    // glob pattern: add .ts, but exclude .d.ts
+    tsProject.addSourceFilesAtPaths(['**/*.ts', '!**/*.d.ts', '!**/node_modules/**']);
   });
 
   return tsProject;

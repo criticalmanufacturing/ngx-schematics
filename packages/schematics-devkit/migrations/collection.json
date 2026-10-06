@@ -10,6 +10,11 @@
       "description": "Updates NgModules and stadnalone components to use standalone components.",
       "factory": "./update-12-0-0-standalone#migrate",
       "schema": "./update-12-0-0-standalone/schema.json"
+    },
+    "update-lbo-call": {
+      "description": "Updates usage of LBOService's call function to the new signature.",
+      "factory": "./update-12-0-0-lbo-call#migrate",
+      "schema": "./update-12-0-0-lbo-call/schema.json"
     }
   }
 }
