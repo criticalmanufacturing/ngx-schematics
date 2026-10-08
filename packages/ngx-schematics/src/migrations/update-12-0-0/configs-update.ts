@@ -1,9 +1,16 @@
 import { chain, Rule } from '@angular-devkit/schematics';
 import {
+  getInstalledDependency,
   updateAppBuildTarget,
   updateTsConfig
 } from '@criticalmanufacturing/schematics-devkit/rules';
-import { KENDO_STYLES, PROJECT_LOADER, V12_ASSETS } from '../../ng-add/package-configs';
+import {
+  KENDO_STYLES,
+  MES_BASE_MODULE,
+  PROJECT_LOADER,
+  V12_ASSETS,
+  V12_MES_ASSETS
+} from '../../ng-add/package-configs';
 
 export const CONNECT_IOT_STYLES = [
   'node_modules/@criticalmanufacturing/connect-iot-controller-engine-core-tasks/assets/font/icon-core-tasks-connect-iot-font.less',
@@ -111,7 +118,7 @@ export const KENDO_OLD_SCRIPTS = [
 export const KENDO_OLD_STYLES = ['node_modules/cmf.kendoui/styles/kendo.common.min.css'];
 
 export function updateAppSettings({ project }: { project: string }): Rule {
-  return () => {
+  return (tree) => {
     return chain([
       updateAppBuildTarget(project, [
         {
@@ -149,7 +156,10 @@ export function updateAppSettings({ project }: { project: string }): Rule {
         },
         {
           path: ['assets'],
-          value: [...V12_ASSETS],
+          value: [
+            ...V12_ASSETS,
+            ...(getInstalledDependency(tree, MES_BASE_MODULE[0]) ? V12_MES_ASSETS : [])
+          ],
           operation: 'add'
         }
       ]),

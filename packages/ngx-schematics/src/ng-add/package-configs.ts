@@ -43,6 +43,22 @@ export const V12_ASSETS = [
     glob: '**/*.wasm',
     input: 'node_modules/zxing-wasm/dist/reader',
     output: 'zxing-wasm/reader'
+  },
+  {
+    glob: '**/*.generated.schema.json',
+    input: 'node_modules/cmf-core-ui/assets/ui-page-schemas',
+    output: 'assets/generated-schemas'
+  }
+];
+
+/**
+ * Generated page schema assets
+ */
+export const V12_MES_ASSETS = [
+  {
+    glob: '**/*.generated.schema.json',
+    input: 'node_modules/cmf-mes-ui/assets/ui-page-schemas',
+    output: 'assets/generated-schemas'
   }
 ];
 
@@ -105,6 +121,7 @@ export const PROJECT_CORE_ASSETS = [...PROJECT_ASSETS];
  */
 export const PROJECT_MES_ASSETS = [
   ...PROJECT_ASSETS,
+  ...V12_MES_ASSETS,
   {
     glob: '**/*.svg',
     input: 'node_modules/cmf-mes-business-controls/assets/product/img',
