@@ -3,7 +3,12 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 import { getBuildTargets } from '@criticalmanufacturing/schematics-devkit';
 import { NEW_THEMES, OLD_THEMES } from './themes-update';
-import { KENDO_STYLES, PROJECT_LOADER, V12_ASSETS } from '../../ng-add/package-configs';
+import {
+  KENDO_STYLES,
+  PROJECT_LOADER,
+  V12_ASSETS,
+  V12_MES_ASSETS
+} from '../../ng-add/package-configs';
 import { KENDO_OLD_SCRIPTS, KENDO_OLD_STYLES, CONNECT_IOT_STYLES } from './configs-update';
 import '../../testing/child_process-exec.mock';
 import { NGSW_WELL_KNOWN_CONFIG } from '../../ng-add/rules/update-ngsw-config';
@@ -270,14 +275,36 @@ describe('Test ng-update', () => {
       expect(styles).not.toEqual(expect.arrayContaining(CONNECT_IOT_STYLES));
     });
 
-    it('should add cmf-core-iot and zxing-wasm assets', async () => {
-      const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+    it.each(['Core', 'dependencies', 'devDependencies'])(
+      'should add v12 assets with %s and preserve existing assets',
+      async (application) => {
+        if (application !== 'Core') {
+          const packageJson = appTree.readJson('/package.json') as JsonObject;
+          packageJson[application] ??= {};
+          (packageJson[application] as JsonObject)['cmf-mes-ui'] = '11.0.0';
+          appTree.overwrite('/package.json', JSON.stringify(packageJson));
+        }
 
-      const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
-      const assets = angularJsonContent.projects.application.architect.build.options.assets;
+        const workspace = await readWorkspace(appTree);
+        const existingAssets = getBuildTargets(workspace.projects.get('application')!)[0].options!
+          .assets as JsonArray;
 
-      expect(assets).toEqual(expect.arrayContaining(V12_ASSETS));
-    });
+        const tree = await migrationsSchematicRunner.runSchematic('update-12-0-0', {}, appTree);
+        const updatedWorkspace = await readWorkspace(tree);
+        const assets = getBuildTargets(updatedWorkspace.projects.get('application')!)[0].options!
+          .assets as JsonArray;
+
+        expect(assets).toEqual(expect.arrayContaining(existingAssets));
+        expect(assets).toEqual(expect.arrayContaining(V12_ASSETS));
+        if (application === 'Core') {
+          for (const asset of V12_MES_ASSETS) {
+            expect(assets).not.toContainEqual(asset);
+          }
+        } else {
+          expect(assets).toEqual(expect.arrayContaining(V12_MES_ASSETS));
+        }
+      }
+    );
 
     it('should not update templates outside Angular project roots', async () => {
       const templatePath = '/outside-project.component.html';

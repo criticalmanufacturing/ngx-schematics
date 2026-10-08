@@ -1,9 +1,10 @@
 import { JsonObject } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { readWorkspace } from '@schematics/angular/utility';
 import { normalize } from '@criticalmanufacturing/schematics-devkit/testing';
 import { parse } from 'jsonc-parser';
 import { readFileSync } from 'node:fs';
-import { KENDO_STYLES, PROJECT_LOADER, V12_ASSETS } from './package-configs';
+import { KENDO_STYLES, PROJECT_LOADER, V12_ASSETS, V12_MES_ASSETS } from './package-configs';
 import '../testing/child_process-exec.mock';
 
 describe('Test ng-add', () => {
@@ -342,13 +343,25 @@ describe('Test ng-add', () => {
         expect(styles).toEqual(expect.arrayContaining(KENDO_STYLES));
       });
 
-      it('should have cmf-core-iot and zxing-wasm assets', async () => {
-        const tree = await schematicRunner.runSchematic('ng-add', ngAddOptions, appTree);
+      it.each(['Core', 'MES'])('should have v12 assets for %s', async (application) => {
+        const tree = await schematicRunner.runSchematic(
+          'ng-add',
+          { ...ngAddOptions, application },
+          appTree
+        );
 
-        const angularJsonContent = JSON.parse(tree.readContent('/angular.json'));
-        const assets = angularJsonContent.projects.application.architect.build.options.assets;
+        const workspace = await readWorkspace(tree);
+        const assets = workspace.projects.get('application')!.targets.get('build')!.options!.assets;
 
         expect(assets).toEqual(expect.arrayContaining(V12_ASSETS));
+
+        if (application === 'MES') {
+          expect(assets).toEqual(expect.arrayContaining(V12_MES_ASSETS));
+        } else {
+          for (const asset of V12_MES_ASSETS) {
+            expect(assets).not.toContainEqual(asset);
+          }
+        }
       });
 
       it('should not have @criticalmanufacturing/connect-iot styles', async () => {
