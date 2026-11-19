@@ -1,24 +1,22 @@
 import { join, normalize, dirname } from '@angular-devkit/core';
 import { chain, Rule, SchematicsException, Tree } from '@angular-devkit/schematics';
 import { readWorkspace, ProjectDefinition } from '@schematics/angular/utility';
-import { createSourceFile, JSONFile, ProjectType } from '@criticalmanufacturing/schematics-devkit';
+import {
+  createSourceFile,
+  getEntryFilePath,
+  ProjectType
+} from '@criticalmanufacturing/schematics-devkit';
 
 import { setPackageInfoMetadata, PackageInfo, getMetadataFilePath } from '../utility/metadata.js';
 import { Schema } from './schema.js';
 
-function getAllFiles(host: Tree, rootPath: string): string[] {
-  if (!host.exists(join(normalize(rootPath), 'ng-package.json'))) {
-    return [];
-  }
-
-  const json = new JSONFile(host, join(normalize(rootPath), 'ng-package.json'));
-  const entryFile = json.get(['lib', 'entryFile']) as string | null;
-
-  if (!entryFile) {
-    return [];
-  }
-
-  const filesToSearch: string[] = [join(normalize(rootPath), entryFile)];
+/**
+ * Lists TypeScript files re-exported directly or indirectly by the primary library entry point.
+ * @param host Schematic tree containing the library sources.
+ * @param entryFile Path to the primary entry point.
+ */
+function getAllFiles(host: Tree, entryFile: string): string[] {
+  const filesToSearch = [entryFile];
   const filesFound: string[] = [];
 
   while (filesToSearch.length > 0) {
@@ -73,6 +71,10 @@ function fillMetadataPackageInfo(project: ProjectDefinition, options: Required<P
   };
 }
 
+/**
+ * Regenerates library package metadata from the classes exposed by the primary entry point.
+ * @param _options Options identifying the library project to inspect.
+ */
 export default function (_options: Schema): Rule {
   return async (tree: Tree) => {
     const workspace = await readWorkspace(tree);
@@ -87,8 +89,13 @@ export default function (_options: Schema): Rule {
       throw new SchematicsException(`Project "${_options.project}" does not exist.`);
     }
 
-    if (project.extensions['projectType'] !== ProjectType.Library || !project.sourceRoot) {
+    if (project.extensions['projectType'] !== ProjectType.Library) {
       return;
+    }
+
+    const entryFile = getEntryFilePath(tree, project, '');
+    if (!entryFile || !tree.exists(entryFile)) {
+      throw new SchematicsException(`Project "${_options.project}" has no primary entry point.`);
     }
 
     const packageInfo: Required<PackageInfo> = {
@@ -99,7 +106,7 @@ export default function (_options: Schema): Rule {
       components: []
     };
 
-    getAllFiles(tree, project.root).forEach((file) => {
+    getAllFiles(tree, entryFile).forEach((file) => {
       const source = createSourceFile(tree, file);
 
       if (!source) {

@@ -1,9 +1,8 @@
-import { basename, join, JsonObject, normalize } from '@angular-devkit/core';
+import { basename, join, normalize } from '@angular-devkit/core';
 import {
   apply,
   applyTemplates,
   chain,
-  externalSchematic,
   mergeWith,
   move,
   noop,
@@ -12,19 +11,23 @@ import {
   url
 } from '@angular-devkit/schematics';
 import { readWorkspace } from '@schematics/angular/utility';
+import { getDependency } from '@schematics/angular/utility/dependency';
 
 import {
   createSourceFile,
   strings,
-  relativeToRoot,
   getDefaultAppProjectName,
   getObjectProperty,
   addSymbolToArrayLiteral,
-  insertImport
+  insertImport,
+  LIBRARY_METADATA_ENTRY,
+  LIBRARY_METADATA_ENTRY_FILE_NAME
 } from '@criticalmanufacturing/schematics-devkit';
 import {
-  updateNgPackageJson,
-  updateTsConfig
+  addLibraryTsTypes,
+  applyLibraryDefaultConfigs,
+  generateAngularLibrary,
+  registerLibraryEntryPoint
 } from '@criticalmanufacturing/schematics-devkit/rules';
 import { Schema } from './schema.js';
 import { addSymbolToNgModuleMetadata, getAppModulePath } from '../utility/ng-module.js';
@@ -99,7 +102,11 @@ function updateAppModule(options: { packageName: string; namePrefix: string }): 
   };
 }
 
-function createMetadataSubEntry(options: { name: string; skipTsConfig?: boolean }) {
+/**
+ * Generates the library's metadata entry point and registers it with the default application when present.
+ * @param options Library project name and whether to skip workspace TypeScript path mappings.
+ */
+function createMetadataSubEntry(options: Pick<Schema, 'name' | 'skipTsConfig'>): Rule {
   return async (host: Tree) => {
     const workspace = await readWorkspace(host);
     const project = workspace.projects.get(options.name);
@@ -108,63 +115,59 @@ function createMetadataSubEntry(options: { name: string; skipTsConfig?: boolean 
       return;
     }
 
-    const packageName = `${options.name}/metadata`;
-    const folderName = basename(normalize(project.root));
-    const distRoot = `./dist/${folderName}/metadata`;
-    const namePrefix = options.name.replace(/^cmf-/, '');
+    const fullName = strings.dasherize(options.name);
+    const packageName = `${fullName}/${LIBRARY_METADATA_ENTRY.entryPoint}`;
+    const namePrefix = basename(normalize(fullName)).replace(/^cmf-/, '');
 
     const templateSource = apply(url('./files'), [
       applyTemplates({
         ...strings,
-        fullName: options.name,
+        fullName,
         name: namePrefix,
-        entryFile: 'public-api',
-        relativePathToWorkspaceRoot: relativeToRoot(join(normalize(project.root), 'metadata')),
-        distRoot: join(basename(normalize(project.root)), 'metadata')
+        entryFile: LIBRARY_METADATA_ENTRY_FILE_NAME
       }),
-      move(join(normalize(project.root), 'metadata'))
+      move(join(normalize(project.root), LIBRARY_METADATA_ENTRY.entryPoint))
     ]);
 
     return chain([
       mergeWith(templateSource),
-      options.skipTsConfig
-        ? noop()
-        : updateTsConfig([{ path: ['compilerOptions', 'paths', packageName], value: [distRoot] }]),
+      registerLibraryEntryPoint({
+        project,
+        projectName: options.name,
+        ...LIBRARY_METADATA_ENTRY,
+        skipTsConfig: options.skipTsConfig
+      }),
       updateAppModule({ packageName, namePrefix }),
       updateAppConfig({ packageName, namePrefix })
     ]);
   };
 }
 
+/**
+ * Generates an Angular UI library with optional metadata integration.
+ * @param _options Library generation options, including whether to skip metadata.
+ */
 export default function (_options: Schema): Rule {
-  return async (tree: Tree) => {
+  return () => {
     if (!_options.prefix) {
-      const folderName = _options.name.startsWith('@') ? _options.name.substring(1) : _options.name;
+      const folderName = basename(normalize(_options.name));
 
       if (/[A-Z]/.test(folderName)) {
         _options.prefix = strings.dasherize(folderName);
       }
     }
 
-    const workspace = await readWorkspace(tree);
-
-    const lint = ((workspace.extensions.cli as JsonObject)?.schematicCollections as string[])?.find(
-      (x) => ['@angular-eslint/schematics', 'angular-eslint'].includes(x)
-    );
-
     const skipMetadata = _options.skipMetadata;
     delete _options.skipMetadata;
 
     return chain([
-      externalSchematic(lint ?? '@schematics/angular', 'library', _options),
-      updateTsConfig(
-        [
-          { path: ['include'], value: ['**/*.ts'], operation: 'replace' },
-          { path: ['compilerOptions', 'types'], value: ['@angular/localize'] }
-        ],
-        _options.name
-      ),
-      updateNgPackageJson(_options),
+      generateAngularLibrary(_options),
+      applyLibraryDefaultConfigs(_options),
+      (tree: Tree) => {
+        if (getDependency(tree, '@angular/localize')) {
+          return addLibraryTsTypes(_options.name, ['@angular/localize']);
+        }
+      },
       !skipMetadata ? createMetadataSubEntry(_options) : noop()
     ]);
   };

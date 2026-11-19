@@ -1,4 +1,4 @@
-import { Path, normalize, relative as ngRelative, isAbsolute } from '@angular-devkit/core';
+import { Path, relative as ngRelative } from '@angular-devkit/core';
 
 /**
  * Builds the relative path from one path to another
@@ -13,17 +13,4 @@ export function relative(from: Path, to: Path): string {
   }
 
   return path;
-}
-
-/**
- * Gets the relative path from the given path to the root
- * @param projectRoot
- * @returns
- */
-export function relativeToRoot(path: string): string {
-  if (!isAbsolute(normalize(path))) {
-    path = '/' + path;
-  }
-
-  return relative(normalize(path), normalize('/'));
 }

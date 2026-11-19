@@ -89,6 +89,21 @@ describe('Generate Widget', () => {
     );
   });
 
+  it('should honor the configured source root of an ng-packagr library', async () => {
+    const workspace = JSON.parse(appTree.readText('angular.json'));
+    const project = workspace.projects[libraryOptions.name];
+    project.sourceRoot = project.root;
+    project.architect.build = { builder: '@angular/build:ng-packagr' };
+    appTree.overwrite('angular.json', JSON.stringify(workspace));
+    appTree.create(`${libPath}/ng-package.json`, '{"lib":{"entryFile":"public-api.ts"}}');
+    appTree.create(`${libPath}/public-api.ts`, '// Public API\n');
+
+    const tree = await schematicRunner.runSchematic('widget', widgetOptions, appTree);
+
+    expect(tree.exists(`${libPath}/lib/${expectedFiles.wdiget}.ts`)).toBe(true);
+    expect(tree.readText(`${libPath}/public-api.ts`)).toContain(`./lib/${expectedFiles.wdiget}`);
+  });
+
   it('should create the widget style file with other extension', async () => {
     const options = { ...widgetOptions, style: 'css' };
     const tree = await schematicRunner.runSchematic('widget', options, appTree);

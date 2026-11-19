@@ -1,7 +1,6 @@
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { parse } from 'jsonc-parser';
 import { getAllFilesFromDir, normalize } from '@criticalmanufacturing/schematics-devkit/testing';
-import { JsonObject } from '@angular-devkit/core';
 import { readFileSync } from 'node:fs';
 
 function getFileContent(tree: UnitTestTree, path: string): any {
@@ -52,6 +51,28 @@ describe('Generate Library', () => {
     );
   });
 
+  it.each([false, true])(
+    'should only reference declared localization types with --skipPackageJson (declared: %s)',
+    async (hasLocalize) => {
+      const packageJson = getFileContent(appTree, 'package.json');
+      if (hasLocalize) {
+        packageJson.dependencies['@angular/localize'] = '^22.3.0';
+        appTree.overwrite('package.json', JSON.stringify(packageJson));
+      }
+
+      const tree = await schematicRunner.runSchematic(
+        'library',
+        { ...libraryOptions, skipPackageJson: true, skipMetadata: true, skipInstall: true },
+        appTree
+      );
+
+      expect(getFileContent(tree, `${libPath}/tsconfig.lib.json`).compilerOptions.types).toEqual(
+        hasLocalize ? ['@angular/localize'] : []
+      );
+      expect(getFileContent(tree, 'package.json')).toEqual(packageJson);
+    }
+  );
+
   describe('With standalone', () => {
     beforeEach(async () => {
       appTree = await schematicRunner.runExternalSchematic(
@@ -62,15 +83,14 @@ describe('Generate Library', () => {
       );
     });
 
-    it('should update the root ng-package.json', async () => {
-      const options = { ...libraryOptions };
+    it('should preserve existing files in the build output', async () => {
+      const tree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
+      const workspace = getFileContent(tree, '/angular.json');
+      const build = workspace.projects[libraryOptions.name].architect.build;
 
-      const tree = await schematicRunner.runSchematic('library', options, appTree);
-      expect(
-        (tree.readJson(`projects/${libraryOptions.name}/ng-package.json`) as JsonObject)[
-          'deleteDestPath'
-        ]
-      ).toEqual(false);
+      expect(build.builder).toBe('@angular/build:library');
+      expect(build.options.deleteOutputPath).toBe(false);
+      expect(tree.exists(`${libPath}/ng-package.json`)).toBe(false);
     });
 
     it('should create a tsconfig for library', async () => {
@@ -78,16 +98,17 @@ describe('Generate Library', () => {
       const fileContent = getFileContent(tree, `${libPath}/tsconfig.lib.json`);
       expect(fileContent).toBeDefined();
       expect(fileContent.include).toEqual(['**/*.ts']);
+      expect(fileContent.compilerOptions.types).toContain('@angular/localize');
+      expect(getFileContent(tree, 'tsconfig.json').include).toBeUndefined();
     });
 
-    describe('should create the metadata secundary entry point', () => {
+    describe('should create the metadata secondary entry point', () => {
       it('should create the library files', async () => {
         const tree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
         const files = getAllFilesFromDir(`${libPath}/metadata`, tree);
 
         expect(files).toEqual(
           expect.arrayContaining([
-            `${libPath}/metadata/ng-package.json`,
             `${libPath}/metadata/src/public-api.ts`,
             `${libPath}/metadata/src/lib/${libraryOptions.name}-metadata.module.ts`,
             `${libPath}/metadata/src/lib/${libraryOptions.name}-metadata.service.ts`
@@ -95,15 +116,15 @@ describe('Generate Library', () => {
         );
       });
 
-      it('should create a ng-package.json in the metadata entry-point', async () => {
+      it('should register the primary and metadata entry points in package.json', async () => {
         const tree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
+        const packageJson = getFileContent(tree, `${libPath}/package.json`);
 
-        const actual = tree.readText(`${libPath}/metadata/ng-package.json`);
-        const expected = readFileSync(`${fixturesPath}/metadata/ng-package.json`, {
-          encoding: 'utf-8'
+        expect(packageJson.exports).toEqual({
+          '.': './src/public-api.ts',
+          './metadata': './metadata/src/public-api.ts'
         });
-
-        expect(normalize(actual)).toEqual(normalize(expected));
+        expect(tree.exists(`${libPath}/metadata/ng-package.json`)).toBe(false);
       });
 
       it('should create a public-api in the metadata entry-point', async () => {
@@ -158,6 +179,35 @@ describe('Generate Library', () => {
         ]);
       });
 
+      it('should preserve existing TypeScript paths for metadata', async () => {
+        const metadataImport = `${libraryOptions.name}/metadata`;
+        const rootTsConfig = getFileContent(appTree, 'tsconfig.json');
+        rootTsConfig.compilerOptions.paths = { [metadataImport]: ['./custom/metadata'] };
+        appTree.overwrite('tsconfig.json', JSON.stringify(rootTsConfig));
+
+        const tree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
+
+        expect(getFileContent(tree, 'tsconfig.json').compilerOptions.paths[metadataImport]).toEqual(
+          ['./custom/metadata', `./dist/${libraryOptions.name}/metadata`]
+        );
+      });
+
+      it('should configure metadata for a scoped library', async () => {
+        const name = '@test/test-lib';
+        const tree = await schematicRunner.runSchematic('library', { name }, appTree);
+        const tsConfigJson = getFileContent(tree, 'tsconfig.json');
+
+        expect(tsConfigJson.compilerOptions.paths[`${name}/metadata`]).toEqual([
+          './dist/test/test-lib/metadata'
+        ]);
+        expect(
+          tree.readText('projects/test/test-lib/metadata/src/lib/test-lib-metadata.module.ts')
+        ).toContain('function provideTestLib()');
+        const appConfig = tree.readText('projects/app/src/app/app.config.ts');
+        expect(appConfig).toContain(`${name}/metadata`);
+        expect(appConfig).toContain('provideTestLib()');
+      });
+
       it(`should not modify the file when --skipTsConfig`, async () => {
         const tree = await schematicRunner.runSchematic(
           'library',
@@ -176,15 +226,13 @@ describe('Generate Library', () => {
         const options = { ...libraryOptions, skipMetadata: true };
 
         const tree = await schematicRunner.runSchematic('library', options, appTree);
-        const files = getAllFilesFromDir(`projects/${libraryOptions.name}`, tree);
-        expect(files).not.toEqual(
-          expect.arrayContaining([
-            `projects/${libraryOptions.name}/metadata/ng-package.json`,
-            `projects/${libraryOptions.name}/metadata/src/public-api.ts`,
-            `projects/${libraryOptions.name}/metadata/src/lib/${libraryOptions.name}-metadata.module.ts`,
-            `projects/${libraryOptions.name}/metadata/src/lib/${libraryOptions.name}-metadata.service.ts`
-          ])
-        );
+        const packageJson = getFileContent(tree, `${libPath}/package.json`);
+        const tsConfigJson = getFileContent(tree, 'tsconfig.json');
+        expect(tree.exists(`${libPath}/metadata/src/public-api.ts`)).toBe(false);
+        expect(packageJson.exports['./metadata']).toBeUndefined();
+        expect(
+          tsConfigJson.compilerOptions.paths[`${libraryOptions.name}/metadata`]
+        ).toBeUndefined();
       });
 
       it('should update the app.config.ts', async () => {

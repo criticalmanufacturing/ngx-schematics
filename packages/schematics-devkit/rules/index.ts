@@ -5,4 +5,6 @@ export * from './src/update-app-build-target.js';
 export * from './src/update-i18n-extract.js';
 export * from './src/update-json-file.js';
 export * from './src/install-packages.js';
-export * from './src/update-ng-package.js';
+export * from './src/apply-library-default-configs.js';
+export * from './src/generate-angular-library.js';
+export * from './src/register-library-entry-point.js';
