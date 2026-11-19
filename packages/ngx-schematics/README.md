@@ -141,7 +141,7 @@ ng generate execution-view [name] --entity-type [entityType]
 
 ### **library**
 
-Creates a new, generic Library project in the current workspace
+Creates a library using the workspace's Angular CLI. Angular CLI 22.0 through 22.2 uses `ng-packagr` and `ng-package.json`. From 22.3, Angular uses `@angular/build:library` and declares entry points in the library's `package.json` exports.
 
 #### **Arguments:**
 
@@ -151,14 +151,17 @@ Creates a new, generic Library project in the current workspace
 
 #### **Options:**
 
-| Name                  | Description                                                                                | Value Type | Default Value |
-| --------------------- | ------------------------------------------------------------------------------------------ | ---------- | ------------- |
-| `--entry-file`        | The path at which to create the library's public API file, relative to the workspace root. | `string`   | `public-api`  |
-| `--prefix`            | A prefix to apply to generated selectors.                                                  | `string`   | `lib`         |
-| `--skip-package-json` | Do not add dependencies to the "package.json" file.                                        | `boolean`  | `false`       |
-| `--skip-install`      | Do not install dependency packages.                                                        | `boolean`  | `false`       |
-| `--skip-ts-config`    | Do not update "tsconfig.json" to add a path mapping for the new library.                   | `boolean`  | `false`       |
-| `--skip-metadata`     | Do not generate metadata for the new library.                                              | `boolean`  | `false`       |
+| Name                  | Description                                                                        | Value Type | Default Value                       |
+| --------------------- | ---------------------------------------------------------------------------------- | ---------- | ----------------------------------- |
+| `--entry-file`        | Name of the public API file under `src`, without the `.ts` extension.              | `string`   | `public-api`                        |
+| `--prefix`            | Prefix for generated selectors.                                                    | `string`   | `lib`                               |
+| `--skip-package-json` | Skip adding dependencies to the workspace `package.json`.                          | `boolean`  | `false`                             |
+| `--skip-install`      | Skip automatic package installation.                                               | `boolean`  | `false`                             |
+| `--skip-ts-config`    | Skip adding library path mappings and references to the workspace `tsconfig.json`. | `boolean`  | `false`                             |
+| `--project-root`      | Library directory relative to the workspace root.                                  | `string`   | Workspace `newProjectRoot` and name |
+| `--standalone`        | Generate the Angular library scaffold using standalone APIs.                       | `boolean`  | `true`                              |
+| `--test-runner`       | Runner for `ng test`. Accepts `vitest` or `karma`. Angular deprecates this option. | `string`   | `vitest`                            |
+| `--skip-metadata`     | Skip generating the library's `./metadata` entry point.                            | `boolean`  | `false`                             |
 
 #### **Usage:**
 

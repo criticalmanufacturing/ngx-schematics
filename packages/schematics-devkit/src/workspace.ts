@@ -1,4 +1,9 @@
-import { ProjectDefinition, TargetDefinition, readWorkspace } from '@schematics/angular/utility';
+import {
+  AngularBuilder,
+  ProjectDefinition,
+  TargetDefinition,
+  readWorkspace
+} from '@schematics/angular/utility';
 import { Tree } from '@angular-devkit/schematics';
 import { exec } from 'child_process';
 import { JsonArray, JsonObject, JsonValue } from '@angular-devkit/core';
@@ -35,15 +40,20 @@ export function getBuildTargets(project: ProjectDefinition): TargetDefinition[] 
 }
 
 /**
- * Build a default project path for generating.
- * @param project The project which will have its default path generated.
+ * Returns the default directory for generated sources in an Angular project.
+ * Uses `src/lib` when the Angular library builder sets `sourceRoot` to the project root.
+ * @param project Workspace project definition.
  */
 export function getDefaultPath(project: ProjectDefinition): string {
-  const root = project.sourceRoot ? `/${project.sourceRoot}/` : `/${project.root}/src/`;
-  const projectDirName =
-    project.extensions['projectType'] === ProjectType.Application ? 'app' : 'lib';
+  const isApplication = project.extensions['projectType'] === ProjectType.Application;
+  const libraryRootIsSourceRoot =
+    project.sourceRoot === project.root &&
+    project.targets.get('build')?.builder === AngularBuilder.BuildLibrary;
+  const sourceRoot =
+    project.sourceRoot && !libraryRootIsSourceRoot ? project.sourceRoot : `${project.root}/src`;
+  const projectDirName = isApplication ? 'app' : 'lib';
 
-  return `${root}${projectDirName}`;
+  return `/${sourceRoot}/${projectDirName}`;
 }
 
 /**

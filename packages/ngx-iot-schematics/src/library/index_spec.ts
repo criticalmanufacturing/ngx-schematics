@@ -70,35 +70,35 @@ describe('Generate Library', () => {
 
         `projects/${libraryOptions.name}/metadata/src/lib/metadata.ts`,
         `projects/${libraryOptions.name}/metadata/src/public-api.ts`,
-        `projects/${libraryOptions.name}/metadata/ng-package.json`,
 
         `projects/${libraryOptions.name}/test/unit/tsconfig.json`,
 
         `projects/${libraryOptions.name}/tsconfig.spec.json`,
         `projects/${libraryOptions.name}/tsconfig.lib.json`,
-        `projects/${libraryOptions.name}/tsconfig.lib.prod.json`,
         `projects/${libraryOptions.name}/tsconfig.lib.runtime.json`,
-        `projects/${libraryOptions.name}/ng-package.json`,
         `projects/${libraryOptions.name}/packConfig.json`,
         `projects/${libraryOptions.name}/package.json`,
 
-        `projects/${libraryOptions.name}/.gitignore`,
         `projects/${libraryOptions.name}/README.md`
       ])
     );
   });
 
-  it('should create a package.json having as name the library name', async () => {
+  it('should register the scoped package name and entry points in package.json', async () => {
     const tree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
     const fileContent = getFileContent(tree, `/projects/${libraryOptions.name}/package.json`);
-    expect(fileContent).not.toBeNull();
-    expect(fileContent.name).toMatch(libraryOptions.name);
+    expect(fileContent.name).toBe(`${libraryOptions.namespace}/${libraryOptions.name}`);
+    expect(fileContent.exports).toEqual({
+      '.': './src/public-api-designer.ts',
+      './metadata': './metadata/src/public-api.ts'
+    });
   });
 
   it('should create a tsconfig for library', async () => {
     const tree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
     const fileContent = getFileContent(tree, `/projects/${libraryOptions.name}/tsconfig.lib.json`);
     expect(fileContent).toBeDefined();
+    expect(fileContent.compilerOptions.types).toContain('@angular/localize');
   });
 
   it(`should have a linter in the package.json`, async () => {
@@ -129,7 +129,10 @@ describe('Generate Library', () => {
     const tree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
 
     const workspace = getFileContent(tree, '/angular.json');
-    expect(workspace.projects.testlib).toBeDefined();
+    const { build, test } = workspace.projects.testlib.architect;
+    expect(build.builder).toBe('@angular/build:library');
+    expect(build.options.deleteOutputPath).toBe(false);
+    expect(test.options.exclude).toContain('test/unit/**');
   });
 
   it('should set the prefix to lib if none is set', async () => {
@@ -149,32 +152,44 @@ describe('Generate Library', () => {
     expect(workspace.projects.testlib.prefix).toEqual(prefix);
   });
 
-  it(`should add ng-packagr to devDependencies`, async () => {
+  it('should use the Angular build dependency', async () => {
     const tree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
 
     const packageJson = getFileContent(tree, 'package.json');
-    expect(packageJson.devDependencies['ng-packagr']).toBeDefined();
+    expect(packageJson.devDependencies['@angular/build']).toBeDefined();
+    expect(packageJson.devDependencies.less).toBeDefined();
+    expect(packageJson.dependencies['@angular/localize']).toBeDefined();
+    expect(packageJson.devDependencies['ng-packagr']).toBeUndefined();
   });
 
-  it(`should not modify the file when --skipPackageJson`, async () => {
+  it('should not add Angular build dependencies when --skipPackageJson is set', async () => {
     const namespace = '@testlib';
+    const workspaceTree = await schematicRunner.runExternalSchematic(
+      '@schematics/angular',
+      'workspace',
+      workspaceOptions
+    );
     const tree = await schematicRunner.runSchematic(
       'library',
       { name: 'test-skip-package-json', skipPackageJson: true, namespace: namespace },
-      appTree
+      workspaceTree
     );
 
     const packageJson = getFileContent(tree, 'package.json');
-    expect(packageJson.devDependencies['ng-packagr']).toBeUndefined();
+    expect(packageJson.devDependencies['@angular/build']).toBeUndefined();
+    expect(packageJson.devDependencies.less).toBeUndefined();
+    expect(packageJson.dependencies['@angular/localize']).toBeUndefined();
+    const libTsConfig = getFileContent(tree, 'projects/test-skip-package-json/tsconfig.lib.json');
+    expect(libTsConfig.compilerOptions.types).toContain('@angular/localize');
   });
 
   it(`should add paths mapping to empty tsconfig`, async () => {
     const tree = await schematicRunner.runSchematic('library', libraryOptions, appTree);
 
     const tsConfigJson = getFileContent(tree, 'tsconfig.json');
-    expect(tsConfigJson.compilerOptions.paths[`${libraryOptions.name}`]).toEqual([
-      `./dist/${libraryOptions.name}`
-    ]);
+    expect(tsConfigJson.compilerOptions.paths).toEqual({
+      [libraryOptions.name]: [`./dist/${libraryOptions.name}`]
+    });
   });
 
   it(`should not modify the file when --skipTsConfig`, async () => {

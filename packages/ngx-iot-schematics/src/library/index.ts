@@ -5,23 +5,29 @@ import {
   apply,
   applyTemplates,
   chain,
-  externalSchematic,
   mergeWith,
   move,
   noop,
   schematic,
   url
 } from '@angular-devkit/schematics';
-import { JsonObject, JsonValue, basename, join, normalize } from '@angular-devkit/core';
-import { readWorkspace } from '@schematics/angular/utility';
+import { JsonObject, JsonValue, join, normalize } from '@angular-devkit/core';
+import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 import { input } from '@inquirer/prompts';
-import { JSONFile, relativeToRoot, strings } from '@criticalmanufacturing/schematics-devkit';
+import {
+  JSONFile,
+  LIBRARY_METADATA_ENTRY,
+  LIBRARY_METADATA_ENTRY_FILE_NAME,
+  strings
+} from '@criticalmanufacturing/schematics-devkit';
 import {
   NodeDependencyType,
   removeDirectory,
   installDependencies,
-  updateNgPackageJson,
-  updateTsConfig
+  addLibraryTsTypes,
+  applyLibraryDefaultConfigs,
+  generateAngularLibrary,
+  registerLibraryEntryPoint
 } from '@criticalmanufacturing/schematics-devkit/rules';
 import { Schema } from './schema.js';
 import { updateEslintConfig } from './update-eslint-config.js';
@@ -112,9 +118,15 @@ function updatePackagejson(options: { project: string; name: string }): Rule {
 }
 
 /**
- * IoT Library generator
+ * Adds the IoT designer, runtime and metadata sources to the Angular library scaffold.
+ * @param options Library project name, scoped package name and workspace update options.
  */
-function addIoTLibrary(options: { project: string; skipInstall: boolean; fullname: string }) {
+function addIoTLibrary(options: {
+  project: string;
+  skipInstall: boolean;
+  skipPackageJson?: boolean;
+  fullname: string;
+}) {
   return async (tree: Tree) => {
     const workspace = await readWorkspace(tree);
     const project = workspace.projects.get(options.project);
@@ -123,15 +135,18 @@ function addIoTLibrary(options: { project: string; skipInstall: boolean; fullnam
       throw new SchematicsException(`Project is not defined in this workspace.`);
     }
 
+    const testTarget = project.targets.get('test');
+    if (testTarget) {
+      testTarget.options = { ...testTarget.options, exclude: ['test/unit/**'] };
+      await writeWorkspace(tree, workspace);
+    }
+
     tree.delete(join(normalize(project.root), 'src', 'public-api-designer.ts'));
 
     const templateSource = apply(url('./files'), [
       applyTemplates({
-        ...options,
-        ...strings,
-        entryFile: 'public-api',
-        relativePathToWorkspaceRoot: relativeToRoot(join(normalize(project.root), 'metadata')),
-        metadatatDistRoot: join(basename(normalize(project.root)), 'metadata')
+        fullname: options.fullname,
+        entryFile: LIBRARY_METADATA_ENTRY_FILE_NAME
       }),
       move(join(normalize(project.root)))
     ]);
@@ -159,6 +174,18 @@ function addIoTLibrary(options: { project: string; skipInstall: boolean; fullnam
         project: options.project,
         name: options.fullname
       }),
+      applyLibraryDefaultConfigs({
+        name: options.project,
+        skipInstall: options.skipInstall,
+        skipPackageJson: options.skipPackageJson
+      }),
+      addLibraryTsTypes(options.project, ['@angular/localize']),
+      registerLibraryEntryPoint({
+        project,
+        projectName: options.project,
+        ...LIBRARY_METADATA_ENTRY,
+        skipTsConfig: true
+      }),
       editVsCodeSettings(),
       schematic('task', {
         path: `${sourceDir}/tasks`,
@@ -168,10 +195,6 @@ function addIoTLibrary(options: { project: string; skipInstall: boolean; fullnam
         hasOutputs: false,
         isForProtocol: false
       }),
-      updateTsConfig(
-        [{ path: ['include'], value: ['**/*.ts'], operation: 'replace' }],
-        options.project
-      ),
       updateEslintConfig(options),
       options.skipInstall
         ? noop()
@@ -187,10 +210,13 @@ function addIoTLibrary(options: { project: string; skipInstall: boolean; fullnam
   };
 }
 
+/**
+ * Generates an IoT library using the designer API as the primary Angular entry point.
+ * @param _options Library generation options, including the package namespace for unscoped names.
+ */
 export default function (_options: Schema): Rule {
-  return async (tree: Tree) => {
+  return async () => {
     const entryFile = 'public-api-designer';
-    const workspace = await readWorkspace(tree);
 
     // Retrieve namespace (i.e @criticalmanufacturing/test -> @criticalmanufacturing)
     let namespace = /^@.*\/.*/.test(_options.name)
@@ -210,10 +236,6 @@ export default function (_options: Schema): Rule {
       );
     }
 
-    const lint = ((workspace.extensions.cli as JsonObject)?.schematicCollections as string[])?.find(
-      (x) => ['@angular-eslint/schematics', 'angular-eslint'].includes(x)
-    );
-
     const fullname =
       !/^@.*\/.*/.test(_options.name) && namespace
         ? strings.dasherize(namespace + '/' + _options.name)
@@ -225,15 +247,16 @@ export default function (_options: Schema): Rule {
     delete _options.namespace;
 
     return chain([
-      externalSchematic(lint ?? '@schematics/angular', 'library', {
+      generateAngularLibrary({
         ..._options,
         prefix: _options.prefix ?? strings.dasherize(_options.name),
+        standalone: true,
         entryFile
       }),
-      updateNgPackageJson(_options),
       addIoTLibrary({
         project: _options.name,
         skipInstall: _options.skipInstall ?? false,
+        skipPackageJson: _options.skipPackageJson,
         fullname: fullname
       })
     ]);

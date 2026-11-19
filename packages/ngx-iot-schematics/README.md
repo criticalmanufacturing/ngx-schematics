@@ -88,7 +88,7 @@ ng generate task [name]
 
 ### **library**
 
-Creates a new, generic IoT Tasks Library project in the current workspace
+Creates an IoT tasks library using the workspace's Angular CLI. Angular CLI 22.0 through 22.2 uses `ng-packagr` and `ng-package.json` for the designer build. From 22.3, Angular uses `@angular/build:library` and reads entry points from the library's `package.json` exports.
 
 #### **Arguments:**
 
@@ -98,14 +98,17 @@ Creates a new, generic IoT Tasks Library project in the current workspace
 
 #### **Options:**
 
-| Name                  | Description                                                              | Value Type | Default Value |
-| --------------------- | ------------------------------------------------------------------------ | ---------- | ------------- |
-| `--prefix`            | A prefix to apply to generated selectors.                                | `string`   | `lib`         |
-| `--skip-package-json` | Do not add dependencies to the "package.json" file.                      | `boolean`  | `false`       |
-| `--skip-install`      | Do not install dependency packages.                                      | `boolean`  | `false`       |
-| `--skip-ts-config`    | Do not update "tsconfig.json" to add a path mapping for the new library. | `boolean`  | `false`       |
-| `--skip-metadata`     | Do not generate metadata for the new library.                            | `boolean`  | `false`       |
-| `--namespace`         | The package namespace to use.                                            | `string`   |               |
+| Name                  | Description                                                                        | Value Type | Default Value                       |
+| --------------------- | ---------------------------------------------------------------------------------- | ---------- | ----------------------------------- |
+| `--prefix`            | Prefix for generated selectors.                                                    | `string`   | Library name                        |
+| `--skip-package-json` | Skip adding Angular build dependencies to the workspace `package.json`.            | `boolean`  | `false`                             |
+| `--skip-install`      | Skip automatic package installation.                                               | `boolean`  | `false`                             |
+| `--skip-ts-config`    | Skip adding library path mappings and references to the workspace `tsconfig.json`. | `boolean`  | `false`                             |
+| `--project-root`      | Library directory relative to the workspace root.                                  | `string`   | Workspace `newProjectRoot` and name |
+| `--test-runner`       | Runner for `ng test`. Accepts `vitest` or `karma`. Angular deprecates this option. | `string`   | `vitest`                            |
+| `--namespace`         | Package scope. The scope in a name such as `@scope/my-lib` takes precedence.       | `string`   | Prompt for an unscoped name         |
+
+Run `npm test` from the generated library directory to run the IoT task tests with Mocha. Use `ng test` for Angular specs you add to the library.
 
 #### **Usage:**
 

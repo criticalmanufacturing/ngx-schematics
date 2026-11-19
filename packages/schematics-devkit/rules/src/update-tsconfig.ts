@@ -1,11 +1,13 @@
 import { JsonArray, JsonValue } from '@angular-devkit/core';
 import { Rule, SchematicsException, Tree } from '@angular-devkit/schematics';
-import { readWorkspace } from '@schematics/angular/utility';
+import { AngularBuilder, readWorkspace } from '@schematics/angular/utility';
 import { updateJsonFile } from './update-json-file';
 
 /**
- * Update the root tsconfig.json file with the new configuration
- * @param rules rules to insert
+ * Updates the workspace tsconfig or the build tsconfig of a specified project.
+ * Uses the development configuration when it defines a tsconfig, then the library builder's default tsconfig, then the workspace tsconfig.
+ * @param rules JSON updates to apply.
+ * @param project Optional workspace project name.
  */
 export function updateTsConfig(
   rules: (
@@ -26,9 +28,13 @@ export function updateTsConfig(
         throw new SchematicsException(`Project is not defined in this workspace.`);
       }
 
-      tsConfig =
-        (projectDef.targets.get('build')?.configurations?.development?.tsConfig as
-          string | undefined) ?? tsConfig;
+      const build = projectDef.targets.get('build');
+      const projectTsConfig =
+        build?.configurations?.development?.['tsConfig'] ??
+        (build?.builder === AngularBuilder.BuildLibrary ? build.options?.['tsConfig'] : undefined);
+      if (typeof projectTsConfig === 'string') {
+        tsConfig = projectTsConfig;
+      }
     }
 
     return updateJsonFile(tsConfig, rules);

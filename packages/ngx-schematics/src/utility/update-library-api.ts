@@ -6,31 +6,26 @@ import {
   createSourceFile,
   insertExport,
   ProjectType,
-  JSONFile,
+  getEntryFilePath,
   relative
 } from '@criticalmanufacturing/schematics-devkit';
 
 /**
- * Updates the project public api by adding all the created *.ts files to it.
- * @param project project definition from which the public api will be updated
+ * Re-exports TypeScript files created by the schematic from the library's primary entry point.
+ * @param project Library project whose public API is updated.
  */
 export function updateLibraryAPI(project: ProjectDefinition): Rule {
   return (tree: Tree) => {
-    if (
-      project.extensions['projectType'] !== ProjectType.Library ||
-      !tree.exists(join(normalize(project.root), 'ng-package.json'))
-    ) {
+    if (project.extensions['projectType'] !== ProjectType.Library) {
       return;
     }
 
-    const json = new JSONFile(tree, join(normalize(project.root), 'ng-package.json'));
-    const entryFile = json.get(['lib', 'entryFile']) as string | null;
-
+    const entryFile = getEntryFilePath(tree, project, '');
     if (!entryFile) {
       return;
     }
 
-    const entryDir = join(tree.root.path, dirname(join(normalize(project.root), entryFile)));
+    const entryDir = join(tree.root.path, dirname(normalize(entryFile)));
     const filesToExport = tree.actions
       .filter((action) => action.kind === 'c' && extname(action.path) === '.ts')
       .map((action) => ({
@@ -38,7 +33,7 @@ export function updateLibraryAPI(project: ProjectDefinition): Rule {
         path: action.path
       }));
 
-    const source = createSourceFile(tree, join(normalize(project.root), entryFile));
+    const source = createSourceFile(tree, entryFile);
 
     if (!source) {
       return;
@@ -48,6 +43,6 @@ export function updateLibraryAPI(project: ProjectDefinition): Rule {
       insertExport(source, '', file.relativePath.replace(extname(file.path), ''), true);
     });
 
-    tree.overwrite(join(normalize(project.root), entryFile), source.getFullText());
+    tree.overwrite(entryFile, source.getFullText());
   };
 }

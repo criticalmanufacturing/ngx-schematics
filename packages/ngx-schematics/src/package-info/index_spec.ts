@@ -1,5 +1,6 @@
 import { strings } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { JSONFile } from '@criticalmanufacturing/schematics-devkit';
 
 describe('Generate Package Info', () => {
   const schematicRunner = new SchematicTestRunner(
@@ -34,6 +35,7 @@ describe('Generate Package Info', () => {
   };
 
   const defaultMetadataFilePath = `/projects/${libraryOptions.name}/metadata/src/lib/${libraryOptions.name}-metadata.service.ts`;
+  const libraryManifestPath = `/projects/${libraryOptions.name}/package.json`;
 
   let appTree: UnitTestTree;
 
@@ -115,6 +117,10 @@ describe('Generate Package Info', () => {
 
     tree = await schematicRunner.runSchematic('package-info', packageInfoOptions, tree);
 
+    expect(tree.readText(`/projects/${libraryOptions.name}/src/public-api.ts`)).toContain(
+      `./lib/${converterName}-converter/${converterName}-converter.pipe`
+    );
+
     const converterComponentName = `${strings.classify(converterName)}Converter`;
 
     const metadataContent = tree.readContent(defaultMetadataFilePath);
@@ -123,6 +129,15 @@ describe('Generate Package Info', () => {
     )?.[0];
     expect(packageInfoConverters).not.toBeNull();
     expect(packageInfoConverters).toContain(`'${converterComponentName}'`);
+  });
+
+  it('should reject a library with only a metadata entry point', async () => {
+    const manifest = new JSONFile(appTree, libraryManifestPath);
+    manifest.modify(['exports', '.'], undefined);
+
+    await expect(
+      schematicRunner.runSchematic('package-info', packageInfoOptions, appTree)
+    ).rejects.toThrow(`Project "${libraryOptions.name}" has no primary entry point.`);
   });
 
   it('should generate the package-info having a Component', async () => {
